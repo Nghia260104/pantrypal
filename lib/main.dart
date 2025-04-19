@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:pantrypal/controllers/settings/theme_controller.dart';
 import 'package:pantrypal/core/theme/app_theme.dart';
 import 'package:pantrypal/core/theme/theme_colors.dart';
+import 'package:pantrypal/screens/root.dart';
 
 void main() {
   runApp(MyApp());
@@ -10,6 +11,8 @@ void main() {
 
 class MyApp extends StatelessWidget {
   final ThemeController themeController = Get.put(ThemeController());
+
+  MyApp({super.key});
 
   // This widget is the root of your application.
   // @override
@@ -44,7 +47,7 @@ class MyApp extends StatelessWidget {
             theme: AppTheme.light,
             darkTheme: AppTheme.dark,
             themeMode: themeController.themeMode.value,
-            home: ThemeSwitcherScreen(),
+            home: RootScreen(),
           ));
     }
 }
@@ -52,6 +55,8 @@ class MyApp extends StatelessWidget {
 /// Test screen to test the theme switcher
 class ThemeSwitcherScreen extends StatelessWidget {
   final ThemeController themeController = Get.find<ThemeController>();
+
+  ThemeSwitcherScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
