@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:pantrypal/controllers/settings/theme_controller.dart';
 import 'package:pantrypal/core/theme/app_theme.dart';
 import 'package:pantrypal/core/theme/theme_colors.dart';
-import 'package:pantrypal/screens/root.dart';
+import 'package:pantrypal/screens/root_screen.dart';
 
 void main() {
   runApp(MyApp());

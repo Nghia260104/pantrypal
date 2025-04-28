@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pantrypal/core/strings/strings.dart';
+import 'package:pantrypal/core/theme/theme_colors.dart';
 
 class CustomBottomNavBar extends StatelessWidget {
   final int currentIndex;
@@ -9,15 +10,19 @@ class CustomBottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).extension<ThemeColors>()!;
     return BottomNavigationBar(
       currentIndex: currentIndex,
       onTap: onTap,
       type: BottomNavigationBarType.fixed,
+      backgroundColor: colors.appbarColor,
+      selectedItemColor: colors.selectedNavColor,
+      unselectedItemColor: colors.unselectedNavColor,
       items: [
         BottomNavigationBarItem(
           icon: Icon(
-            Icons.home, 
-            size: 24
+            Icons.home_outlined, 
+            size: 24,
           ),
           label: Strings.home,
         ),
