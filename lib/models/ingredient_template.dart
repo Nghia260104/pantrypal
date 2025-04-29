@@ -1,0 +1,57 @@
+import 'package:hive_ce/hive.dart';
+
+part 'ingredient_template.g.dart';
+
+@HiveType(typeId: 3)
+class IngredientTemplate extends HiveObject {
+  @HiveField(0)
+  final int id;
+
+  @HiveField(1)
+  final String name;
+
+  @HiveField(2)
+  final String defaultUnit;
+
+  @HiveField(3)
+  final double caloriesPerUnit;
+
+  @HiveField(4)
+  final double proteinPerUnit;
+
+  @HiveField(5)
+  final double carbsPerUnit;
+
+  @HiveField(6)
+  final double fatPerUnit;
+
+  IngredientTemplate({
+    required this.id,
+    required this.name,
+    required this.defaultUnit,
+    required this.proteinPerUnit,
+    required this.carbsPerUnit,
+    required this.fatPerUnit,
+  }) : caloriesPerUnit =
+           (4 * proteinPerUnit) + (4 * carbsPerUnit) + (9 * fatPerUnit);
+
+  static const String boxName = 'ingredient_templates';
+
+  /// Creates and stores a new [IngredientTemplate] in Hive.
+  static Future<void> create(IngredientTemplate template) async {
+    final box = Hive.box<IngredientTemplate>(boxName);
+    await box.put(template.id, template);
+  }
+
+  /// Retrieves an [IngredientTemplate] by its [id].
+  static IngredientTemplate? getById(int id) {
+    final box = Hive.box<IngredientTemplate>(boxName);
+    return box.get(id);
+  }
+
+  /// Returns all stored [IngredientTemplate]s.
+  static List<IngredientTemplate> all() {
+    final box = Hive.box<IngredientTemplate>(boxName);
+    return box.values.toList();
+  }
+}

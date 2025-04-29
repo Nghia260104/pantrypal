@@ -85,6 +85,8 @@ class ThemeColors extends ThemeExtension<ThemeColors> {
   final Color backgroundColor;
   final Color appbarColor;
 
+  final Color mainContainerColor;
+
   const ThemeColors({
     required this.customPrimary,
     required this.customBackground,
@@ -148,6 +150,7 @@ class ThemeColors extends ThemeExtension<ThemeColors> {
     required this.highlightedContentColor,
     required this.backgroundColor,
     required this.appbarColor,
+    required this.mainContainerColor,
   });
 
   @override
@@ -214,6 +217,7 @@ class ThemeColors extends ThemeExtension<ThemeColors> {
     Color? highlightedContentColor,
     Color? backgroundColor,
     Color? appbarColor,
+    Color? mainContainerColor,
   }) {
     return ThemeColors(
       customPrimary: customPrimary ?? this.customPrimary,
@@ -278,6 +282,7 @@ class ThemeColors extends ThemeExtension<ThemeColors> {
       highlightedContentColor: highlightedContentColor ?? this.highlightedContentColor,
       backgroundColor: backgroundColor ?? this.backgroundColor,
       appbarColor: appbarColor ?? this.appbarColor,
+      mainContainerColor: mainContainerColor ?? this.mainContainerColor,
     );
   }
 
@@ -347,6 +352,7 @@ class ThemeColors extends ThemeExtension<ThemeColors> {
       highlightedContentColor: Color.lerp(highlightedContentColor, other.highlightedContentColor, t)!,
       backgroundColor: Color.lerp(backgroundColor, other.backgroundColor, t)!,
       appbarColor: Color.lerp(appbarColor, other.appbarColor, t)!,
+      mainContainerColor: Color.lerp(mainContainerColor, other.mainContainerColor, t)!,
     );
   }
 
@@ -406,7 +412,7 @@ class ThemeColors extends ThemeExtension<ThemeColors> {
     favoriteColor: CustomColors.yellow,
     buttonColor: CustomColors.primary500,
     buttonContentColor: CustomColors.neutral50,
-    secondaryButtonColor: CustomColors.neutral50,
+    secondaryButtonColor: CustomColors.neutral0,
     secondaryButtonContentColor: CustomColors.neutral950,
     dangerButtonColor: CustomColors.error,
     dangerButtonContentColor: CustomColors.neutral50,
@@ -415,6 +421,7 @@ class ThemeColors extends ThemeExtension<ThemeColors> {
     highlightedContentColor: CustomColors.neutral50,
     backgroundColor: CustomColors.neutral100,
     appbarColor: CustomColors.neutral0,
+    mainContainerColor: CustomColors.neutral0,
   );
 
   static const dark = ThemeColors(
@@ -481,5 +488,6 @@ class ThemeColors extends ThemeExtension<ThemeColors> {
     highlightedContentColor: Colors.black,
     backgroundColor: Colors.black,
     appbarColor: Colors.black,
+    mainContainerColor: Colors.black,
   );
 }

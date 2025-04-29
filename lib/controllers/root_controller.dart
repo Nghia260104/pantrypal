@@ -8,7 +8,7 @@ class RootController extends GetxController {
 
   void changeTab(int index) {
     clearNavigatorStack(currentNavId.value);
-    
+
     selectedIndex.value = index;
     currentNavId.value = index + 1;
   }
