@@ -60,7 +60,7 @@ class CustomColors {
   static const Color darkPurple = Color(0xffa250ed);
 
   // Yellow color
-  static const Color yellow = Color(0xFFfacc15);
+  static const Color yellow = Color.fromARGB(255, 248, 202, 19);
 
   // Semantic colors
   static const Color success = Color(0xFF22C55E);

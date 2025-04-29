@@ -18,7 +18,7 @@ class HomeScreen extends StatelessWidget {
   ];
 
   final List<String> nutritions = [
-    "Protein", "Carbs", "Fat",
+    "Protein", "", "Carbs", "", "Fat",
   ];
 
   @override
@@ -142,36 +142,35 @@ class HomeScreen extends StatelessWidget {
                         SizedBox(height: 16),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-
-                          children: List.generate(3, (index) {
+                          children: List.generate(5, (index) {
+                            if (index == 1 || index == 3) {
+                              return SizedBox(width: 16,);
+                            }
                             return Expanded(
-                              child: Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 8),
-                                child: RoundedBox(
-                                  color: (index == 0 ? colors.proteinDisplayColor : 
-                                  (index == 1 ? colors.carbsDisplayColor : colors.fatDisplayColor)),
-                                  outlineColor: (index == 0 ? colors.proteinDisplayColor : 
-                                  (index == 1 ? colors.carbsDisplayColor : colors.fatDisplayColor)),
-                                  outlineStroke: 0,
-                                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                  child: Column(
-                                    children: [
-                                      Text(
-                                        nutritions[index],
-                                        style: TextStyle(color: colors.hintTextColor),
-                                      ),
-                                      Text(
-                                        "${(index + 1) * 10}g",
-                                        style: TextStyle(color: colors.textPrimaryColor, fontSize: 16, fontWeight: FontWeight.bold),
-                                      ),
-                                      Text(
-                                        "/ ${(index + 1) * 20}g",
-                                        style: TextStyle(color: colors.hintTextColor),
-                                      ),
-                                    ],
-                                  ),
+                              child: RoundedBox(
+                                color: (index == 0 ? colors.proteinDisplayColor : 
+                                (index == 2 ? colors.carbsDisplayColor : colors.fatDisplayColor)),
+                                outlineColor: (index == 0 ? colors.proteinDisplayColor : 
+                                (index == 2 ? colors.carbsDisplayColor : colors.fatDisplayColor)),
+                                outlineStroke: 0,
+                                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                child: Column(
+                                  children: [
+                                    Text(
+                                      nutritions[index],
+                                      style: TextStyle(color: colors.hintTextColor),
+                                    ),
+                                    Text(
+                                      "${(index + 1) * 10}g",
+                                      style: TextStyle(color: colors.textPrimaryColor, fontSize: 16, fontWeight: FontWeight.bold),
+                                    ),
+                                    Text(
+                                      "/ ${(index + 1) * 20}g",
+                                      style: TextStyle(color: colors.hintTextColor),
+                                    ),
+                                  ],
                                 ),
-                              )
+                              ),
                             );
                           }),
                         ),

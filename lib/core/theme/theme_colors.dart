@@ -75,6 +75,8 @@ class ThemeColors extends ThemeExtension<ThemeColors> {
   final Color buttonContentColor;
   final Color secondaryButtonColor;
   final Color secondaryButtonContentColor;
+  final Color dangerButtonColor;
+  final Color dangerButtonContentColor;
 
   final Color highlightedContainerColor;
   final Color highlightedTextColor;
@@ -139,6 +141,8 @@ class ThemeColors extends ThemeExtension<ThemeColors> {
     required this.buttonContentColor,
     required this.secondaryButtonColor,
     required this.secondaryButtonContentColor,
+    required this.dangerButtonColor,
+    required this.dangerButtonContentColor,
     required this.highlightedContainerColor,
     required this.highlightedTextColor,
     required this.highlightedContentColor,
@@ -203,6 +207,8 @@ class ThemeColors extends ThemeExtension<ThemeColors> {
     Color? buttonContentColor,
     Color? secondaryButtonColor,
     Color? secondaryButtonContentColor,
+    Color? dangerButtonColor,
+    Color? dangerButtonContentColor,
     Color? highlightedContainerColor,
     Color? highlightedTextColor,
     Color? highlightedContentColor,
@@ -265,6 +271,8 @@ class ThemeColors extends ThemeExtension<ThemeColors> {
       buttonContentColor: buttonContentColor ?? this.buttonContentColor,
       secondaryButtonColor: secondaryButtonColor ?? this.secondaryButtonColor,
       secondaryButtonContentColor: secondaryButtonContentColor ?? this.secondaryButtonContentColor,
+      dangerButtonColor: dangerButtonColor ?? this.dangerButtonColor,
+      dangerButtonContentColor: dangerButtonContentColor ?? this.dangerButtonContentColor,
       highlightedContainerColor: highlightedContainerColor ?? this.highlightedContainerColor,
       highlightedTextColor: highlightedTextColor ?? this.highlightedTextColor,
       highlightedContentColor: highlightedContentColor ?? this.highlightedContentColor,
@@ -332,6 +340,8 @@ class ThemeColors extends ThemeExtension<ThemeColors> {
       buttonContentColor: Color.lerp(buttonContentColor, other.buttonContentColor, t)!,
       secondaryButtonColor: Color.lerp(secondaryButtonColor, other.secondaryButtonColor, t)!,
       secondaryButtonContentColor: Color.lerp(secondaryButtonContentColor, other.secondaryButtonContentColor, t)!,
+      dangerButtonColor: Color.lerp(dangerButtonColor, other.dangerButtonColor, t)!,
+      dangerButtonContentColor: Color.lerp(dangerButtonContentColor, other.dangerButtonContentColor, t)!,
       highlightedContainerColor: Color.lerp(highlightedContainerColor, other.highlightedContainerColor, t)!,
       highlightedTextColor: Color.lerp(highlightedTextColor, other.highlightedTextColor, t)!,
       highlightedContentColor: Color.lerp(highlightedContentColor, other.highlightedContentColor, t)!,
@@ -398,6 +408,8 @@ class ThemeColors extends ThemeExtension<ThemeColors> {
     buttonContentColor: CustomColors.neutral50,
     secondaryButtonColor: CustomColors.neutral50,
     secondaryButtonContentColor: CustomColors.neutral950,
+    dangerButtonColor: CustomColors.error,
+    dangerButtonContentColor: CustomColors.neutral50,
     highlightedContainerColor: CustomColors.primary500,
     highlightedTextColor: CustomColors.primary500,
     highlightedContentColor: CustomColors.neutral50,
@@ -462,6 +474,8 @@ class ThemeColors extends ThemeExtension<ThemeColors> {
     buttonContentColor: Colors.black,
     secondaryButtonColor: Colors.black,
     secondaryButtonContentColor: Colors.black,
+    dangerButtonColor: Colors.black,
+    dangerButtonContentColor: Colors.black,
     highlightedContainerColor: Colors.black,
     highlightedTextColor: Colors.black,
     highlightedContentColor: Colors.black,

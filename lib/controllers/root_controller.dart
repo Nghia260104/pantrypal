@@ -1,5 +1,4 @@
 import 'package:get/get.dart';
-import 'package:flutter/material.dart';
 
 class RootController extends GetxController {
   // Optional for bottom nav index tracking

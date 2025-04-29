@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 class RoundedBox extends StatelessWidget {
   final Widget? child;
   final double? width;
+  final double? height;
   final EdgeInsets padding;
   final Color? color;
   final Color? outlineColor;
@@ -13,6 +14,7 @@ class RoundedBox extends StatelessWidget {
     Key? key,
     this.child,
     this.width,
+    this.height,
     this.padding = const EdgeInsets.all(8),
     this.color = Colors.white,
     this.outlineColor = Colors.grey,
@@ -24,6 +26,7 @@ class RoundedBox extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: width,
+      height: height,
       padding: padding,
       decoration: BoxDecoration(
         color: color,

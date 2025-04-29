@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pantrypal/screens/ingredients/ingredients_screen.dart';
 import 'package:pantrypal/screens/meal/meal_screen.dart';
 import 'package:pantrypal/screens/place_holder_screen.dart';
 import 'package:pantrypal/widgets/custom_bottom_nav_bar.dart';
@@ -36,7 +37,7 @@ class RootScreen extends StatelessWidget {
               onGenerateRoute: (settings) {
                 return GetPageRoute(
                   settings: settings,
-                  page: () => const PlaceHolderScreen(title: '2',),
+                  page: () => IngredientsScreen(),
                 );
               },
             ),
