@@ -1,5 +1,5 @@
 import 'package:get/get.dart';
-import 'package:flutter/material.dart';
+// import 'package:flutter/material.dart';
 
 class RootController extends GetxController {
   // Optional for bottom nav index tracking
@@ -9,7 +9,7 @@ class RootController extends GetxController {
 
   void changeTab(int index) {
     clearNavigatorStack(currentNavId.value);
-    
+
     selectedIndex.value = index;
     currentNavId.value = index + 1;
   }

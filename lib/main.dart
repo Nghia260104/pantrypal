@@ -4,8 +4,19 @@ import 'package:pantrypal/controllers/settings/theme_controller.dart';
 import 'package:pantrypal/core/theme/app_theme.dart';
 import 'package:pantrypal/core/theme/theme_colors.dart';
 import 'package:pantrypal/screens/root_screen.dart';
+import 'package:pantrypal/models/hive_manager.dart';
 
-void main() {
+import 'package:pantrypal/models/ingredient_template.dart';
+import 'package:pantrypal/models/inventory_item.dart';
+import 'package:pantrypal/models/recipe_ingredient.dart';
+import 'package:pantrypal/models/recipe.dart';
+import 'package:pantrypal/models/meal.dart';
+import 'package:pantrypal/models/enums/meal_type.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await HiveManager.init();
+  await _seedSampleData();
   runApp(MyApp());
 }
 
@@ -40,16 +51,18 @@ class MyApp extends StatelessWidget {
   //     home: const MyHomePage(title: 'Flutter Demo Home Page'),
   //   );
   // }
-    @override
-    Widget build(BuildContext context) {
-      return Obx(() => GetMaterialApp(
-            title: 'Theme Switcher',
-            theme: AppTheme.light,
-            darkTheme: AppTheme.dark,
-            themeMode: themeController.themeMode.value,
-            home: RootScreen(),
-          ));
-    }
+  @override
+  Widget build(BuildContext context) {
+    return Obx(
+      () => GetMaterialApp(
+        title: 'Theme Switcher',
+        theme: AppTheme.light,
+        darkTheme: AppTheme.dark,
+        themeMode: themeController.themeMode.value,
+        home: RootScreen(),
+      ),
+    );
+  }
 }
 
 /// Test screen to test the theme switcher
@@ -61,7 +74,7 @@ class ThemeSwitcherScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).extension<ThemeColors>()!;
-    
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Theme Switcher Screen'),
@@ -69,18 +82,101 @@ class ThemeSwitcherScreen extends StatelessWidget {
       ),
       body: Center(
         child: ElevatedButton(
-            onPressed: () {
-              themeController.toggleTheme();
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: colors.testButtonColor,
-            ),
-            child: Text(
-              'Toggle Theme',
-              style: TextStyle(color: colors.testTextColor),
-            ),
+          onPressed: () {
+            themeController.toggleTheme();
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: colors.testButtonColor,
           ),
+          child: Text(
+            'Toggle Theme',
+            style: TextStyle(color: colors.testTextColor),
+          ),
+        ),
       ),
+    );
+  }
+}
+
+Future<void> _seedSampleData() async {
+  // ----- INGREDIENT TEMPLATES -----
+  if (IngredientTemplate.all().isEmpty) {
+    await IngredientTemplate.create(
+      IngredientTemplate(
+        id: 1,
+        name: 'Egg',
+        defaultUnit: 'piece',
+        proteinPerUnit: 6.0,
+        carbsPerUnit: 0.6,
+        fatPerUnit: 5.3,
+      ),
+    );
+    await IngredientTemplate.create(
+      IngredientTemplate(
+        id: 2,
+        name: 'Bread Slice',
+        defaultUnit: 'slice',
+        proteinPerUnit: 3.0,
+        carbsPerUnit: 15.0,
+        fatPerUnit: 1.0,
+      ),
+    );
+  }
+
+  // ----- INVENTORY -----
+  if (InventoryItem.all().isEmpty) {
+    final eggTemp = IngredientTemplate.getById(1)!;
+    final breadTemp = IngredientTemplate.getById(2)!;
+    await InventoryItem.create(
+      InventoryItem(
+        id: 1,
+        template: eggTemp,
+        quantity: 4,
+        dateAdded: DateTime.now(),
+        expirationDate: DateTime.now().add(Duration(days: 7)),
+      ),
+    );
+    await InventoryItem.create(
+      InventoryItem(
+        id: 2,
+        template: breadTemp,
+        quantity: 6,
+        dateAdded: DateTime.now(),
+        expirationDate: DateTime.now().add(Duration(days: 3)),
+      ),
+    );
+  }
+
+  // ----- RECIPES -----
+  if (Recipe.all().isEmpty) {
+    final eggTemp = IngredientTemplate.getById(1)!;
+    final breadTemp = IngredientTemplate.getById(2)!;
+
+    // “Egg on Toast” recipe
+    final eggOnToast = Recipe(
+      id: 1,
+      name: 'Egg on Toast',
+      instructions: 'Fry egg, toast bread, assemble.',
+      duration: 10,
+      difficulty: 'Easy',
+      briefDescription: 'A classic breakfast staple.',
+      ingredientRequirements: [
+        RecipeIngredient(template: eggTemp, quantity: 1),
+        RecipeIngredient(template: breadTemp, quantity: 2),
+      ],
+    );
+    await Recipe.create(eggOnToast);
+  }
+
+  // ----- MEALS -----
+  if (Meal.all().isEmpty) {
+    final recipe = Recipe.getById(1)!;
+    // Schedule “Egg on Toast” for tomorrow breakfast
+    await Meal.scheduleRecipes(
+      id: 1,
+      recipes: [recipe],
+      dateTime: DateTime.now().add(Duration(days: 1, hours: 8)),
+      type: MealType.Breakfast,
     );
   }
 }
