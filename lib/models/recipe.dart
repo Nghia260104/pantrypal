@@ -56,6 +56,12 @@ class Recipe extends HiveObject {
     return box.values.toList();
   }
 
+  /// Deletes a [Recipe] by its [id].
+  static Future<void> remove(int id) async {
+    final box = Hive.box<Recipe>(boxName);
+    await box.delete(id); // Remove the recipe using its ID as the key
+  }
+
   /// Adds an ingredient to this recipe and saves the change.
   Future<void> addIngredient(RecipeIngredient ingredient) async {
     ingredientRequirements.add(ingredient);

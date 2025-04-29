@@ -48,6 +48,12 @@ class InventoryItem extends HiveObject {
     return box.values.toList();
   }
 
+  /// Deletes an [InventoryItem] by its [id].
+  static Future<void> remove(int id) async {
+    final box = Hive.box<InventoryItem>(boxName);
+    await box.delete(id); // Remove the inventory item using its ID as the key
+  }
+
   /// Computes total nutrition based on [quantity] and its [template]'s values.
   Map<String, double> totals() {
     return {
