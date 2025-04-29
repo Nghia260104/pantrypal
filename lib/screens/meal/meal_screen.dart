@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pantrypal/widgets/rounded_box.dart';
 
-class IngredientsController extends GetxController {
+class MealController extends GetxController {
   var selectedTab = 0.obs;
   var favoriteStatus = <int, bool>{}.obs;
 
@@ -15,8 +15,8 @@ class IngredientsController extends GetxController {
   }
 }
 
-class IngredientsScreen extends StatelessWidget {
-  final IngredientsController controller = Get.put(IngredientsController());
+class MealScreen extends StatelessWidget {
+  final MealController controller = Get.put(MealController());
 
   @override
   Widget build(BuildContext context) {
