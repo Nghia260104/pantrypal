@@ -2,6 +2,7 @@ import 'package:hive_ce/hive.dart';
 import 'recipe.dart';
 import '../models/enums/meal_type.dart';
 import '../models/enums/meal_status.dart';
+import 'hive_manager.dart';
 
 part 'meal.g.dart';
 
@@ -34,11 +35,16 @@ class Meal extends HiveObject {
 
   /// Schedules a new [Meal] and stores it in Hive.
   static Future<Meal> scheduleRecipes({
-    required int id,
+    // required int id,
     required List<Recipe> recipes,
     required DateTime dateTime,
     required MealType type,
   }) async {
+    final box = Hive.box<Meal>(boxName);
+    // Get the next incremental ID
+    final hiveManager = HiveManager();
+    final id = await hiveManager.getNextId('lastMealId');
+
     final meal = Meal(
       id: id,
       type: type,
@@ -46,8 +52,10 @@ class Meal extends HiveObject {
       status: MealStatus.Upcoming,
       recipes: recipes,
     );
-    final box = Hive.box<Meal>(boxName);
+    // Store the Meal in Hive
     await box.put(meal.id, meal);
+
+    // Return the Meal object
     return meal;
   }
 

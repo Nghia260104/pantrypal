@@ -1,5 +1,6 @@
 import 'package:hive_ce/hive.dart';
 import 'enums/notification_type.dart';
+import 'hive_manager.dart';
 
 part 'notification_model.g.dart';
 
@@ -30,9 +31,25 @@ class NotificationModel extends HiveObject {
 
   static const String boxName = 'notifications';
 
-  static Future<void> create(NotificationModel notification) async {
+  static Future<int> create(NotificationModel notification) async {
     final box = Hive.box<NotificationModel>(boxName);
-    await box.put(notification.id, notification);
+
+    // Get the next incremental ID
+    final hiveManager = HiveManager();
+    final id = await hiveManager.getNextId('lastNotificationId');
+
+    // Assign the ID to the notification
+    final newNotification = NotificationModel(
+      id: id,
+      message: notification.message,
+      dateTime: notification.dateTime,
+      type: notification.type,
+      isRead: notification.isRead,
+    );
+
+    await box.put(newNotification.id, newNotification);
+
+    return id;
   }
 
   Future<void> markRead() async {

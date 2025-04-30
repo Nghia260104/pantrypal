@@ -1,6 +1,6 @@
 import 'package:hive_ce/hive.dart';
 import 'ingredient_template.dart';
-
+import 'hive_manager.dart';
 part 'inventory_item.g.dart';
 
 @HiveType(typeId: 4)
@@ -12,7 +12,7 @@ class InventoryItem extends HiveObject {
   final IngredientTemplate template;
 
   @HiveField(2)
-  final double quantity;
+  double quantity;
 
   @HiveField(3)
   final DateTime? expirationDate;
@@ -31,9 +31,40 @@ class InventoryItem extends HiveObject {
   static const String boxName = 'inventory_items';
 
   /// Creates and stores a new [InventoryItem] in Hive.
-  static Future<void> create(InventoryItem item) async {
+  /// If an item with the same [template] and [expirationDate] already exists, it updates the quantity.
+  /// Otherwise, it creates a new inventory item.
+  static Future<int> create(InventoryItem newItem) async {
     final box = Hive.box<InventoryItem>(boxName);
-    await box.put(item.id, item);
+
+    // Get the next incremental ID
+    final hiveManager = HiveManager();
+    final id = await hiveManager.getNextId('lastInventoryItemId');
+
+    // Assign the ID to the new item
+    final newInventoryItem = InventoryItem(
+      id: id,
+      template: newItem.template,
+      quantity: newItem.quantity,
+      expirationDate: newItem.expirationDate,
+      dateAdded: newItem.dateAdded,
+    );
+
+    // Check if an inventory item with the same template and expiration date already exists
+    final matches = box.values.where(
+      (item) =>
+          item.template.id == newInventoryItem.template.id &&
+          item.expirationDate == newInventoryItem.expirationDate,
+    );
+
+    if (matches.isNotEmpty) {
+      final existingItem = matches.first;
+      existingItem.quantity += newInventoryItem.quantity;
+      await existingItem.save();
+    } else {
+      await box.put(newInventoryItem.id, newInventoryItem);
+    }
+
+    return id;
   }
 
   /// Retrieves an [InventoryItem] by its [id].

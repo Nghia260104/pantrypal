@@ -1,5 +1,5 @@
 import 'package:hive_ce/hive.dart';
-
+import 'hive_manager.dart';
 part 'ingredient_template.g.dart';
 
 @HiveType(typeId: 3)
@@ -38,9 +38,26 @@ class IngredientTemplate extends HiveObject {
   static const String boxName = 'ingredient_templates';
 
   /// Creates and stores a new [IngredientTemplate] in Hive.
-  static Future<void> create(IngredientTemplate template) async {
+  static Future<int> create(IngredientTemplate template) async {
     final box = Hive.box<IngredientTemplate>(boxName);
-    await box.put(template.id, template);
+
+    // Get the next incremental ID
+    final hiveManager = HiveManager();
+    final id = await hiveManager.getNextId('lastIngredientTemplateId');
+
+    // Assign the ID to the template
+    final newTemplate = IngredientTemplate(
+      id: id,
+      name: template.name,
+      defaultUnit: template.defaultUnit,
+      proteinPerUnit: template.proteinPerUnit,
+      carbsPerUnit: template.carbsPerUnit,
+      fatPerUnit: template.fatPerUnit,
+    );
+
+    await box.put(newTemplate.id, newTemplate);
+
+    return id;
   }
 
   /// Retrieves an [IngredientTemplate] by its [id].
