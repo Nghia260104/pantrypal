@@ -114,6 +114,78 @@ class IngredientsController extends GetxController {
     if (selectedFilter.value == 'All') {
       return [
         {
+          'section': 'Past its use-by date',
+          'items':
+              items
+                  .where((item) => item['usebyDate'] == true)
+                  .where((item) {
+                    final daysLeft =
+                        item['expirationDate'] != null
+                            ? item['expirationDate'].difference(now).inDays
+                            : 0;
+                    return daysLeft <= 0; // Expired items
+                  })
+                  .map((item) {
+                    return {
+                      ...item,
+                      'status': 'Expired',
+                      'statusColor': 0, // Red
+                    };
+                  })
+                  .toList(),
+        },
+        {
+          'section': 'Less than 3 days left',
+          'items':
+              items
+                  .where((item) => item['usebyDate'] == true)
+                  .where((item) {
+                    final daysLeft =
+                        item['expirationDate'] != null
+                            ? item['expirationDate'].difference(now).inDays
+                            : 0;
+                    return daysLeft > 0 &&
+                        daysLeft <= 3; // Items expiring within 3 days
+                  })
+                  .map((item) {
+                    final daysLeft =
+                        item['expirationDate'] != null
+                            ? item['expirationDate'].difference(now).inDays
+                            : 0;
+                    return {
+                      ...item,
+                      'status': 'Expires in $daysLeft day(s)',
+                      'statusColor': 1, // Yellow
+                    };
+                  })
+                  .toList(),
+        },
+        {
+          'section': '3 or more days left',
+          'items':
+              items
+                  .where((item) => item['usebyDate'] == true)
+                  .where((item) {
+                    final daysLeft =
+                        item['expirationDate'] != null
+                            ? item['expirationDate'].difference(now).inDays
+                            : 0;
+                    return daysLeft > 3; // Items with more than 3 days left
+                  })
+                  .map((item) {
+                    final daysLeft =
+                        item['expirationDate'] != null
+                            ? item['expirationDate'].difference(now).inDays
+                            : 0;
+                    return {
+                      ...item,
+                      'status': 'Expires in $daysLeft day(s)',
+                      'statusColor': 2, // Green
+                    };
+                  })
+                  .toList(),
+        },
+        {
           'section': 'No use-by date',
           'items':
               items.where((item) => item['usebyDate'] == false).map((item) {
@@ -125,66 +197,80 @@ class IngredientsController extends GetxController {
                 };
               }).toList(),
         },
-        {
-          'section': 'Use-by date',
-          'items':
-              items.where((item) => item['usebyDate'] == true).map((item) {
-                final daysLeft =
-                    item['expirationDate'] != null
-                        ? item['expirationDate'].difference(now).inDays
-                        : 0;
-
-                // Determine the color based on days left
-                int statusColor;
-                if (daysLeft > 7) {
-                  statusColor = 2; // Green
-                } else if (daysLeft >= 4 && daysLeft <= 7) {
-                  statusColor = 1; // Yellow
-                } else if (daysLeft >= 0 && daysLeft <= 3) {
-                  statusColor = 0; // Red
-                } else {
-                  statusColor = 0; // Red for expired items
-                }
-
-                return {
-                  ...item,
-                  'status':
-                      daysLeft > 0 ? 'Expires in $daysLeft day(s)' : 'Expired',
-                  'statusColor': statusColor,
-                };
-              }).toList(),
-        },
       ];
     } else if (selectedFilter.value == 'Use-by Date') {
       return [
         {
-          'section': 'Use-by date',
+          'section': 'Past its use-by date',
           'items':
-              items.where((item) => item['usebyDate'] == true).map((item) {
-                final daysLeft =
-                    item['expirationDate'] != null
-                        ? item['expirationDate'].difference(now).inDays
-                        : 0;
-
-                // Determine the color based on days left
-                int statusColor;
-                if (daysLeft > 7) {
-                  statusColor = 2; // Green
-                } else if (daysLeft >= 4 && daysLeft <= 7) {
-                  statusColor = 1; // Yellow
-                } else if (daysLeft >= 0 && daysLeft <= 3) {
-                  statusColor = 0; // Red
-                } else {
-                  statusColor = 0; // Red for expired items
-                }
-
-                return {
-                  ...item,
-                  'status':
-                      daysLeft > 0 ? 'Expires in $daysLeft day(s)' : 'Expired',
-                  'statusColor': statusColor,
-                };
-              }).toList(),
+              items
+                  .where((item) => item['usebyDate'] == true)
+                  .where((item) {
+                    final daysLeft =
+                        item['expirationDate'] != null
+                            ? item['expirationDate'].difference(now).inDays
+                            : 0;
+                    return daysLeft <= 0; // Expired items
+                  })
+                  .map((item) {
+                    return {
+                      ...item,
+                      'status': 'Expired',
+                      'statusColor': 0, // Red
+                    };
+                  })
+                  .toList(),
+        },
+        {
+          'section': 'Less than 3 days left',
+          'items':
+              items
+                  .where((item) => item['usebyDate'] == true)
+                  .where((item) {
+                    final daysLeft =
+                        item['expirationDate'] != null
+                            ? item['expirationDate'].difference(now).inDays
+                            : 0;
+                    return daysLeft > 0 &&
+                        daysLeft <= 3; // Items expiring within 3 days
+                  })
+                  .map((item) {
+                    final daysLeft =
+                        item['expirationDate'] != null
+                            ? item['expirationDate'].difference(now).inDays
+                            : 0;
+                    return {
+                      ...item,
+                      'status': 'Expires in $daysLeft day(s)',
+                      'statusColor': 1, // yellow
+                    };
+                  })
+                  .toList(),
+        },
+        {
+          'section': '3 or more days left',
+          'items':
+              items
+                  .where((item) => item['usebyDate'] == true)
+                  .where((item) {
+                    final daysLeft =
+                        item['expirationDate'] != null
+                            ? item['expirationDate'].difference(now).inDays
+                            : 0;
+                    return daysLeft > 3; // Items with more than 3 days left
+                  })
+                  .map((item) {
+                    final daysLeft =
+                        item['expirationDate'] != null
+                            ? item['expirationDate'].difference(now).inDays
+                            : 0;
+                    return {
+                      ...item,
+                      'status': 'Expires in $daysLeft day(s)',
+                      'statusColor': 2, // Green
+                    };
+                  })
+                  .toList(),
         },
       ];
     } else if (selectedFilter.value == 'No use-by') {
