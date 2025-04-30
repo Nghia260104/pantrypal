@@ -16,7 +16,7 @@ import 'package:pantrypal/models/enums/meal_type.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await HiveManager.init();
-  await _seedSampleData();
+  // await _seedSampleData();
   runApp(MyApp());
 }
 
@@ -173,7 +173,6 @@ Future<void> _seedSampleData() async {
     final recipe = Recipe.getById(1)!;
     // Schedule “Egg on Toast” for tomorrow breakfast
     await Meal.scheduleRecipes(
-      id: 1,
       recipes: [recipe],
       dateTime: DateTime.now().add(Duration(days: 1, hours: 8)),
       type: MealType.Breakfast,

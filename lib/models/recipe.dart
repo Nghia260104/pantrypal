@@ -1,4 +1,5 @@
 import 'package:hive_ce/hive.dart';
+import 'hive_manager.dart';
 import 'recipe_ingredient.dart';
 
 part 'recipe.g.dart';
@@ -39,9 +40,27 @@ class Recipe extends HiveObject {
   static const String boxName = 'recipes';
 
   /// Creates and stores a new [Recipe] in Hive.
-  static Future<void> create(Recipe recipe) async {
+  static Future<int> create(Recipe recipe) async {
     final box = Hive.box<Recipe>(boxName);
-    await box.put(recipe.id, recipe);
+
+    // Get the next incremental ID
+    final hiveManager = HiveManager();
+    final id = await hiveManager.getNextId('lastRecipeId');
+
+    // Assign the ID to the recipe
+    final newRecipe = Recipe(
+      id: id,
+      name: recipe.name,
+      instructions: recipe.instructions,
+      duration: recipe.duration,
+      difficulty: recipe.difficulty,
+      briefDescription: recipe.briefDescription,
+      ingredientRequirements: recipe.ingredientRequirements,
+    );
+
+    await box.put(newRecipe.id, newRecipe);
+
+    return id;
   }
 
   /// Retrieves a [Recipe] by its [id].

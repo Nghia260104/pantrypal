@@ -1,5 +1,6 @@
 import 'package:hive_ce/hive.dart';
 import 'ingredient_template.dart';
+import 'hive_manager.dart';
 import 'cart_item.dart';
 
 part 'shopping_cart.g.dart';
@@ -22,6 +23,25 @@ class ShoppingCart extends HiveObject {
   });
 
   static const String boxName = 'shopping_carts';
+
+  static Future<int> create(ShoppingCart cart) async {
+    final box = Hive.box<ShoppingCart>(boxName);
+
+    // Get the next incremental ID
+    final hiveManager = HiveManager();
+    final id = await hiveManager.getNextId('lastShoppingCartId');
+
+    // Assign the ID to the cart
+    final newCart = ShoppingCart(
+      id: id,
+      createdDate: cart.createdDate,
+      items: cart.items,
+    );
+
+    await box.put(newCart.id, newCart);
+
+    return id;
+  }
 
   static Future<ShoppingCart> getCart({int id = 0}) async {
     final box = Hive.box<ShoppingCart>(boxName);
