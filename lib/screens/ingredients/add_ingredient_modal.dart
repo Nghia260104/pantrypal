@@ -26,7 +26,10 @@ class AddIngredientModal extends StatelessWidget {
       },
       child: Dialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        child: SingleChildScrollView(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(context).size.height * 0.7, // Limit modal height to 80% of screen height
+          ),
           child: Container(
             padding: const EdgeInsets.all(16),
             child: Column(
@@ -78,6 +81,7 @@ class AddIngredientModal extends StatelessWidget {
                                       ? colors.buttonContentColor
                                       : colors.hintTextColor,
                                 ),
+                                textAlign: TextAlign.center,
                               ),
                             ),
                           ),
@@ -97,7 +101,7 @@ class AddIngredientModal extends StatelessWidget {
                             ),
                             child: Center(
                               child: Text(
-                                'Create New Type',
+                                'Create Type',
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
@@ -105,6 +109,7 @@ class AddIngredientModal extends StatelessWidget {
                                       ? colors.buttonContentColor
                                       : colors.hintTextColor,
                                 ),
+                                textAlign: TextAlign.center,
                               ),
                             ),
                           ),
@@ -115,12 +120,16 @@ class AddIngredientModal extends StatelessWidget {
                 }),
                 const SizedBox(height: 16),
 
-                // Tab Content
-                Obx(() {
-                  return selectedTab.value == 0
-                      ? _buildAddToPantryContent(context, colors)
-                      : _buildCreateNewTypeContent(context, colors);
-                }),
+                // Scrollable Content
+                Flexible(
+                  child: SingleChildScrollView(
+                    child: Obx(() {
+                      return selectedTab.value == 0
+                          ? _buildAddToPantryContent(context, colors)
+                          : _buildCreateTypeContent(context, colors);
+                    }),
+                  ),
+                ),
               ],
             ),
           ),
@@ -273,7 +282,7 @@ class AddIngredientModal extends StatelessWidget {
   }
 
   // Content for "Create New Type" Tab
-  Widget _buildCreateNewTypeContent(BuildContext context, ThemeColors colors) {
+  Widget _buildCreateTypeContent(BuildContext context, ThemeColors colors) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

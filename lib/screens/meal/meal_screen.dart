@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pantrypal/controllers/root_controller.dart';
 import 'package:pantrypal/core/theme/theme_colors.dart';
+import 'package:pantrypal/screens/meal/create_recipe_screen.dart';
 import 'package:pantrypal/screens/meal/meal_detail_screen.dart';
 import 'package:pantrypal/widgets/rounded_box.dart';
 import 'package:pantrypal/controllers/meal/meal_controller.dart';
@@ -230,6 +231,7 @@ class MealScreen extends StatelessWidget {
                   child: FloatingActionButton(
                     onPressed: () {
                       // Handle add button press
+                      Get.to(CreateRecipeScreen(), id: rootController.currentNavId.value);
                     },
                     backgroundColor: colors.buttonColor,
                     child: Icon(Icons.add, color: colors.buttonContentColor),

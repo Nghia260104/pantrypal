@@ -20,6 +20,10 @@ class CustomDropdownButton extends StatelessWidget {
   final Color iconColor;
   final EdgeInsets padding;
 
+  // New property for enabling/disabling the dropdown
+  final bool isEnabled;
+  final Color disabledColor;
+
   CustomDropdownButton({
     super.key,
     required this.selectedValue,
@@ -35,13 +39,16 @@ class CustomDropdownButton extends StatelessWidget {
     this.selectedColor = Colors.blue,
     this.outlineStroke = 1,
     this.iconColor = Colors.black,
-    this.padding = const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+    this.padding = const EdgeInsets.only(left: 16, right: 4, top: 12, bottom: 12),
+    this.isEnabled = true, // Default to enabled
+    this.disabledColor = Colors.grey, // Default disabled color
   });
 
   final RxBool isDropdownOpen = false.obs; // Reactive variable for dropdown open/close state
   final Rx<OverlayEntry?> overlayEntry = Rx<OverlayEntry?>(null); // Reactive OverlayEntry
 
   void _toggleDropdown(BuildContext context) {
+    if (!isEnabled) return; // Do nothing if disabled
     if (isDropdownOpen.value) {
       _closeDropdown();
     } else {
@@ -50,6 +57,8 @@ class CustomDropdownButton extends StatelessWidget {
   }
 
   void _openDropdown(BuildContext context) {
+    if (!isEnabled) return; // Do nothing if disabled
+
     final RenderBox renderBox = context.findRenderObject() as RenderBox;
     final Offset offset = renderBox.localToGlobal(Offset.zero);
     final Size size = renderBox.size;
@@ -113,6 +122,7 @@ class CustomDropdownButton extends StatelessWidget {
                                   : buttonColor),
                               child: InkWell(
                                 onTap: () {
+                                  if (!isEnabled) return; // Do nothing if disabled
                                   selectedValue.value = item; // Update selected value
                                   onChanged(item); // Trigger callback
                                   _closeDropdown(); // Close dropdown
@@ -168,20 +178,28 @@ class CustomDropdownButton extends StatelessWidget {
           width: width,
           height: height,
           padding: padding,
-          outlineColor: outlineColor,
+          outlineColor: isEnabled ? outlineColor : outlineColor.withAlpha(50), // Dim outline when disabled
           outlineStroke: outlineStroke,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                selectedValue.value,
-                style: textStyle ??
-                    TextStyle(
-                      fontSize: 16,
-                      color: textColor,
-                    ),
+              // Wrap the Text widget in Expanded to prevent overflow
+              Expanded(
+                child: Text(
+                  selectedValue.value,
+                  style: textStyle ??
+                      TextStyle(
+                        fontSize: 16,
+                        color: isEnabled ? textColor : disabledColor, // Dim text when disabled
+                      ),
+                  overflow: TextOverflow.ellipsis, // Add ellipsis for overflowed text
+                  maxLines: 1, // Ensure the text is limited to one line
+                ),
               ),
-              Icon(Icons.arrow_drop_down, color: iconColor),
+              Icon(
+                Icons.arrow_drop_down,
+                color: isEnabled ? iconColor : iconColor.withAlpha(100), // Dim icon when disabled
+              ),
             ],
           ),
         ),
