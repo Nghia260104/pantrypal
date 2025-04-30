@@ -86,6 +86,7 @@ class ThemeColors extends ThemeExtension<ThemeColors> {
   final Color appbarColor;
 
   final Color mainContainerColor;
+  final Color imagePickerColor;
 
   const ThemeColors({
     required this.customPrimary,
@@ -151,6 +152,7 @@ class ThemeColors extends ThemeExtension<ThemeColors> {
     required this.backgroundColor,
     required this.appbarColor,
     required this.mainContainerColor,
+    required this.imagePickerColor,
   });
 
   @override
@@ -218,6 +220,7 @@ class ThemeColors extends ThemeExtension<ThemeColors> {
     Color? backgroundColor,
     Color? appbarColor,
     Color? mainContainerColor,
+    Color? imagePickerColor,
   }) {
     return ThemeColors(
       customPrimary: customPrimary ?? this.customPrimary,
@@ -283,6 +286,7 @@ class ThemeColors extends ThemeExtension<ThemeColors> {
       backgroundColor: backgroundColor ?? this.backgroundColor,
       appbarColor: appbarColor ?? this.appbarColor,
       mainContainerColor: mainContainerColor ?? this.mainContainerColor,
+      imagePickerColor: imagePickerColor ?? this.imagePickerColor,
     );
   }
 
@@ -353,6 +357,7 @@ class ThemeColors extends ThemeExtension<ThemeColors> {
       backgroundColor: Color.lerp(backgroundColor, other.backgroundColor, t)!,
       appbarColor: Color.lerp(appbarColor, other.appbarColor, t)!,
       mainContainerColor: Color.lerp(mainContainerColor, other.mainContainerColor, t)!,
+      imagePickerColor: Color.lerp(imagePickerColor, other.imagePickerColor, t)!,
     );
   }
 
@@ -422,6 +427,7 @@ class ThemeColors extends ThemeExtension<ThemeColors> {
     backgroundColor: CustomColors.neutral100,
     appbarColor: CustomColors.neutral0,
     mainContainerColor: CustomColors.neutral0,
+    imagePickerColor: CustomColors.neutral200,
   );
 
   static const dark = ThemeColors(
@@ -489,5 +495,6 @@ class ThemeColors extends ThemeExtension<ThemeColors> {
     backgroundColor: Colors.black,
     appbarColor: Colors.black,
     mainContainerColor: Colors.black,
+    imagePickerColor: Colors.black,
   );
 }

@@ -22,7 +22,7 @@ class CustomDropdownButton extends StatelessWidget {
 
   // New property for enabling/disabling the dropdown
   final bool isEnabled;
-  final Color disabledColor;
+  final TextStyle? disabledTextStyle;
 
   CustomDropdownButton({
     super.key,
@@ -41,7 +41,7 @@ class CustomDropdownButton extends StatelessWidget {
     this.iconColor = Colors.black,
     this.padding = const EdgeInsets.only(left: 16, right: 4, top: 12, bottom: 12),
     this.isEnabled = true, // Default to enabled
-    this.disabledColor = Colors.grey, // Default disabled color
+    this.disabledTextStyle, // Default disabled color
   });
 
   final RxBool isDropdownOpen = false.obs; // Reactive variable for dropdown open/close state
@@ -187,11 +187,13 @@ class CustomDropdownButton extends StatelessWidget {
               Expanded(
                 child: Text(
                   selectedValue.value,
-                  style: textStyle ??
-                      TextStyle(
-                        fontSize: 16,
-                        color: isEnabled ? textColor : disabledColor, // Dim text when disabled
-                      ),
+                  style: isEnabled
+                      ? textStyle
+                      : (disabledTextStyle ??
+                          TextStyle(
+                            fontSize: 16,
+                            color: Colors.grey, // Dim text when disabled
+                          )),
                   overflow: TextOverflow.ellipsis, // Add ellipsis for overflowed text
                   maxLines: 1, // Ensure the text is limited to one line
                 ),
