@@ -6,10 +6,12 @@ import 'package:pantrypal/models/recipe.dart';
 class MealController extends GetxController {
   /// Now holds recipes, not meals
   final RxList<Recipe> recipes = <Recipe>[].obs;
+  final titles = ["My Meals", "My Recipes", "Favorites"];
 
   // tabs & favorites stay the same
   var selectedTab = 0.obs;
-  var favoriteStatus = <int, bool>{}.obs;
+  var recipeFavoriteStatus = <int, bool>{}.obs;
+  var mealFavoriteStatus = <int, bool>{}.obs;
 
   @override
   void onInit() {
@@ -24,6 +26,9 @@ class MealController extends GetxController {
 
   void toggleTab(int index) => selectedTab.value = index;
 
-  void toggleFavorite(int idx) =>
-      favoriteStatus[idx] = !(favoriteStatus[idx] ?? false);
+  void toggleRecipeFavorite(int idx) =>
+      recipeFavoriteStatus[idx] = !(recipeFavoriteStatus[idx] ?? false);
+
+  void toggleMealFavorite(int idx) =>
+      mealFavoriteStatus[idx] = !(mealFavoriteStatus[idx] ?? false);
 }
