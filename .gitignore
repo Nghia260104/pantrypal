@@ -46,3 +46,8 @@ app.*.map.json
 
 # Ignore generated Dart files
 *.g.dart
+
+# Ignore generated files from the build process
+*.cc 
+*.cmake
+*.swift

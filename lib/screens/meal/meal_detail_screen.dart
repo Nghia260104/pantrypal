@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pantrypal/controllers/root_controller.dart';
+import 'package:pantrypal/controllers/meal/meal_controller.dart';
 import 'package:pantrypal/core/theme/theme_colors.dart';
 import 'package:pantrypal/widgets/rounded_box.dart';
 
@@ -29,12 +30,15 @@ class MealDetailController extends GetxController {
 }
 
 class MealDetailScreen extends StatelessWidget {
+  final int recipeId;
+
+  MealDetailScreen({required this.recipeId});
+
   final MealDetailController controller = Get.put(MealDetailController());
+  final MealController mealController = Get.find<MealController>();
   final RootController rootController = Get.find<RootController>();
-  
-  final List<String> nutritions = [
-    "Protein", "", "Carbs", "", "Fat",
-  ];
+
+  final List<String> nutritions = ["Protein", "", "Carbs", "", "Fat"];
 
   @override
   Widget build(BuildContext context) {
@@ -61,35 +65,43 @@ class MealDetailScreen extends StatelessWidget {
                     width: 40,
                     height: 40,
                     decoration: BoxDecoration(
-                      color: colors.secondaryButtonColor, // Semi-transparent background
+                      color:
+                          colors
+                              .secondaryButtonColor, // Semi-transparent background
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(Icons.arrow_back, color: colors.secondaryButtonContentColor),
+                    child: Icon(
+                      Icons.arrow_back,
+                      color: colors.secondaryButtonContentColor,
+                    ),
                   ),
                 ),
               ),
               Positioned(
                 top: 40,
                 right: 16,
-                child: Obx(() => GestureDetector(
-                  onTap: controller.toggleFavorite,
-                  child: Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: colors.secondaryButtonColor, // Semi-transparent background
-                      shape: BoxShape.circle,
+                child: Obx(() {
+                  final isFavorite =
+                      mealController.favoriteStatus[recipeId] ?? false;
+                  return GestureDetector(
+                    onTap: () => mealController.toggleFavorite(recipeId),
+                    child: Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: colors.secondaryButtonColor,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        isFavorite ? Icons.star : Icons.star_border,
+                        color:
+                            isFavorite
+                                ? colors.favoriteColor
+                                : colors.secondaryButtonContentColor,
+                      ),
                     ),
-                    child: Icon(
-                      controller.isFavorite.value
-                          ? Icons.star // Star icon when true
-                          : Icons.star_border, // Star outline when false
-                      color: controller.isFavorite.value
-                          ? colors.favoriteColor // Yellow when true
-                          : colors.secondaryButtonContentColor, // Black when false
-                    ),
-                  ),
-                )),
+                  );
+                }),
               ),
             ],
           ),
@@ -113,23 +125,26 @@ class MealDetailScreen extends StatelessWidget {
                   SizedBox(height: 8),
                   Text(
                     "This is a description of the meal. It provides details about the meal.",
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: colors.hintTextColor,
-                    ),               
+                    style: TextStyle(fontSize: 16, color: colors.hintTextColor),
                   ),
                   SizedBox(height: 16),
 
                   // Time and Difficulty
                   Row(
                     children: [
-                      Icon(Icons.access_time, color: colors.hintTextColor,),
+                      Icon(Icons.access_time, color: colors.hintTextColor),
                       SizedBox(width: 4),
-                      Text("30 min", style: TextStyle(color: colors.hintTextColor),),
+                      Text(
+                        "30 min",
+                        style: TextStyle(color: colors.hintTextColor),
+                      ),
                       SizedBox(width: 16),
                       Icon(Icons.flatware, color: colors.hintTextColor),
                       SizedBox(width: 4),
-                      Text("Medium", style: TextStyle(color: colors.hintTextColor)),
+                      Text(
+                        "Medium",
+                        style: TextStyle(color: colors.hintTextColor),
+                      ),
                     ],
                   ),
                   SizedBox(height: 16),
@@ -159,47 +174,69 @@ class MealDetailScreen extends StatelessWidget {
                               width: 32, // Reduced width
                               height: 32, // Reduced height
                               decoration: BoxDecoration(
-                                border: Border.all(color: colors.secondaryButtonContentColor.withAlpha(50), width: 1),
+                                border: Border.all(
+                                  color: colors.secondaryButtonContentColor
+                                      .withAlpha(50),
+                                  width: 1,
+                                ),
                                 shape: BoxShape.circle,
                               ),
                               child: IconButton(
-                                icon: Icon(Icons.remove, color: colors.secondaryButtonContentColor, size: 20),
+                                icon: Icon(
+                                  Icons.remove,
+                                  color: colors.secondaryButtonContentColor,
+                                  size: 20,
+                                ),
                                 onPressed: controller.decrementServings,
                                 constraints: BoxConstraints(
                                   minWidth: 32, // Match the container size
                                   minHeight: 32, // Match the container size
                                 ),
-                                padding: EdgeInsets.zero, // Remove extra padding
+                                padding:
+                                    EdgeInsets.zero, // Remove extra padding
                               ),
                             ),
-                            SizedBox(width: 8,),
-                            Obx(() => Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                                  child: Text(
-                                    "${controller.servings.value}",
-                                    style: TextStyle(
-                                      color: colors.textPrimaryColor,
-                                      fontSize: 18,
-                                    ),
+                            SizedBox(width: 8),
+                            Obx(
+                              () => Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                ),
+                                child: Text(
+                                  "${controller.servings.value}",
+                                  style: TextStyle(
+                                    color: colors.textPrimaryColor,
+                                    fontSize: 18,
                                   ),
-                                )),
-                            SizedBox(width: 8,),
+                                ),
+                              ),
+                            ),
+                            SizedBox(width: 8),
                             // Increment Button with Outline
                             Container(
                               width: 32, // Reduced width
                               height: 32, // Reduced height
                               decoration: BoxDecoration(
-                                border: Border.all(color: colors.secondaryButtonContentColor.withAlpha(50), width: 1),
+                                border: Border.all(
+                                  color: colors.secondaryButtonContentColor
+                                      .withAlpha(50),
+                                  width: 1,
+                                ),
                                 shape: BoxShape.circle,
                               ),
                               child: IconButton(
-                                icon: Icon(Icons.add, color: colors.secondaryButtonContentColor, size: 20),
+                                icon: Icon(
+                                  Icons.add,
+                                  color: colors.secondaryButtonContentColor,
+                                  size: 20,
+                                ),
                                 onPressed: controller.incrementServings,
                                 constraints: BoxConstraints(
                                   minWidth: 32, // Match the container size
                                   minHeight: 32, // Match the container size
                                 ),
-                                padding: EdgeInsets.zero, // Remove extra padding
+                                padding:
+                                    EdgeInsets.zero, // Remove extra padding
                               ),
                             ),
                           ],
@@ -256,21 +293,38 @@ class MealDetailScreen extends StatelessWidget {
                             }
                             return Expanded(
                               child: RoundedBox(
-                                color: (index == 0 ? colors.proteinDisplayColor : 
-                                (index == 2 ? colors.carbsDisplayColor : colors.fatDisplayColor)),
-                                outlineColor: (index == 0 ? colors.proteinDisplayColor : 
-                                (index == 2 ? colors.carbsDisplayColor : colors.fatDisplayColor)),
+                                color:
+                                    (index == 0
+                                        ? colors.proteinDisplayColor
+                                        : (index == 2
+                                            ? colors.carbsDisplayColor
+                                            : colors.fatDisplayColor)),
+                                outlineColor:
+                                    (index == 0
+                                        ? colors.proteinDisplayColor
+                                        : (index == 2
+                                            ? colors.carbsDisplayColor
+                                            : colors.fatDisplayColor)),
                                 outlineStroke: 0,
-                                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 4,
+                                ),
                                 child: Column(
                                   children: [
                                     Text(
                                       nutritions[index],
-                                      style: TextStyle(color: colors.hintTextColor),
+                                      style: TextStyle(
+                                        color: colors.hintTextColor,
+                                      ),
                                     ),
                                     Text(
                                       "${(index + 1) * 10}g",
-                                      style: TextStyle(color: colors.textPrimaryColor, fontSize: 16, fontWeight: FontWeight.bold),
+                                      style: TextStyle(
+                                        color: colors.textPrimaryColor,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -284,11 +338,13 @@ class MealDetailScreen extends StatelessWidget {
                   SizedBox(height: 16),
 
                   // Tabs
-                  Obx(() => Row(
+                  Obx(
+                    () => Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: List.generate(2, (index) {
                         final titles = ["Ingredients", "Instructions"];
-                        final isSelected = controller.selectedTab.value == index;
+                        final isSelected =
+                            controller.selectedTab.value == index;
                         return Expanded(
                           child: GestureDetector(
                             onTap: () {
@@ -302,13 +358,22 @@ class MealDetailScreen extends StatelessWidget {
                                   borderRadius: 0,
                                   width: double.infinity,
                                   outlineStroke: 0,
-                                  outlineColor: isSelected ? colors.appbarColor : Colors.transparent,
-                                  color: isSelected ? colors.appbarColor : colors.unselectedSecondaryTabColor,
+                                  outlineColor:
+                                      isSelected
+                                          ? colors.appbarColor
+                                          : Colors.transparent,
+                                  color:
+                                      isSelected
+                                          ? colors.appbarColor
+                                          : colors.unselectedSecondaryTabColor,
                                   child: Center(
                                     child: Text(
                                       titles[index],
                                       style: TextStyle(
-                                        color: isSelected ? colors.selectedNavColor : colors.hintTextColor,
+                                        color:
+                                            isSelected
+                                                ? colors.selectedNavColor
+                                                : colors.hintTextColor,
                                       ),
                                     ),
                                   ),
@@ -362,7 +427,7 @@ class MealDetailScreen extends StatelessWidget {
                                     ],
                                   ),
                                   Divider(),
-                                  SizedBox(height: 8,),
+                                  SizedBox(height: 8),
                                 ],
                               ),
                             ),
@@ -411,7 +476,7 @@ class MealDetailScreen extends StatelessWidget {
                       );
                     }
                   }),
-                  SizedBox(height: 64,),
+                  SizedBox(height: 64),
                 ],
               ),
             ),

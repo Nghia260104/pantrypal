@@ -20,10 +20,24 @@ class MealController extends GetxController {
   void _loadRecipes() {
     // loads all recipes from Hive
     recipes.assignAll(Recipe.all());
+
+    // Populate the favoriteStatus map
+    for (var recipe in recipes) {
+      favoriteStatus[recipe.id] = recipe.isFavorite;
+    }
   }
 
   void toggleTab(int index) => selectedTab.value = index;
 
-  void toggleFavorite(int idx) =>
-      favoriteStatus[idx] = !(favoriteStatus[idx] ?? false);
+  void toggleFavorite(int recipeId) async {
+    // Toggle the favorite status in the map
+    favoriteStatus[recipeId] = !(favoriteStatus[recipeId] ?? false);
+
+    // Find the recipe and toggle its favorite status in Hive
+    final recipe = recipes.firstWhere((r) => r.id == recipeId);
+    await recipe.toggleFavorite();
+
+    // Refresh the recipes list to update the UI
+    recipes.refresh();
+  }
 }

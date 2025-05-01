@@ -27,6 +27,9 @@ class Recipe extends HiveObject {
   @HiveField(6)
   final List<RecipeIngredient> ingredientRequirements;
 
+  @HiveField(7)
+  bool isFavorite; // Mutable attribute for favorite status
+
   Recipe({
     required this.id,
     required this.name,
@@ -35,6 +38,7 @@ class Recipe extends HiveObject {
     required this.difficulty,
     required this.briefDescription,
     required this.ingredientRequirements,
+    this.isFavorite = false, // Default value is false
   });
 
   static const String boxName = 'recipes';
@@ -85,6 +89,11 @@ class Recipe extends HiveObject {
   Future<void> addIngredient(RecipeIngredient ingredient) async {
     ingredientRequirements.add(ingredient);
     await save();
+  }
+
+  Future<void> toggleFavorite() async {
+    isFavorite = !isFavorite; // Toggle the value
+    await save(); // Save the updated state to Hive
   }
 
   /// Returns the list of ingredients.
