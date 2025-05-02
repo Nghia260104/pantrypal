@@ -10,8 +10,11 @@ import 'package:pantrypal/models/ingredient_template.dart';
 import 'package:pantrypal/models/recipe.dart';
 import 'package:pantrypal/models/recipe_ingredient.dart';
 import 'package:pantrypal/widgets/rounded_box.dart';
+import 'package:pantrypal/controllers/ingredients/ingredients_controller.dart';
 
 class CreateRecipeController extends GetxController {
+  final IngredientsController ingredientsController =
+      Get.find<IngredientsController>();
   var selectedImage = Rx<XFile?>(null);
   TextEditingController recipeNameController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
@@ -43,6 +46,11 @@ class CreateRecipeController extends GetxController {
   void onInit() {
     super.onInit();
     loadIngredientTemplates(); // Load ingredient templates on initialization
+
+    ingredientsController.ingredientTemplates.listen((templates) {
+      // Update the ingredient templates when they change
+      loadIngredientTemplates();
+    });
   }
 
   void loadIngredientTemplates() {
@@ -148,7 +156,9 @@ class CreateRecipeController extends GetxController {
           if (templateList == null || templateList.isEmpty) {
             throw Exception("Invalid ingredient template.");
           }
-          final template = templateList[ingredient["unitIndex"].value]; // Get the first template
+          final template =
+              templateList[ingredient["unitIndex"]
+                  .value]; // Get the first template
           final quantity = double.tryParse(ingredient["quantity"].value) ?? 0;
 
           if (quantity <= 0) {
@@ -564,13 +574,22 @@ class CreateRecipeScreen extends StatelessWidget {
                                       selectedValue: name,
                                       items: controller.uniqueIngredientNames,
                                       onChanged: (value) {
-                                          name.value = value;
-                                          var curUnitsList = controller.unitsList[index];
-                                          curUnitsList.clear();
-                                          final curList = controller.ingredientTemplatesMap[value]!;
-                                          for (int i = 0; i < curList.length; i++) {
-                                            curUnitsList.add(curList[i].defaultUnit);
-                                          }
+                                        name.value = value;
+                                        var curUnitsList =
+                                            controller.unitsList[index];
+                                        curUnitsList.clear();
+                                        final curList =
+                                            controller
+                                                .ingredientTemplatesMap[value]!;
+                                        for (
+                                          int i = 0;
+                                          i < curList.length;
+                                          i++
+                                        ) {
+                                          curUnitsList.add(
+                                            curList[i].defaultUnit,
+                                          );
+                                        }
                                       },
                                       textStyle: TextStyle(
                                         color:
@@ -667,10 +686,10 @@ class CreateRecipeScreen extends StatelessWidget {
                                       selectedIndex: unitIndex,
                                       items: controller.unitsList[index],
                                       onChanged: (value) {
-                                          unit.value =
-                                              value;
+                                        unit.value = value;
                                       },
-                                      isEnabled: (name.value != "Ingredient Name"),
+                                      isEnabled:
+                                          (name.value != "Ingredient Name"),
                                       disabledTextStyle: TextStyle(
                                         color: colors.hintTextColor,
                                         fontSize: 16,
