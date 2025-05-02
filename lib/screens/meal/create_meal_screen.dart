@@ -63,9 +63,11 @@ class CreateMealScreen extends StatelessWidget {
                           ? Center(child: Icon(Icons.camera_alt_outlined, size: 50, color: colors.hintTextColor))
                           : ClipRRect(
                               borderRadius: BorderRadius.circular(8),
-                              child: Image.file(
-                                File(controller.selectedImage.value!.path),
-                                fit: BoxFit.cover,
+                              child: Center(
+                                child: Image.file(
+                                  File(controller.selectedImage.value!.path),
+                                  fit: BoxFit.cover,
+                                ),
                               ),
                             ),
                     );
