@@ -30,11 +30,15 @@ class Meal extends HiveObject {
   @HiveField(7)
   double fat = 0;
 
+  @HiveField(8)
+  bool isFavorite; // Mutable attribute for favorite status
+
   Meal({
     required this.id,
     required this.name,
     this.description = "A generic meal. Nothing special.", // Default value
     required this.recipes,
+    this.isFavorite = false, // Default value is false
   });
 
   static const String boxName = 'meals';
@@ -82,10 +86,21 @@ class Meal extends HiveObject {
     return box.values.toList();
   }
 
+  // Add a recipe to the Meal.
+  Future<void> addRecipe(Recipe recipe) async {
+    recipes.add(recipe);
+    await save(); // Persist the change to Hive
+  }
+
   // Delete a [Meal] by its [id].
   static Future<void> remove(int id) async {
     final box = Hive.box<Meal>(boxName);
     await box.delete(id);
+  }
+
+  Future<void> toggleFavorite() async {
+    isFavorite = !isFavorite;
+    await save(); // Persist the change to Hive
   }
 
   /// Computes total nutrition across all recipes and stores the values.

@@ -71,4 +71,10 @@ class IngredientTemplate extends HiveObject {
     final box = Hive.box<IngredientTemplate>(boxName);
     return box.values.toList();
   }
+
+  static String getUnit(int id) {
+    final box = Hive.box<IngredientTemplate>(boxName);
+    final template = box.get(id);
+    return template?.defaultUnit ?? 'unit'; // Default to 'unit' if not found
+  }
 }

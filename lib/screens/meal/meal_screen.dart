@@ -204,7 +204,7 @@ class MealScreen extends StatelessWidget {
                                   ), // Fully rounded corners
                             ),
                             child: Text(
-                              "Label", // The label text
+                              "${recipe.calories.round()} kcal", // The label text
                               style: TextStyle(
                                 color:
                                     colors
@@ -414,7 +414,7 @@ class MealScreen extends StatelessWidget {
                                   ), // Fully rounded corners
                             ),
                             child: Text(
-                              "Label", // The label text
+                              "", // The label text
                               style: TextStyle(
                                 color:
                                     colors

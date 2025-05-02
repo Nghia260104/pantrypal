@@ -38,11 +38,16 @@ class MealDetailScreen extends StatelessWidget {
   final MealController mealController = Get.find<MealController>();
   final RootController rootController = Get.find<RootController>();
 
+  late final recipe;
+
   final List<String> nutritions = ["Protein", "", "Carbs", "", "Fat"];
 
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).extension<ThemeColors>()!;
+    recipe = mealController.recipes.firstWhere(
+      (recipe) => recipe.id == recipeId,
+    );
 
     return Scaffold(
       backgroundColor: colors.backgroundColor,
@@ -115,7 +120,7 @@ class MealDetailScreen extends StatelessWidget {
                 children: [
                   // Meal Title
                   Text(
-                    "Meal Title",
+                    recipe.name,
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -124,7 +129,7 @@ class MealDetailScreen extends StatelessWidget {
                   ),
                   SizedBox(height: 8),
                   Text(
-                    "This is a description of the meal. It provides details about the meal.",
+                    recipe.briefDescription,
                     style: TextStyle(fontSize: 16, color: colors.hintTextColor),
                   ),
                   SizedBox(height: 16),
@@ -135,14 +140,14 @@ class MealDetailScreen extends StatelessWidget {
                       Icon(Icons.access_time, color: colors.hintTextColor),
                       SizedBox(width: 4),
                       Text(
-                        "30 min",
+                        "${recipe.duration} min",
                         style: TextStyle(color: colors.hintTextColor),
                       ),
                       SizedBox(width: 16),
                       Icon(Icons.flatware, color: colors.hintTextColor),
                       SizedBox(width: 4),
                       Text(
-                        "Medium",
+                        recipe.difficulty,
                         style: TextStyle(color: colors.hintTextColor),
                       ),
                     ],
@@ -276,7 +281,7 @@ class MealDetailScreen extends StatelessWidget {
                               ),
                             ),
                             Text(
-                              "200 kcal",
+                              "${recipe.calories.round()} kcal",
                               style: TextStyle(
                                 color: colors.textPrimaryColor,
                                 fontSize: 16,
@@ -319,7 +324,7 @@ class MealDetailScreen extends StatelessWidget {
                                       ),
                                     ),
                                     Text(
-                                      "${(index + 1) * 10}g",
+                                      "${(index == 0 ? recipe.protein : (index == 2 ? recipe.carbs : recipe.fat)).round()} g",
                                       style: TextStyle(
                                         color: colors.textPrimaryColor,
                                         fontSize: 16,
@@ -403,7 +408,7 @@ class MealDetailScreen extends StatelessWidget {
                         children: [
                           Column(
                             children: List.generate(
-                              5,
+                              recipe.ingredientRequirements.length,
                               (index) => Column(
                                 children: [
                                   Row(
@@ -411,14 +416,17 @@ class MealDetailScreen extends StatelessWidget {
                                         MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
-                                        "Ingredient $index",
+                                        recipe
+                                            .ingredientRequirements[index]
+                                            .template
+                                            .name,
                                         style: TextStyle(
                                           fontSize: 18,
                                           color: colors.textPrimaryColor,
                                         ),
                                       ),
                                       Text(
-                                        "100 g",
+                                        "${recipe.ingredientRequirements[index].quantity} ${recipe.ingredientRequirements[index].template.defaultUnit}",
                                         style: TextStyle(
                                           fontSize: 16,
                                           color: colors.hintTextColor,
@@ -453,10 +461,7 @@ class MealDetailScreen extends StatelessWidget {
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            "This is a long description of the instructions. It explains how to prepare the meal step by step.",
-                            textAlign: TextAlign.left,
-                          ),
+                          Text(recipe.instructions, textAlign: TextAlign.left),
                           SizedBox(height: 16),
                           ElevatedButton(
                             onPressed: () {},
