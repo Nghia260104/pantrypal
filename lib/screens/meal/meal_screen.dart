@@ -159,7 +159,7 @@ class MealScreen extends StatelessWidget {
                                                     ), // Fully rounded corners
                                               ),
                                               child: Text(
-                                                "Label", // The label text
+                                                "${recipe.calories.round()} kcal", // The label text
                                                 style: TextStyle(
                                                   color:
                                                       colors
@@ -507,8 +507,7 @@ class MealScreen extends StatelessWidget {
                           CreateRecipeScreen(),
                           id: rootController.currentNavId.value,
                         );
-                      }
-                      else {
+                      } else {
                         Get.to(
                           CreateMealScreen(),
                           id: rootController.currentNavId.value,
