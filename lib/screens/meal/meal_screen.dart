@@ -33,7 +33,6 @@ class MealScreen extends StatelessWidget {
                   () => Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: List.generate(3, (index) {
-                      final titles = ["Suggestions", "My Recipes", "Favorites"];
                       final isSelected = controller.selectedTab.value == index;
                       return Expanded(
                         child: GestureDetector(
@@ -58,7 +57,7 @@ class MealScreen extends StatelessWidget {
                                         : Colors.transparent,
                                 child: Center(
                                   child: Text(
-                                    titles[index],
+                                    controller.titles[index],
                                     style: TextStyle(
                                       color:
                                           isSelected
@@ -86,179 +85,410 @@ class MealScreen extends StatelessWidget {
                 const SizedBox(height: 16),
                 Expanded(
                   child: Obx(() {
-                    final list = controller.recipes;
-                    if (list.isEmpty) {
-                      return Center(
-                        child: Text(
-                          "No recipes available",
-                          style: TextStyle(color: colors.hintTextColor),
-                        ),
-                      );
-                    }
-                    return ListView.builder(
-                      itemCount: list.length,
-                      itemBuilder: (context, index) {
-                        final recipe = list[index];
-
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 8,
+                    if (controller.selectedTab.value != 0) {
+                      final list = controller.recipes;
+                      if (list.isEmpty) {
+                        return Center(
+                          child: Text(
+                            "No recipes available",
+                            style: TextStyle(color: colors.hintTextColor),
                           ),
-                          child: GestureDetector(
-                            onTap: () {
-                              // e.g. navigate to recipe detail
-                              print('Tapped on recipe ${recipe.id}');
-                              Get.to(
-                                MealDetailScreen(recipeId: recipe.id),
-                                id: rootController.currentNavId.value,
-                              );
-                            },
-                            child: RoundedBox(
-                              padding: EdgeInsets.zero,
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(8),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    // IMAGE PLACEHOLDER
-                                    Container(
-                                      height: 150,
-                                      width: double.infinity,
-                                      decoration: BoxDecoration(
-                                        color: colors.hintTextColor,
-                                      ),
-                                    ),
+                        );
+                      }
+                      return ListView.builder(
+                        itemCount: list.length + 1,
+                        itemBuilder: (context, index) {
+                          if (index == list.length) {
+                            return const SizedBox(height: 80);
+                          }
+                          final recipe = list[index];
 
-                                    // INFO PANEL
-                                    RoundedBox(
-                                      color: colors.appbarColor,
-                                      padding: EdgeInsets.zero,
-                                      outlineStroke: 0,
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(16),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            // Title + favorite
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                Text(
-                                                  recipe.name,
-                                                  style: TextStyle(
-                                                    fontWeight: FontWeight.w500,
-                                                    fontSize: 20,
-                                                    color:
-                                                        colors.textPrimaryColor,
-                                                  ),
-                                                ),
-                                                Obx(
-                                                  () => GestureDetector(
-                                                    onTap:
-                                                        () => controller
-                                                            .toggleFavorite(
-                                                              recipe.id,
-                                                            ),
-                                                    child: Icon(
-                                                      controller.favoriteStatus[recipe
-                                                                  .id] ==
-                                                              true
-                                                          ? Icons.star
-                                                          : Icons.star_border,
-                                                      color:
-                                                          controller.favoriteStatus[recipe
-                                                                      .id] ==
-                                                                  true
-                                                              ? colors
-                                                                  .favoriteColor
-                                                              : colors
-                                                                  .hintTextColor,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 8,
+                            ),
+                            child: GestureDetector(
+                              onTap: () {
+                                // e.g. navigate to recipe detail
+                                print('Tapped on recipe ${recipe.id}');
+                                Get.to(
+                                  MealDetailScreen(),
+                                  id: rootController.currentNavId.value,
+                                );
+                              },
+                              child: RoundedBox(
+                                padding: EdgeInsets.zero,
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      // IMAGE PLACEHOLDER
+                                      Stack(
+                                        children: [
+                                          // Image Placeholder
+                                          Container(
+                                            height: 150,
+                                            width: double.infinity,
+                                            decoration: BoxDecoration(
+                                              color: colors.hintTextColor,
                                             ),
-
-                                            const SizedBox(height: 2),
-
-                                            // Brief description
-                                            Text(
-                                              recipe.briefDescription,
-                                              style: TextStyle(
-                                                fontSize: 16,
-                                                color: colors.hintTextColor,
+                                          ),
+                                          // Label in a rounded rectangle
+                                          Positioned(
+                                            top:
+                                                8, // Adjust the vertical position
+                                            right:
+                                                8, // Adjust the horizontal position
+                                            child: Container(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                    horizontal: 16,
+                                                    vertical: 4,
+                                                  ), // Padding inside the label
+                                              decoration: BoxDecoration(
+                                                color:
+                                                    colors
+                                                        .buttonColor, // Background color for the label
+                                                borderRadius:
+                                                    BorderRadius.circular(
+                                                      16,
+                                                    ), // Fully rounded corners
+                                              ),
+                                              child: Text(
+                                                "Label", // The label text
+                                                style: TextStyle(
+                                                  color:
+                                                      colors
+                                                          .buttonContentColor, // Text color
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 14,
+                                                ),
                                               ),
                                             ),
+                                          ),
+                                        ],
+                                      ),
 
-                                            const SizedBox(height: 4),
-
-                                            // Two info boxes: difficulty & duration
-                                            Row(
-                                              children: [
-                                                // Difficulty
-                                                RoundedBox(
-                                                  borderRadius: 32,
-                                                  padding:
-                                                      const EdgeInsets.symmetric(
-                                                        horizontal: 12,
-                                                        vertical: 4,
-                                                      ),
-                                                  child: Text(
-                                                    recipe.difficulty,
+                                      // INFO PANEL
+                                      RoundedBox(
+                                        color: colors.appbarColor,
+                                        padding: EdgeInsets.zero,
+                                        outlineStroke: 0,
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(16),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              // Title + favorite
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Text(
+                                                    recipe.name,
                                                     style: TextStyle(
-                                                      fontSize: 14,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      fontSize: 20,
                                                       color:
                                                           colors
                                                               .textPrimaryColor,
-                                                      fontWeight:
-                                                          FontWeight.w600,
                                                     ),
                                                   ),
-                                                ),
-                                                const SizedBox(width: 8),
-                                                // Duration
-                                                RoundedBox(
-                                                  borderRadius: 32,
-                                                  padding:
-                                                      const EdgeInsets.symmetric(
-                                                        horizontal: 12,
-                                                        vertical: 4,
+                                                  Obx(
+                                                    () => GestureDetector(
+                                                      onTap:
+                                                          () => controller
+                                                              .toggleRecipeFavorite(
+                                                                index,
+                                                              ),
+                                                      child: Icon(
+                                                        controller.recipeFavoriteStatus[index] ==
+                                                                true
+                                                            ? Icons.star
+                                                            : Icons.star_border,
+                                                        color:
+                                                            controller.recipeFavoriteStatus[index] ==
+                                                                    true
+                                                                ? colors
+                                                                    .favoriteColor
+                                                                : colors
+                                                                    .hintTextColor,
                                                       ),
-                                                  child: Text(
-                                                    '${recipe.duration} min',
-                                                    style: TextStyle(
-                                                      fontSize: 14,
-                                                      color:
-                                                          colors
-                                                              .textPrimaryColor,
-                                                      fontWeight:
-                                                          FontWeight.w600,
                                                     ),
                                                   ),
+                                                ],
+                                              ),
+
+                                              const SizedBox(height: 2),
+
+                                              // Brief description
+                                              Text(
+                                                recipe.briefDescription,
+                                                style: TextStyle(
+                                                  fontSize: 16,
+                                                  color: colors.hintTextColor,
                                                 ),
-                                              ],
-                                            ),
-                                          ],
+                                              ),
+
+                                              const SizedBox(height: 4),
+
+                                              // Two info boxes: difficulty & duration
+                                              Row(
+                                                children: [
+                                                  // Difficulty
+                                                  RoundedBox(
+                                                    borderRadius: 32,
+                                                    padding:
+                                                        const EdgeInsets.symmetric(
+                                                          horizontal: 12,
+                                                          vertical: 4,
+                                                        ),
+                                                    child: Text(
+                                                      recipe.difficulty,
+                                                      style: TextStyle(
+                                                        fontSize: 14,
+                                                        color:
+                                                            colors
+                                                                .textPrimaryColor,
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  const SizedBox(width: 8),
+                                                  // Duration
+                                                  RoundedBox(
+                                                    borderRadius: 32,
+                                                    padding:
+                                                        const EdgeInsets.symmetric(
+                                                          horizontal: 12,
+                                                          vertical: 4,
+                                                        ),
+                                                    child: Text(
+                                                      '${recipe.duration} min',
+                                                      style: TextStyle(
+                                                        fontSize: 14,
+                                                        color:
+                                                            colors
+                                                                .textPrimaryColor,
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                        );
-                      },
-                    );
+                          );
+                        },
+                      );
+                    } else {
+                      // final list = [];
+                      // if (list.isEmpty) {
+                      //   return Center(
+                      //     child: Text("No meals available", style: TextStyle(color: colors.hintTextColor)),
+                      //   );
+                      // }
+                      final lengthTest = 3;
+                      return ListView.builder(
+                        itemCount: lengthTest + 1,
+                        itemBuilder: (context, index) {
+                          if (index == lengthTest) {
+                            return const SizedBox(height: 80);
+                          }
+                          // final recipe = list[index];
+
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 8,
+                            ),
+                            child: GestureDetector(
+                              onTap: () {
+                                // e.g. navigate to recipe detail
+                                print('Tapped on meal $index');
+                                // Get.to(MealDetailScreen(), id: rootController.currentNavId.value);
+                              },
+                              child: RoundedBox(
+                                padding: EdgeInsets.zero,
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      // IMAGE PLACEHOLDER
+                                      Stack(
+                                        children: [
+                                          // Image Placeholder
+                                          Container(
+                                            height: 150,
+                                            width: double.infinity,
+                                            decoration: BoxDecoration(
+                                              color: colors.hintTextColor,
+                                            ),
+                                          ),
+                                          // Label in a rounded rectangle
+                                          Positioned(
+                                            top:
+                                                8, // Adjust the vertical position
+                                            right:
+                                                8, // Adjust the horizontal position
+                                            child: Container(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                    horizontal: 16,
+                                                    vertical: 4,
+                                                  ), // Padding inside the label
+                                              decoration: BoxDecoration(
+                                                color:
+                                                    colors
+                                                        .buttonColor, // Background color for the label
+                                                borderRadius:
+                                                    BorderRadius.circular(
+                                                      16,
+                                                    ), // Fully rounded corners
+                                              ),
+                                              child: Text(
+                                                "Label", // The label text
+                                                style: TextStyle(
+                                                  color:
+                                                      colors
+                                                          .buttonContentColor, // Text color
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 14,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+
+                                      // INFO PANEL
+                                      RoundedBox(
+                                        color: colors.appbarColor,
+                                        padding: EdgeInsets.zero,
+                                        outlineStroke: 0,
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(16),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              // Title + favorite
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Text(
+                                                    "We have already died",
+                                                    style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      fontSize: 20,
+                                                      color:
+                                                          colors
+                                                              .textPrimaryColor,
+                                                    ),
+                                                  ),
+                                                  Obx(
+                                                    () => GestureDetector(
+                                                      onTap:
+                                                          () => controller
+                                                              .toggleMealFavorite(
+                                                                index,
+                                                              ),
+                                                      child: Icon(
+                                                        controller.mealFavoriteStatus[index] ==
+                                                                true
+                                                            ? Icons.star
+                                                            : Icons.star_border,
+                                                        color:
+                                                            controller.mealFavoriteStatus[index] ==
+                                                                    true
+                                                                ? colors
+                                                                    .favoriteColor
+                                                                : colors
+                                                                    .hintTextColor,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+
+                                              const SizedBox(height: 2),
+
+                                              // Brief description
+                                              Text(
+                                                "At least we died together",
+                                                style: TextStyle(
+                                                  fontSize: 16,
+                                                  color: colors.hintTextColor,
+                                                ),
+                                              ),
+
+                                              const SizedBox(height: 4),
+
+                                              // "includes" text
+                                              Text(
+                                                "Includes:",
+                                                style: TextStyle(
+                                                  fontSize: 14,
+                                                  color: colors.hintTextColor,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              ),
+                                              const SizedBox(
+                                                width: 8,
+                                              ), // Add spacing between "includes" and recipes list
+                                              // Recipes list
+                                              Text(
+                                                "1001 reasons we die", // Join the recipes into a single string
+                                                style: TextStyle(
+                                                  fontSize: 14,
+                                                  color:
+                                                      colors.textPrimaryColor,
+                                                ),
+                                                maxLines:
+                                                    1, // Limit to one line
+                                                overflow:
+                                                    TextOverflow
+                                                        .ellipsis, // Add ellipsis if text overflows
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      );
+                    }
                   }),
                 ),
               ],
             ),
-            if (controller.selectedTab.value == 1)
+            if (controller.selectedTab.value == 1 ||
+                controller.selectedTab.value == 0)
               Align(
                 alignment: Alignment.bottomRight,
                 child: Padding(
@@ -269,10 +499,12 @@ class MealScreen extends StatelessWidget {
                   child: FloatingActionButton(
                     onPressed: () {
                       // Handle add button press
-                      Get.to(
-                        CreateRecipeScreen(),
-                        id: rootController.currentNavId.value,
-                      );
+                      if (controller.selectedTab.value == 1) {
+                        Get.to(
+                          CreateRecipeScreen(),
+                          id: rootController.currentNavId.value,
+                        );
+                      }
                     },
                     backgroundColor: colors.buttonColor,
                     child: Icon(Icons.add, color: colors.buttonContentColor),
