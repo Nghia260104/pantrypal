@@ -13,9 +13,13 @@ import 'package:pantrypal/widgets/rounded_box.dart';
 
 class CreateRecipeController extends GetxController {
   var selectedImage = Rx<XFile?>(null);
-  var recipeName = ''.obs;
-  var description = ''.obs;
-  var cookingTime = ''.obs;
+  TextEditingController recipeNameController = TextEditingController();
+  TextEditingController descriptionController = TextEditingController();
+  TextEditingController cookingTimeController = TextEditingController();
+  TextEditingController instructionsController = TextEditingController();
+  // var recipeName = ''.obs;
+  // var description = ''.obs;
+  // var cookingTime = ''.obs;
   var difficulty = 'Easy'.obs;
   var ingredients = <Map<String, dynamic>>[].obs;
   var unitsList = <RxList<String>>[].obs;
@@ -85,7 +89,7 @@ class CreateRecipeController extends GetxController {
 
   /// Validates the recipe name.
   bool validateRecipeName() {
-    if (recipeName.value.isEmpty) {
+    if (recipeNameController.text.isEmpty) {
       Get.snackbar("Error", "Recipe name is required.");
       return false;
     }
@@ -125,7 +129,7 @@ class CreateRecipeController extends GetxController {
 
   /// Validates the entire recipe form.
   bool validateRecipeForm() {
-    if (recipeName.value.isEmpty || ingredients.isEmpty) {
+    if (recipeNameController.text.isEmpty || ingredients.isEmpty) {
       Get.snackbar("Error", "Recipe name and ingredients are required.");
       return false;
     }
@@ -159,11 +163,11 @@ class CreateRecipeController extends GetxController {
     // Create and save the recipe
     final newRecipe = Recipe(
       id: 0, // Temporary ID, will be replaced by the database
-      name: recipeName.value,
-      instructions: description.value,
-      duration: int.tryParse(cookingTime.value) ?? 0,
+      name: recipeNameController.text,
+      instructions: instructionsController.text,
+      duration: int.tryParse(cookingTimeController.text) ?? 0,
       difficulty: difficulty.value,
-      briefDescription: description.value,
+      briefDescription: descriptionController.text,
       ingredientRequirements: recipeIngredients,
     );
 
@@ -180,17 +184,17 @@ class CreateRecipeController extends GetxController {
 
     Get.snackbar("Success", "Recipe saved successfully!");
     resetData(); // Reset the form data
-    final RootController rootController = Get.find<RootController>();
-    rootController.handleBack(); // Navigate back to the previous screen
+    // rootController.handleBack(); // Navigate back to the previous screen
 
     return; // Return the ID of the saved recipe
   }
 
   void resetData() {
     selectedImage.value = null;
-    recipeName.value = '';
-    description.value = '';
-    cookingTime.value = '';
+    recipeNameController.text = '';
+    descriptionController.text = '';
+    cookingTimeController.text = '';
+    instructionsController.text = '';
     difficulty.value = 'Easy';
     ingredients.clear();
     unitsList.clear();
@@ -227,7 +231,10 @@ class CreateRecipeScreen extends StatelessWidget {
               right: 8.0,
             ), // Add padding to the right
             child: ElevatedButton(
-              onPressed: controller.saveRecipe, // Save recipe logic,
+              onPressed: () {
+                controller.saveRecipe();
+                rootController.handleBack();
+              }, // Save recipe logic,
               style: ElevatedButton.styleFrom(
                 backgroundColor:
                     colors.buttonColor, // Use buttonColor from ThemeColors
@@ -311,7 +318,8 @@ class CreateRecipeScreen extends StatelessWidget {
                 ),
                 SizedBox(height: 8),
                 TextField(
-                  onChanged: (value) => controller.recipeName.value = value,
+                  // onChanged: (value) => controller.recipeName.value = value,
+                  controller: controller.recipeNameController,
                   decoration: InputDecoration(
                     hintText: "e.g. Spaghetti Bolognese",
                     hintStyle: TextStyle(color: colors.hintTextColor),
@@ -353,7 +361,8 @@ class CreateRecipeScreen extends StatelessWidget {
                 SizedBox(height: 8),
                 TextField(
                   maxLines: 3,
-                  onChanged: (value) => controller.description.value = value,
+                  // onChanged: (value) => controller.description.value = value,
+                  controller: controller.descriptionController,
                   decoration: InputDecoration(
                     hintText: "Briefly describe your recipe",
                     hintStyle: TextStyle(color: colors.hintTextColor),
@@ -398,8 +407,9 @@ class CreateRecipeScreen extends StatelessWidget {
                     Expanded(
                       child: TextField(
                         keyboardType: TextInputType.number,
-                        onChanged:
-                            (value) => controller.cookingTime.value = value,
+                        controller: controller.cookingTimeController,
+                        // onChanged:
+                        //     (value) => controller.cookingTime.value = value,
                         decoration: InputDecoration(
                           hintText: "Time",
                           hintStyle: TextStyle(color: colors.hintTextColor),
@@ -718,6 +728,7 @@ class CreateRecipeScreen extends StatelessWidget {
                 SizedBox(height: 8),
                 TextField(
                   maxLines: 3,
+                  controller: controller.instructionsController,
                   decoration: InputDecoration(
                     hintText: "Instructions",
                     border: OutlineInputBorder(
@@ -753,6 +764,8 @@ class CreateRecipeScreen extends StatelessWidget {
                 ElevatedButton(
                   onPressed: () {
                     // Save recipe logic here
+                    controller.saveRecipe();
+                    rootController.handleBack();
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor:
