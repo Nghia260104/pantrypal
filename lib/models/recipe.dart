@@ -30,6 +30,18 @@ class Recipe extends HiveObject {
   @HiveField(7)
   bool isFavorite; // Mutable attribute for favorite status
 
+  @HiveField(8)
+  double calories = 0;
+
+  @HiveField(9)
+  double protein = 0;
+
+  @HiveField(10)
+  double carbs = 0;
+
+  @HiveField(11)
+  double fat = 0;
+
   Recipe({
     required this.id,
     required this.name,
@@ -99,20 +111,20 @@ class Recipe extends HiveObject {
   /// Returns the list of ingredients.
   List<RecipeIngredient> getIngredients() => ingredientRequirements;
 
-  /// Computes total nutrition across all ingredients.
-  Map<String, double> computeNutrition() {
-    double calories = 0, protein = 0, carbs = 0, fat = 0;
+  /// Computes total nutrition across all ingredients and stores the values.
+  void computeNutrition() {
+    double totalCalories = 0, totalProtein = 0, totalCarbs = 0, totalFat = 0;
     for (var ri in ingredientRequirements) {
-      calories += ri.template.caloriesPerUnit * ri.quantity;
-      protein += ri.template.proteinPerUnit * ri.quantity;
-      carbs += ri.template.carbsPerUnit * ri.quantity;
-      fat += ri.template.fatPerUnit * ri.quantity;
+      totalCalories += ri.template.caloriesPerUnit * ri.quantity;
+      totalProtein += ri.template.proteinPerUnit * ri.quantity;
+      totalCarbs += ri.template.carbsPerUnit * ri.quantity;
+      totalFat += ri.template.fatPerUnit * ri.quantity;
     }
-    return {
-      'calories': calories,
-      'protein': protein,
-      'carbs': carbs,
-      'fat': fat,
-    };
+    calories = totalCalories;
+    protein = totalProtein;
+    carbs = totalCarbs;
+    fat = totalFat;
+
+    save(); // Persist the updated values to Hive
   }
 }

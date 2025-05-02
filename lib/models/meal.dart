@@ -1,7 +1,5 @@
 import 'package:hive_ce/hive.dart';
 import 'recipe.dart';
-import '../models/enums/meal_type.dart';
-import '../models/enums/meal_status.dart';
 import 'hive_manager.dart';
 
 part 'meal.g.dart';
@@ -12,61 +10,65 @@ class Meal extends HiveObject {
   final int id;
 
   @HiveField(1)
-  MealType type;
+  String name;
 
   @HiveField(2)
-  DateTime dateTime;
+  String description;
 
   @HiveField(3)
-  MealStatus status;
+  List<Recipe> recipes;
 
   @HiveField(4)
-  final List<Recipe> recipes;
+  double calories = 0;
+
+  @HiveField(5)
+  double protein = 0;
+
+  @HiveField(6)
+  double carbs = 0;
+
+  @HiveField(7)
+  double fat = 0;
 
   Meal({
     required this.id,
-    required this.type,
-    required this.dateTime,
-    required this.status,
+    required this.name,
+    this.description = "A generic meal. Nothing special.", // Default value
     required this.recipes,
   });
 
   static const String boxName = 'meals';
 
-  /// Schedules a new [Meal] and stores it in Hive.
-  static Future<Meal> scheduleRecipes({
-    // required int id,
-    required List<Recipe> recipes,
-    required DateTime dateTime,
-    required MealType type,
-  }) async {
+  /// Creates and stores a new [Meal] in Hive.
+  static Future<int> create(Meal meal) async {
     final box = Hive.box<Meal>(boxName);
+
     // Get the next incremental ID
     final hiveManager = HiveManager();
     final id = await hiveManager.getNextId('lastMealId');
 
-    final meal = Meal(
+    // Assign the ID to the meal
+    final newMeal = Meal(
       id: id,
-      type: type,
-      dateTime: dateTime,
-      status: MealStatus.Upcoming,
-      recipes: recipes,
+      name: meal.name,
+      description: meal.description,
+      recipes: meal.recipes,
     );
-    // Store the Meal in Hive
-    await box.put(meal.id, meal);
 
-    // Return the Meal object
-    return meal;
+    // Store the Meal in Hive
+    await box.put(newMeal.id, newMeal);
+
+    return id;
   }
 
   /// Returns the list of scheduled recipes.
   List<Recipe> getRecipes() => recipes;
 
   /// Updates the status of this meal and persists the change.
-  Future<void> updateStatus(MealStatus newStatus) async {
-    status = newStatus;
-    await save();
-  }
+  // Future<void> updateStatus(MealStatus newStatus) async {
+  //   status = newStatus;
+  //   await save();
+  // }
 
   /// Retrieves a [Meal] by its [id].
   static Meal? getById(int id) {
@@ -78,5 +80,29 @@ class Meal extends HiveObject {
   static List<Meal> all() {
     final box = Hive.box<Meal>(boxName);
     return box.values.toList();
+  }
+
+  // Delete a [Meal] by its [id].
+  static Future<void> remove(int id) async {
+    final box = Hive.box<Meal>(boxName);
+    await box.delete(id);
+  }
+
+  /// Computes total nutrition across all recipes and stores the values.
+  void computeNutrition() {
+    double totalCalories = 0, totalProtein = 0, totalCarbs = 0, totalFat = 0;
+    for (var recipe in recipes) {
+      recipe.computeNutrition(); // Ensure recipe nutrition is up-to-date
+      totalCalories += recipe.calories;
+      totalProtein += recipe.protein;
+      totalCarbs += recipe.carbs;
+      totalFat += recipe.fat;
+    }
+    calories = totalCalories;
+    protein = totalProtein;
+    carbs = totalCarbs;
+    fat = totalFat;
+
+    save(); // Persist the updated values to Hive
   }
 }

@@ -73,6 +73,21 @@ class InventoryItem extends HiveObject {
     return box.get(id);
   }
 
+  /// Retrieves an inventory item by the ID of its ingredient template.
+  static InventoryItem? getByTemplateId(int templateId) {
+    final box = Hive.box<InventoryItem>(boxName);
+    try {
+      return box.values.firstWhere(
+        (item) => item.template.id == templateId,
+        // if nothing matches, orElse is called. We throw here
+        // so it flows into the catch and returns null.
+        orElse: () => throw StateError('no matching item'),
+      );
+    } on StateError {
+      return null;
+    }
+  }
+
   /// Returns all stored [InventoryItem]s.
   static List<InventoryItem> all() {
     final box = Hive.box<InventoryItem>(boxName);

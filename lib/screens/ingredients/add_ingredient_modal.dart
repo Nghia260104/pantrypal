@@ -32,7 +32,9 @@ class AddIngredientModal extends StatelessWidget {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         child: ConstrainedBox(
           constraints: BoxConstraints(
-            maxHeight: MediaQuery.of(context).size.height * 0.7, // Limit modal height to 80% of screen height
+            maxHeight:
+                MediaQuery.of(context).size.height *
+                0.7, // Limit modal height to 80% of screen height
           ),
           child: Container(
             padding: const EdgeInsets.all(16),
@@ -384,20 +386,18 @@ class AddIngredientModal extends StatelessWidget {
           decoration: BoxDecoration(
             color: colors.secondaryButtonColor,
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: colors.secondaryButtonContentColor.withAlpha(50)),
+            border: Border.all(
+              color: colors.secondaryButtonContentColor.withAlpha(50),
+            ),
           ),
           child: TextField(
             onChanged: (value) => newIngredientName.value = value,
             decoration: InputDecoration(
               border: InputBorder.none,
               hintText: 'Enter ingredient name',
-              hintStyle: TextStyle(
-                color: colors.hintTextColor,
-              )
+              hintStyle: TextStyle(color: colors.hintTextColor),
             ),
-            style: TextStyle(
-              color: colors.textPrimaryColor,
-            ),
+            style: TextStyle(color: colors.textPrimaryColor),
           ),
         ),
         const SizedBox(height: 16),
@@ -444,9 +444,7 @@ class AddIngredientModal extends StatelessWidget {
                       color: colors.secondaryButtonColor,
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
-                        color: colors.secondaryButtonContentColor.withAlpha(
-                          50,
-                        ),
+                        color: colors.secondaryButtonContentColor.withAlpha(50),
                       ),
                     ),
                     child: TextField(
@@ -491,9 +489,7 @@ class AddIngredientModal extends StatelessWidget {
                       color: colors.secondaryButtonColor,
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
-                        color: colors.secondaryButtonContentColor.withAlpha(
-                          50,
-                        ),
+                        color: colors.secondaryButtonContentColor.withAlpha(50),
                       ),
                     ),
                     child: TextField(

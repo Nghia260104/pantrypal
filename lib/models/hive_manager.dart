@@ -1,6 +1,7 @@
 // lib/models/hive_manager.dart
 
 import 'package:hive_ce_flutter/hive_flutter.dart';
+import 'package:pantrypal/models/meal_plan.dart';
 
 // Enums
 import 'enums/meal_type.dart';
@@ -37,12 +38,14 @@ class HiveManager {
     Hive.registerAdapter(NotificationModelAdapter());
     Hive.registerAdapter(CartItemAdapter());
     Hive.registerAdapter(ShoppingCartAdapter());
+    Hive.registerAdapter(MealPlanAdapter());
 
     // 3. Open boxes (using the static boxName from each model)
     await Hive.openBox<IngredientTemplate>(IngredientTemplate.boxName);
     await Hive.openBox<InventoryItem>(InventoryItem.boxName);
     await Hive.openBox<Recipe>(Recipe.boxName);
     await Hive.openBox<Meal>(Meal.boxName);
+    await Hive.openBox<MealPlan>(MealPlan.boxName);
     await Hive.openBox<NotificationModel>(NotificationModel.boxName);
     await Hive.openBox<ShoppingCart>(ShoppingCart.boxName);
 
@@ -127,6 +130,18 @@ class HiveManager {
               ? mealBox.values.map((e) => e.id).reduce((a, b) => a > b ? a : b)
               : 0;
       counterBox.put('lastMealId', lastId);
+    }
+
+    // Initialize counters for MealPlan
+    if (!counterBox.containsKey('lastMealPlanId')) {
+      final mealPlanBox = Hive.box<MealPlan>(MealPlan.boxName);
+      final lastId =
+          mealPlanBox.values.isNotEmpty
+              ? mealPlanBox.values
+                  .map((e) => e.id)
+                  .reduce((a, b) => a > b ? a : b)
+              : 0;
+      counterBox.put('lastMealPlanId', lastId);
     }
   }
 

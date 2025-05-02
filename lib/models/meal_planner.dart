@@ -1,88 +1,111 @@
 import 'package:hive_ce/hive.dart';
 // import 'ingredient_template.dart';
+import 'enums/meal_status.dart';
 import 'inventory_item.dart';
 import 'recipe.dart';
 import 'meal.dart';
+import 'meal_plan.dart';
 import 'shopping_cart.dart';
 import 'notification_model.dart';
 import 'enums/notification_type.dart';
 
 class MealPlanner {
+  /// Checks if a recipe can be made with available inventory.
   bool canMake(Recipe recipe) {
-    final inventory = InventoryItem.all();
-    for (var req in recipe.ingredientRequirements) {
-      final available = inventory
-          .where((item) => item.template.id == req.template.id)
-          .fold<double>(0, (sum, item) => sum + item.quantity);
-      if (available < req.quantity) return false;
+    for (var ingredient in recipe.ingredientRequirements) {
+      final available =
+          InventoryItem.getByTemplateId(ingredient.template.id)?.quantity ?? 0;
+      if (available < ingredient.quantity) {
+        return false;
+      }
     }
     return true;
   }
 
+  /// Generates a shopping list for missing ingredients.
   List<Map<String, dynamic>> shoppingList(Recipe recipe) {
-    final inventory = InventoryItem.all();
-    return recipe.ingredientRequirements
-        .map((req) {
-          final available = inventory
-              .where((item) => item.template.id == req.template.id)
-              .fold<double>(0, (sum, item) => sum + item.quantity);
-          final needed = req.quantity - available;
-          return {'template': req.template, 'needed': needed > 0 ? needed : 0};
-        })
-        .where((entry) => (entry['needed'] as double) > 0)
-        .toList();
-  }
-
-  Future<void> scheduleMeal(Meal meal) async {
-    final box = Hive.box<Meal>(Meal.boxName);
-    await box.put(meal.id, meal);
-  }
-
-  List<InventoryItem> expiringSoon([int days = 3]) {
-    final cutoff = DateTime.now().add(Duration(days: days));
-    return InventoryItem.all()
-        .where(
-          (item) =>
-              item.expirationDate != null &&
-              item.expirationDate!.isBefore(cutoff),
-        )
-        .toList();
-  }
-
-  void notifyExpiry([int days = 3]) {
-    final expiring = expiringSoon(days);
-    for (var item in expiring) {
-      NotificationModel.create(
-        NotificationModel(
-          id: DateTime.now().millisecondsSinceEpoch,
-          message:
-              'Your ${item.template.name} will expire on ${item.expirationDate}',
-          dateTime: DateTime.now(),
-          type: NotificationType.Expiry,
-        ),
-      );
+    final missingIngredients = <Map<String, dynamic>>[];
+    for (var ingredient in recipe.ingredientRequirements) {
+      final available =
+          InventoryItem.getByTemplateId(ingredient.template.id)?.quantity ?? 0;
+      if (available < ingredient.quantity) {
+        missingIngredients.add({
+          'template': ingredient.template,
+          'needed': ingredient.quantity - available,
+        });
+      }
     }
+    return missingIngredients;
   }
 
-  void notifyUpcomingMeal([int minutes = 30]) {
-    final now = DateTime.now();
-    final upcoming = Meal.all().where(
-      (m) =>
-          m.dateTime.isAfter(now) &&
-          m.dateTime.isBefore(now.add(Duration(minutes: minutes))),
+  /// Schedules a MealPlan and handles related tasks.
+  Future<void> schedulePlan(MealPlan mealPlan) async {
+    // Check if all recipes can be made
+    for (var recipe in mealPlan.recipes) {
+      if (!canMake(recipe)) {
+        // Add missing ingredients to the shopping cart
+        final cart = await ShoppingCart.getCart();
+        for (var item in shoppingList(recipe)) {
+          await cart.addItem(item['template'], item['needed']);
+        }
+      }
+    }
+
+    // Save the MealPlan
+    await MealPlan.schedule(
+      recipes: mealPlan.recipes,
+      dateTime: mealPlan.dateTime,
+      type: mealPlan.type,
     );
-    for (var m in upcoming) {
-      NotificationModel.create(
+  }
+
+  /// Returns a list of inventory items expiring soon.
+  List<InventoryItem> expiringSoon({int days = 3}) {
+    final now = DateTime.now();
+    return InventoryItem.all().where((item) {
+      final expirationDate = item.expirationDate;
+      return expirationDate != null &&
+          expirationDate.difference(now).inDays <= days;
+    }).toList();
+  }
+
+  /// Notifies the user about expiring inventory items.
+  Future<void> notifyExpiry({int days = 3}) async {
+    final expiringItems = expiringSoon(days: days);
+    if (expiringItems.isNotEmpty) {
+      await NotificationModel.create(
         NotificationModel(
-          id: DateTime.now().millisecondsSinceEpoch,
-          message: 'Your ${m.type} is starting at ${m.dateTime}',
-          dateTime: now,
-          type: NotificationType.Other,
+          id: 0,
+          message: '${expiringItems.length} items are expiring soon!',
+          dateTime: DateTime.now(),
+          type: NotificationType.ExpiryWarning,
         ),
       );
     }
   }
 
+  /// Notifies the user about upcoming meals.
+  Future<void> notifyUpcomingMeal({int minutes = 30}) async {
+    final now = DateTime.now();
+    final upcomingMeals =
+        MealPlan.all().where((mealPlan) {
+          return mealPlan.dateTime.difference(now).inMinutes <= minutes &&
+              mealPlan.status == MealStatus.Upcoming;
+        }).toList();
+
+    if (upcomingMeals.isNotEmpty) {
+      await NotificationModel.create(
+        NotificationModel(
+          id: 0,
+          message: '${upcomingMeals.length} meals are starting soon!',
+          dateTime: DateTime.now(),
+          type: NotificationType.UpcomingMeal,
+        ),
+      );
+    }
+  }
+
+  /// Retrieves the shopping cart.
   Future<ShoppingCart> getCart() async {
     return await ShoppingCart.getCart();
   }
