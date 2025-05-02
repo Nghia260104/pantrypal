@@ -34,7 +34,7 @@ class AddIngredientModal extends StatelessWidget {
           constraints: BoxConstraints(
             maxHeight:
                 MediaQuery.of(context).size.height *
-                0.7, // Limit modal height to 80% of screen height
+                0.7, // Limit modal height to 70% of screen height
           ),
           child: Container(
             padding: const EdgeInsets.all(16),
