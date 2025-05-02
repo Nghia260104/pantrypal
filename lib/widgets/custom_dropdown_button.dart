@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pantrypal/widgets/rounded_box.dart';
+import 'package:pantrypal/controllers/dropdown_controller.dart';
 
 class CustomDropdownButton extends StatelessWidget {
   final RxString selectedValue; // Reactive variable for the selected value
   final RxInt? selectedIndex;
   final List<String> items; // List of dropdown items
   final Function(String) onChanged; // Callback for value change
+  final dropdownController = Get.find<DropdownController>(); // GetX controller for managing dropdown state
 
   // Customization options
   final double? width;
@@ -162,13 +164,15 @@ class CustomDropdownButton extends StatelessWidget {
       },
     );
 
-    Overlay.of(context).insert(overlayEntry.value!);
+    // Overlay.of(context).insert(overlayEntry.value!);
+    dropdownController.showOverlay(overlayEntry, context);
     isDropdownOpen.value = true;
   }
 
   void _closeDropdown() {
-    overlayEntry.value?.remove();
-    overlayEntry.value = null; // Reset the overlay entry
+    // overlayEntry.value?.remove();
+    // overlayEntry.value = null; // Reset the overlay entry
+    dropdownController.closeOverlay();
     isDropdownOpen.value = false;
   }
 
