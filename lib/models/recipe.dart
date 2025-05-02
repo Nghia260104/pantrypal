@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:hive_ce/hive.dart';
 import 'hive_manager.dart';
 import 'recipe_ingredient.dart';
@@ -73,7 +74,7 @@ class Recipe extends HiveObject {
       briefDescription: recipe.briefDescription,
       ingredientRequirements: recipe.ingredientRequirements,
     );
-
+    newRecipe.computeNutrition(); // Compute nutrition values
     await box.put(newRecipe.id, newRecipe);
 
     return id;

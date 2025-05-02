@@ -57,7 +57,7 @@ class Meal extends HiveObject {
 
     // Store the Meal in Hive
     await box.put(newMeal.id, newMeal);
-
+    newMeal.computeNutrition();
     return id;
   }
 

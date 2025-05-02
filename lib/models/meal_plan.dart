@@ -67,7 +67,7 @@ class MealPlan extends HiveObject {
 
     // Store the MealPlan in Hive
     await box.put(mealPlan.id, mealPlan);
-
+    mealPlan.computeNutrition(); // Compute nutrition after storing
     return mealPlan;
   }
 
