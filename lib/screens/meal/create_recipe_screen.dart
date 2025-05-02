@@ -9,6 +9,7 @@ import 'package:pantrypal/widgets/custom_dropdown_button.dart';
 import 'package:pantrypal/models/ingredient_template.dart';
 import 'package:pantrypal/models/recipe.dart';
 import 'package:pantrypal/models/recipe_ingredient.dart';
+import 'package:pantrypal/widgets/rounded_box.dart';
 
 class CreateRecipeController extends GetxController {
   var selectedImage = Rx<XFile?>(null);
@@ -17,20 +18,22 @@ class CreateRecipeController extends GetxController {
   var cookingTime = ''.obs;
   var difficulty = 'Easy'.obs;
   var ingredients = <Map<String, dynamic>>[].obs;
-  var units =
-      [
-        "g",
-        "kg",
-        "ml",
-        "l",
-        "tbsp",
-        "tsp",
-        "cup",
-        "oz",
-      ].obs; // List of units for ingredients
+  var unitsList = <RxList<String>>[].obs;
+  var ingredientTemplatesMap = <String, List<IngredientTemplate>>{};
+  // var units =
+  //     [
+  //       "g",
+  //       "kg",
+  //       "ml",
+  //       "l",
+  //       "tbsp",
+  //       "tsp",
+  //       "cup",
+  //       "oz",
+  //     ].obs; // List of units for ingredients
 
-  final ingredientTemplates = <IngredientTemplate>[].obs; // Load from database
-  final uniqueIngredientNames = <String>[].obs; // Unique ingredient names
+  final ingredientTemplates = <IngredientTemplate>[]; // Load from database
+  final uniqueIngredientNames = <String>[]; // Unique ingredient names
 
   @override
   void onInit() {
@@ -40,9 +43,12 @@ class CreateRecipeController extends GetxController {
 
   void loadIngredientTemplates() {
     ingredientTemplates.assignAll(IngredientTemplate.all());
-    uniqueIngredientNames.assignAll(
-      ingredientTemplates.map((e) => e.name).toSet().toList(),
-    );
+    // Group ingredient templates by name
+    for (var ingredient in ingredientTemplates) {
+      ingredientTemplatesMap.putIfAbsent(ingredient.name, () => []);
+      ingredientTemplatesMap[ingredient.name]!.add(ingredient);
+    }
+    uniqueIngredientNames.assignAll(ingredientTemplatesMap.keys.toList());
   }
 
   /// Groups ingredient templates by name.
@@ -64,14 +70,17 @@ class CreateRecipeController extends GetxController {
       return;
     }
     ingredients.add({
-      "template": Rx<IngredientTemplate?>(null), // Selected ingredient template
+      "name": "Ingredient Name".obs, // Ingredient name
       "quantity": "".obs, // Default quantity
-      "unit": "".obs, // Selected unit
+      "unit": "Unit".obs, // Selected unit
+      "unitIndex": (-1).obs, // Index of the selected unit
     });
+    unitsList.add(<String>[].obs);
   }
 
   void removeIngredient(int index) {
     ingredients.removeAt(index);
+    unitsList.removeAt(index);
   }
 
   /// Validates the recipe name.
@@ -91,11 +100,17 @@ class CreateRecipeController extends GetxController {
     }
 
     for (var ingredient in ingredients) {
-      final template = ingredient["template"].value as IngredientTemplate?;
+      // final template = ingredient["template"].value as IngredientTemplate?;
       final quantity = double.tryParse(ingredient["quantity"].value) ?? 0;
+      final unitIndex = ingredient["unitIndex"].value;
 
-      if (template == null) {
-        Get.snackbar("Error", "Each ingredient must have a valid template.");
+      // if (template == null) {
+      //   Get.snackbar("Error", "Each ingredient must have a valid template.");
+      //   return false;
+      // }
+
+      if (unitIndex == -1) {
+        Get.snackbar("Error", "Each ingredient must have a valid unit.");
         return false;
       }
 
@@ -124,11 +139,16 @@ class CreateRecipeController extends GetxController {
     // Map ingredients to RecipeIngredient objects
     final recipeIngredients =
         ingredients.map((ingredient) {
-          final template = ingredient["template"].value as IngredientTemplate?;
+          // final template = ingredient["template"].value as IngredientTemplate?;
+          final templateList = ingredientTemplatesMap[ingredient["name"].value];
+          if (templateList == null || templateList.isEmpty) {
+            throw Exception("Invalid ingredient template.");
+          }
+          final template = templateList[ingredient["unitIndex"].value]; // Get the first template
           final quantity = double.tryParse(ingredient["quantity"].value) ?? 0;
 
-          if (template == null || quantity <= 0) {
-            throw Exception("Invalid ingredient data.");
+          if (quantity <= 0) {
+            throw Exception("Invalid ingredient quantity.");
           }
 
           return RecipeIngredient(template: template, quantity: quantity);
@@ -475,11 +495,12 @@ class CreateRecipeScreen extends StatelessWidget {
                           int index = entry.key;
                           Map<String, dynamic> ingredient = entry.value;
 
-                          final Rx<IngredientTemplate?> template =
-                              ingredient["template"];
+                          final RxString name = ingredient["name"];
                           final RxString quantity = ingredient["quantity"];
                           final RxString unit = ingredient["unit"];
-
+                          final RxInt unitIndex = ingredient["unitIndex"];
+                          // final RxInt unitIndex = (-1).obs;
+                          // print(ingredient["unitIndex"]);
                           return Column(
                             children: [
                               Row(
@@ -487,43 +508,73 @@ class CreateRecipeScreen extends StatelessWidget {
                                 children: [
                                   // Ingredient Name Dropdown (Expanded)
                                   Expanded(
-                                    child: DropdownButton<String>(
-                                      value: template.value?.name,
-                                      items:
-                                          controller.uniqueIngredientNames.map((
-                                            name,
-                                          ) {
-                                            return DropdownMenuItem(
-                                              value: name,
-                                              child: Text(name),
-                                            );
-                                          }).toList(),
+                                    // child: DropdownButton<String>(
+                                    //   value: template.value?.name,
+                                    //   items:
+                                    //       controller.uniqueIngredientNames.map((
+                                    //         name,
+                                    //       ) {
+                                    //         return DropdownMenuItem(
+                                    //           value: name,
+                                    //           child: Text(name),
+                                    //         );
+                                    //       }).toList(),
+                                    //   onChanged: (value) {
+                                    //     if (value != null) {
+                                    //       final templates = controller
+                                    //           .getTemplatesByName(value);
+                                    //       template.value = templates.first;
+
+                                    //       // Update the units dynamically
+                                    //       controller.units.assignAll(
+                                    //         templates
+                                    //             .map((t) => t.defaultUnit)
+                                    //             .toSet()
+                                    //             .toList(),
+                                    //       );
+
+                                    //       // Set the default unit to the first one in the list
+                                    //       unit.value = controller.units.first;
+                                    //     }
+                                    //   },
+                                    // ),
+                                    child: CustomDropdownButton(
+                                      selectedValue: name,
+                                      items: controller.uniqueIngredientNames,
                                       onChanged: (value) {
-                                        if (value != null) {
-                                          final templates = controller
-                                              .getTemplatesByName(value);
-                                          template.value = templates.first;
-
-                                          // Update the units dynamically
-                                          controller.units.assignAll(
-                                            templates
-                                                .map((t) => t.defaultUnit)
-                                                .toSet()
-                                                .toList(),
-                                          );
-
-                                          // Set the default unit to the first one in the list
-                                          unit.value = controller.units.first;
-                                        }
+                                          name.value = value;
+                                          var curUnitsList = controller.unitsList[index];
+                                          curUnitsList.clear();
+                                          final curList = controller.ingredientTemplatesMap[value]!;
+                                          for (int i = 0; i < curList.length; i++) {
+                                            curUnitsList.add(curList[i].defaultUnit);
+                                          }
                                       },
+                                      textStyle: TextStyle(
+                                        color:
+                                            colors.secondaryButtonContentColor,
+                                        fontSize: 16,
+                                      ),
+                                      buttonColor: colors.secondaryButtonColor,
+                                      selectedColor: colors.buttonColor,
+                                      selectedText: TextStyle(
+                                        color: colors.buttonContentColor,
+                                        fontSize: 16,
+                                      ),
+                                      outlineColor: colors
+                                          .secondaryButtonContentColor
+                                          .withAlpha(50),
+                                      outlineStroke: 0.5,
                                     ),
                                   ),
                                   SizedBox(width: 8),
 
                                   // Quantity Input (Fixed Width)
-                                  SizedBox(
+                                  RoundedBox(
                                     width: 60,
-                                    height: 48,
+                                    height: 49,
+                                    padding: EdgeInsets.zero,
+                                    color: colors.secondaryButtonColor,
                                     child: TextField(
                                       keyboardType: TextInputType.number,
                                       onChanged: (value) {
@@ -568,7 +619,7 @@ class CreateRecipeScreen extends StatelessWidget {
                                         ),
                                         contentPadding: EdgeInsets.symmetric(
                                           horizontal: 8,
-                                          vertical: 12,
+                                          vertical: 14,
                                         ),
                                         fillColor: colors.secondaryButtonColor,
                                         filled: true,
@@ -591,13 +642,17 @@ class CreateRecipeScreen extends StatelessWidget {
                                     width: 80,
                                     child: CustomDropdownButton(
                                       selectedValue: unit,
-                                      items: controller.units,
+                                      selectedIndex: unitIndex,
+                                      items: controller.unitsList[index],
                                       onChanged: (value) {
-                                        if (value != null) {
                                           unit.value =
-                                              value; // Update the selected unit
-                                        }
+                                              value;
                                       },
+                                      isEnabled: (name.value != "Ingredient Name"),
+                                      disabledTextStyle: TextStyle(
+                                        color: colors.hintTextColor,
+                                        fontSize: 16,
+                                      ),
                                       textStyle: TextStyle(
                                         color:
                                             colors.secondaryButtonContentColor,

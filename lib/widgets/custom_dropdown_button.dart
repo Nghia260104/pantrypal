@@ -4,6 +4,7 @@ import 'package:pantrypal/widgets/rounded_box.dart';
 
 class CustomDropdownButton extends StatelessWidget {
   final RxString selectedValue; // Reactive variable for the selected value
+  final RxInt? selectedIndex;
   final List<String> items; // List of dropdown items
   final Function(String) onChanged; // Callback for value change
 
@@ -27,6 +28,7 @@ class CustomDropdownButton extends StatelessWidget {
   CustomDropdownButton({
     super.key,
     required this.selectedValue,
+    this.selectedIndex,
     required this.items,
     required this.onChanged,
     this.width,
@@ -124,6 +126,7 @@ class CustomDropdownButton extends StatelessWidget {
                                 onTap: () {
                                   if (!isEnabled) return; // Do nothing if disabled
                                   selectedValue.value = item; // Update selected value
+                                  selectedIndex?.value = index; // Update selected index
                                   onChanged(item); // Trigger callback
                                   _closeDropdown(); // Close dropdown
                                 },

@@ -72,7 +72,7 @@ class IngredientsScreen extends StatelessWidget {
                   itemBuilder: (context, index) {
                     if (index == sections.length) {
                       // Add a SizedBox at the end
-                      return const SizedBox(height: 70); // Adjust the height as needed
+                      return const SizedBox(height: 80); // Adjust the height as needed
                     }
 
                     final section = sections[index];
@@ -93,7 +93,7 @@ class IngredientsScreen extends StatelessWidget {
                               padding: const EdgeInsets.symmetric(vertical: 6),
                               child: Container(
                                 decoration: BoxDecoration(
-                                  color: Colors.white,
+                                  color: colors.secondaryButtonColor,
                                   borderRadius: BorderRadius.circular(8.0),
                                   boxShadow: [
                                     BoxShadow(
