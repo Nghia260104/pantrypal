@@ -113,7 +113,7 @@ class MealScreen extends StatelessWidget {
                                 // e.g. navigate to recipe detail
                                 print('Tapped on recipe ${recipe.id}');
                                 Get.to(
-                                  MealDetailScreen(),
+                                  MealDetailScreen(recipeId: recipe.id),
                                   id: rootController.currentNavId.value,
                                 );
                               },
@@ -205,15 +205,17 @@ class MealScreen extends StatelessWidget {
                                                       onTap:
                                                           () => controller
                                                               .toggleRecipeFavorite(
-                                                                index,
+                                                                recipe.id,
                                                               ),
                                                       child: Icon(
-                                                        controller.recipeFavoriteStatus[index] ==
+                                                        controller.recipeFavoriteStatus[recipe
+                                                                    .id] ==
                                                                 true
                                                             ? Icons.star
                                                             : Icons.star_border,
                                                         color:
-                                                            controller.recipeFavoriteStatus[index] ==
+                                                            controller.recipeFavoriteStatus[recipe
+                                                                        .id] ==
                                                                     true
                                                                 ? colors
                                                                     .favoriteColor

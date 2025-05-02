@@ -82,9 +82,9 @@ class MealDetailScreen extends StatelessWidget {
                 right: 16,
                 child: Obx(() {
                   final isFavorite =
-                      mealController.favoriteStatus[recipeId] ?? false;
+                      mealController.recipeFavoriteStatus[recipeId] ?? false;
                   return GestureDetector(
-                    onTap: () => mealController.toggleFavorite(recipeId),
+                    onTap: () => mealController.toggleRecipeFavorite(recipeId),
                     child: Container(
                       width: 40,
                       height: 40,
