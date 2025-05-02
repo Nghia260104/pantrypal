@@ -216,97 +216,81 @@ class AddRecipeToMealModal extends StatelessWidget {
                       separatorBuilder: (_, __) => SizedBox(height: 8),
                       itemBuilder: (context, index) {
                         final recipe = controller.recipes[index];
-                        return Container(
-                          padding: EdgeInsets.only(left: 12, right: 4, top: 12, bottom: 12),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(12),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black12,
-                                blurRadius: 4,
-                                offset: Offset(0, 2),
-                              ),
-                            ],
-                          ),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Expanded(
-                                child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Container(
-                                      width: 50,
-                                      height: 50,
-                                      color: Colors.grey[300],
-                                      margin: const EdgeInsets.only(top: 4.0),
-                                    ),
-                                    SizedBox(width: 12),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            recipe.title,
-                                            maxLines: 2,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                                          ),
-                                          SizedBox(height: 4),
-                                          Text(
-                                            recipe.description,
-                                            maxLines: 2,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: TextStyle(fontSize: 14, color: Colors.grey[600]),
-                                          ),
-                                          SizedBox(height: 8),
-                                          Row(
-                                            children: recipe.tags.map((tag) {
-                                              return Container(
-                                                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 2),
-                                                margin: EdgeInsets.only(right: 8),
-                                                decoration: BoxDecoration(
-                                                  color: colors.secondaryButtonColor,
-                                                  borderRadius: BorderRadius.circular(16),
-                                                  border: Border.all(
-                                                    color: colors.secondaryButtonContentColor.withAlpha(50),
-                                                    width: 1.0,
-                                                  ),
-                                                ),
-                                                child: Text(
-                                                  tag,
-                                                  style: TextStyle(
-                                                    fontSize: 12, 
-                                                    color: colors.secondaryButtonContentColor,
-                                                    fontWeight: FontWeight.w500,
-                                                  ),
-                                                ),
-                                              );
-                                            }).toList(),
-                                          ),
-                                        ],
+                        return GestureDetector(
+                          onTap: () {
+                            controller.addRecipeToMeal(recipe);
+                            // Get.back(); // Close modal after adding
+                          },
+                          child: Container(
+                            padding: EdgeInsets.only(left: 12, right: 4, top: 12, bottom: 12),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black12,
+                                  blurRadius: 4,
+                                  offset: Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  width: 50,
+                                  height: 50,
+                                  color: Colors.grey[300],
+                                  margin: const EdgeInsets.only(top: 4.0),
+                                ),
+                                SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        recipe.title,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                                       ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              ElevatedButton(
-                                onPressed: () => controller.addRecipeToMeal(recipe),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: colors.buttonColor, // Use buttonColor from ThemeColors
-                                  foregroundColor: colors.buttonContentColor, // Use buttonContentColor for text
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8), // Rounded rectangle shape
+                                      SizedBox(height: 4),
+                                      Text(
+                                        recipe.description,
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                                      ),
+                                      SizedBox(height: 8),
+                                      Row(
+                                        children: recipe.tags.map((tag) {
+                                          return Container(
+                                            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+                                            margin: EdgeInsets.only(right: 8),
+                                            decoration: BoxDecoration(
+                                              color: colors.secondaryButtonColor,
+                                              borderRadius: BorderRadius.circular(16),
+                                              border: Border.all(
+                                                color: colors.secondaryButtonContentColor.withAlpha(50),
+                                                width: 1.0,
+                                              ),
+                                            ),
+                                            child: Text(
+                                              tag,
+                                              style: TextStyle(
+                                                fontSize: 12, 
+                                                color: colors.secondaryButtonContentColor,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                          );
+                                        }).toList(),
+                                      ),
+                                    ],
                                   ),
-                                  minimumSize: Size(30, 30), // Adjust horizontal size to make it smaller
-                                  padding: EdgeInsets.zero,
                                 ),
-                                child: Center(
-                                  child: Icon(Icons.add),
-                                ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         );
                       },
