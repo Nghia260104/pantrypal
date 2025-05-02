@@ -179,15 +179,27 @@ class CreateRecipeController extends GetxController {
     }
 
     Get.snackbar("Success", "Recipe saved successfully!");
-    Get.back(); // Navigate back
+    resetData(); // Reset the form data
+    final RootController rootController = Get.find<RootController>();
+    rootController.handleBack(); // Navigate back to the previous screen
 
     return; // Return the ID of the saved recipe
+  }
+
+  void resetData() {
+    selectedImage.value = null;
+    recipeName.value = '';
+    description.value = '';
+    cookingTime.value = '';
+    difficulty.value = 'Easy';
+    ingredients.clear();
+    unitsList.clear();
   }
 }
 
 class CreateRecipeScreen extends StatelessWidget {
   final CreateRecipeController controller = Get.put(CreateRecipeController());
-  final MealController mealController = Get.find<MealController>();
+  // final MealController mealController = Get.find<MealController>();
   final RootController rootController = Get.find<RootController>();
 
   @override
