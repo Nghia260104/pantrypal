@@ -5,7 +5,7 @@ class DropdownController extends GetxController {
   Rx<OverlayEntry?> activeOverlay = Rx<OverlayEntry?>(null);
 
   void showOverlay(Rx<OverlayEntry?> entry, BuildContext context) {
-    closeOverlay();
+    // closeOverlay();
     activeOverlay = entry;
     Overlay.of(context).insert(entry.value!);
   }
