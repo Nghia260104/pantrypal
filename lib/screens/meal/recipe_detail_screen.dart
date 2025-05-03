@@ -5,7 +5,7 @@ import 'package:pantrypal/controllers/meal/meal_controller.dart';
 import 'package:pantrypal/core/theme/theme_colors.dart';
 import 'package:pantrypal/widgets/rounded_box.dart';
 
-class MealDetailController extends GetxController {
+class RecipeDetailController extends GetxController {
   var isFavorite = false.obs;
   var servings = 1.obs;
   var selectedTab = 0.obs; // 0 for Ingredients, 1 for Instructions
@@ -29,12 +29,12 @@ class MealDetailController extends GetxController {
   }
 }
 
-class MealDetailScreen extends StatelessWidget {
+class RecipeDetailScreen extends StatelessWidget {
   final int recipeId;
 
-  MealDetailScreen({required this.recipeId});
+  RecipeDetailScreen({required this.recipeId});
 
-  final MealDetailController controller = Get.put(MealDetailController());
+  final RecipeDetailController controller = Get.put(RecipeDetailController());
   final MealController mealController = Get.find<MealController>();
   final RootController rootController = Get.find<RootController>();
 

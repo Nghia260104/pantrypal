@@ -4,6 +4,7 @@ import 'package:pantrypal/controllers/root_controller.dart';
 import 'package:pantrypal/core/theme/theme_colors.dart';
 import 'package:pantrypal/screens/meal/create_meal_screen.dart';
 import 'package:pantrypal/screens/meal/create_recipe_screen.dart';
+import 'package:pantrypal/screens/meal/meal_detail_screen.dart';
 import 'package:pantrypal/screens/meal/recipe_detail_screen.dart';
 import 'package:pantrypal/widgets/rounded_box.dart';
 import 'package:pantrypal/controllers/meal/meal_controller.dart';
@@ -159,7 +160,7 @@ class MealScreen extends StatelessWidget {
               // e.g. navigate to recipe detail
               print('Tapped on recipe ${recipe.id}');
               Get.to(
-                MealDetailScreen(recipeId: recipe.id),
+                RecipeDetailScreen(recipeId: recipe.id),
                 id: rootController.currentNavId.value,
               );
             },
@@ -371,7 +372,7 @@ class MealScreen extends StatelessWidget {
             onTap: () {
               // e.g. navigate to recipe detail
               print('Tapped on meal $index');
-              // Get.to(MealDetailScreen(), id: rootController.currentNavId.value);
+              Get.to(MealDetailScreen(), id: rootController.currentNavId.value);
             },
             child: RoundedBox(
               padding: EdgeInsets.zero,
