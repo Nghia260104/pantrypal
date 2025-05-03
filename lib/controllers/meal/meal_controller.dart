@@ -65,4 +65,11 @@ class MealController extends GetxController {
     await meal.toggleFavorite();
     meals.refresh();
   }
+
+  void deleteMeal(int mealId) async {
+    mealFavoriteStatus[mealId] = false;
+    final meal = meals.firstWhere((m) => m.id == mealId);
+    await meal.delete();
+    meals.removeWhere((m) => m.id == mealId);
+  }
 }

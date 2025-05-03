@@ -353,7 +353,10 @@ class MealScreen extends StatelessWidget {
             onTap: () {
               // e.g. navigate to meal detail
               print('Tapped on meal $index');
-              Get.to(MealDetailScreen(), id: rootController.currentNavId.value);
+              Get.to(
+                MealDetailScreen(mealId: meal.id),
+                id: rootController.currentNavId.value,
+              );
             },
             child: RoundedBox(
               padding: EdgeInsets.zero,

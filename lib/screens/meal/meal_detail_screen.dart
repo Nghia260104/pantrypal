@@ -14,17 +14,23 @@ class MealDetailController extends GetxController {
 }
 
 class MealDetailScreen extends StatelessWidget {
+  final int mealId;
+
+  MealDetailScreen({required this.mealId});
 
   final MealDetailController controller = Get.put(MealDetailController());
   final MealController mealController = Get.find<MealController>();
   final RootController rootController = Get.find<RootController>();
+
+  late final meal;
 
   final List<String> nutritions = ["Protein", "", "Carbs", "", "Fat"];
 
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).extension<ThemeColors>()!;
-
+    final meal = mealController.meals.firstWhere((meal) => meal.id == mealId);
+    // controller.setMeal(meal);
     return Scaffold(
       backgroundColor: colors.backgroundColor,
       body: Column(
@@ -62,13 +68,14 @@ class MealDetailScreen extends StatelessWidget {
                 top: 40,
                 right: 16,
                 child: Obx(() {
-                  // final isFavorite =
-                  //     mealController.recipeFavoriteStatus[recipeId] ?? false;
+                  final isFavorite =
+                      mealController.mealFavoriteStatus[mealId] ?? false;
                   return GestureDetector(
-                    onTap: () => {
-                      // Toggle favorite status
-                      controller.toggleFavorite(),
-                    },
+                    onTap:
+                        () => {
+                          // Toggle favorite status
+                          mealController.toggleMealFavorite(mealId),
+                        },
                     child: Container(
                       width: 40,
                       height: 40,
@@ -77,9 +84,9 @@ class MealDetailScreen extends StatelessWidget {
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
-                        controller.isFavorite.value ? Icons.star : Icons.star_border,
+                        isFavorite ? Icons.star : Icons.star_border,
                         color:
-                            controller.isFavorite.value
+                            isFavorite
                                 ? colors.favoriteColor
                                 : colors.secondaryButtonContentColor,
                       ),
@@ -99,7 +106,7 @@ class MealDetailScreen extends StatelessWidget {
                 children: [
                   // Meal Title
                   Text(
-                    "Meal name",
+                    meal.name,
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -108,7 +115,7 @@ class MealDetailScreen extends StatelessWidget {
                   ),
                   SizedBox(height: 8),
                   Text(
-                    "Description of the meal goes here. It can be a bit longer to provide more details about the recipe.",
+                    meal.description,
                     style: TextStyle(fontSize: 16, color: colors.hintTextColor),
                   ),
                   SizedBox(height: 16),
@@ -144,7 +151,7 @@ class MealDetailScreen extends StatelessWidget {
                               ),
                             ),
                             Text(
-                              "? kcal",
+                              "${meal.calories.round().toString()} kcal",
                               style: TextStyle(
                                 color: colors.textPrimaryColor,
                                 fontSize: 16,
@@ -187,7 +194,7 @@ class MealDetailScreen extends StatelessWidget {
                                       ),
                                     ),
                                     Text(
-                                      "${(index == 0 ? 1: (index == 2 ? 1 : 1)).round()} g",
+                                      "${(index == 0 ? meal.protein : (index == 2 ? meal.carbs : meal.fat)).toStringAsFixed(1)} g",
                                       style: TextStyle(
                                         color: colors.textPrimaryColor,
                                         fontSize: 16,
@@ -213,109 +220,126 @@ class MealDetailScreen extends StatelessWidget {
                     ),
                   ),
                   SizedBox(height: 16), // Spacing between title and list
-
                   // Recipe List
                   Column(
-                    children: List.generate(3, (index) {
-                      // final recipe = mealController.recipes[index];
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 12), // Padding between items
-                        child: RoundedBox(
-                          padding: const EdgeInsets.all(16),
-                          color: colors.secondaryButtonColor,
-                          outlineColor: colors.secondaryButtonContentColor.withAlpha(127),
-                          outlineStroke: 0.5,
-                          borderRadius: 8,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Recipe Name
-                              Text(
-                                "Recipe Name",
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: colors.textPrimaryColor,
-                                ),
-                              ),
-                              SizedBox(height: 8), // Spacing between name and description
-
-                              // Recipe Description
-                              Text(
-                                "Recipe description goes here. It can be a bit longer to provide more details about the recipe.",
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: colors.hintTextColor,
-                                ),
-                              ),
-                              SizedBox(height: 16), // Spacing between description and row
-
-                              // Duration and Serving Row
-                              Row(
+                    children:
+                        meal.portions.map((portion) {
+                          return Padding(
+                            padding: const EdgeInsets.only(
+                              bottom: 12,
+                            ), // Padding between items
+                            child: RoundedBox(
+                              padding: const EdgeInsets.all(16),
+                              color: colors.secondaryButtonColor,
+                              outlineColor: colors.secondaryButtonContentColor
+                                  .withAlpha(127),
+                              outlineStroke: 0.5,
+                              borderRadius: 8,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  // Duration Box
-                                  RoundedBox(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 16,
-                                      vertical: 6,
-                                    ),
-                                    color: colors.secondaryButtonColor,
-                                    outlineColor: colors.secondaryButtonContentColor.withAlpha(127),
-                                    outlineStroke: 0.5,
-                                    borderRadius: 50,
-                                    child: Row(
-                                      children: [
-                                        Icon(
-                                          Icons.access_time,
-                                          size: 16,
-                                          color: colors.secondaryButtonContentColor,
-                                        ),
-                                        SizedBox(width: 4), // Spacing between icon and text
-                                        Text(
-                                          "? min",
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            color: colors.secondaryButtonContentColor,
-                                          ),
-                                        ),
-                                      ],
+                                  // Recipe Name
+                                  Text(
+                                    portion.recipe.name,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: colors.textPrimaryColor,
                                     ),
                                   ),
-                                  SizedBox(width: 8), // Spacing between duration and serving
-
-                                  // Serving Box
-                                  RoundedBox(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 16,
-                                      vertical: 6,
+                                  SizedBox(
+                                    height: 8,
+                                  ), // Spacing between name and description
+                                  // Recipe Description
+                                  Text(
+                                    portion.recipe.briefDescription,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: colors.hintTextColor,
                                     ),
-                                    color: colors.secondaryButtonColor,
-                                    outlineColor: colors.secondaryButtonContentColor.withAlpha(127),
-                                    outlineStroke: 0.5,
-                                    borderRadius: 50,
-                                    child: Row(
-                                      children: [
-                                        Text(
-                                          "? serving",
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            color: colors.secondaryButtonContentColor,
-                                          ),
+                                  ),
+                                  SizedBox(
+                                    height: 16,
+                                  ), // Spacing between description and row
+                                  // Duration and Serving Row
+                                  Row(
+                                    children: [
+                                      // Duration Box
+                                      RoundedBox(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 16,
+                                          vertical: 6,
                                         ),
-                                      ],
-                                    ),
+                                        color: colors.secondaryButtonColor,
+                                        outlineColor: colors
+                                            .secondaryButtonContentColor
+                                            .withAlpha(127),
+                                        outlineStroke: 0.5,
+                                        borderRadius: 50,
+                                        child: Row(
+                                          children: [
+                                            Icon(
+                                              Icons.access_time,
+                                              size: 16,
+                                              color:
+                                                  colors
+                                                      .secondaryButtonContentColor,
+                                            ),
+                                            SizedBox(
+                                              width: 4,
+                                            ), // Spacing between icon and text
+                                            Text(
+                                              "${portion.recipe.duration.toString()} min",
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                color:
+                                                    colors
+                                                        .secondaryButtonContentColor,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        width: 8,
+                                      ), // Spacing between duration and serving
+                                      // Serving Box
+                                      RoundedBox(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 16,
+                                          vertical: 6,
+                                        ),
+                                        color: colors.secondaryButtonColor,
+                                        outlineColor: colors
+                                            .secondaryButtonContentColor
+                                            .withAlpha(127),
+                                        outlineStroke: 0.5,
+                                        borderRadius: 50,
+                                        child: Row(
+                                          children: [
+                                            Text(
+                                              "${portion.quantity.round().toString()} serving",
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                color:
+                                                    colors
+                                                        .secondaryButtonContentColor,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ],
                               ),
-                            ],
-                          ),
-                        ),
-                      );
-                    }),
+                            ),
+                          );
+                        }).toList(),
                   ),
                   SizedBox(height: 16), // Spacing between list and button
                   ElevatedButton(
@@ -332,7 +356,7 @@ class MealDetailScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-                  SizedBox(height: 64,),
+                  SizedBox(height: 64),
                 ],
               ),
             ),
@@ -341,7 +365,7 @@ class MealDetailScreen extends StatelessWidget {
       ),
     );
   }
-  
+
   void _showDeleteConfirmationModal(BuildContext context) {
     final colors = Theme.of(context).extension<ThemeColors>()!;
 
@@ -363,10 +387,7 @@ class MealDetailScreen extends StatelessWidget {
           ),
           content: Text(
             'Are you sure you want to delete this meal?',
-            style: TextStyle(
-              fontSize: 16,
-              color: colors.hintTextColor,
-            ),
+            style: TextStyle(fontSize: 16, color: colors.hintTextColor),
           ),
           actions: [
             TextButton(
@@ -375,21 +396,19 @@ class MealDetailScreen extends StatelessWidget {
               },
               child: Text(
                 'Cancel',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: colors.textPrimaryColor,
-                ),
+                style: TextStyle(fontSize: 16, color: colors.textPrimaryColor),
               ),
             ),
             ElevatedButton(
               onPressed: () {
-                // Handle delete action
-                // controller.deleteCheckedItems(); // Call the delete method in the controller
+                mealController.deleteMeal(mealId);
                 Navigator.of(context).pop(); // Close the modal
-                rootController.handleBack(); // Navigate back to the previous screen
+                rootController
+                    .handleBack(); // Navigate back to the previous screen
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: colors.dangerButtonColor, // Highlight the delete button
+                backgroundColor:
+                    colors.dangerButtonColor, // Highlight the delete button
                 foregroundColor: colors.dangerButtonContentColor, // Text color
               ),
               child: Text(

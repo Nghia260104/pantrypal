@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pantrypal/controllers/meal/meal_controller.dart';
 import 'package:pantrypal/core/theme/theme_colors.dart';
 import 'package:pantrypal/widgets/rounded_box.dart';
 
@@ -343,6 +344,8 @@ class AddRecipeToMealController extends GetxController
     with GetSingleTickerProviderStateMixin {
   late TabController tabController;
   // var recipes = <Recipe>[].obs;
+
+  final MealController mealController = Get.find<MealController>();
   var recipes = <ModelRecipe.Recipe>[].obs;
   var selectedTab = 0.obs;
   final titles = ["All", "Favorites"];
@@ -352,6 +355,11 @@ class AddRecipeToMealController extends GetxController
     super.onInit();
     tabController = TabController(length: 2, vsync: this);
     fetchRecipes();
+
+    mealController.recipes.listen((templates) {
+      // Update the ingredient templates when they change
+      fetchRecipes();
+    });
   }
 
   void toggleTab(int index) => selectedTab.value = index;
@@ -370,7 +378,7 @@ class AddRecipeToMealController extends GetxController
     //     tags: ["Salad", "Healthy"],
     //   ),
     // ];
-    recipes.value = ModelRecipe.Recipe.all();
+    recipes.assignAll(ModelRecipe.Recipe.all());
   }
 
   // void addRecipeToMeal(Recipe recipe) {
