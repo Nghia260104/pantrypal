@@ -37,6 +37,7 @@ class CreateMealScreen extends StatelessWidget {
             child: ElevatedButton(
               onPressed: () {
                 controller.saveMeal();
+                rootController.handleBack();
                 // Save logic here
               },
               style: ElevatedButton.styleFrom(
