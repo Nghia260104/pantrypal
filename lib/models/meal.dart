@@ -1,6 +1,7 @@
 import 'package:hive_ce/hive.dart';
 import 'recipe.dart';
 import 'hive_manager.dart';
+import 'recipe_portion.dart'; // Import the RecipePortion class
 
 part 'meal.g.dart';
 
@@ -16,7 +17,7 @@ class Meal extends HiveObject {
   String description;
 
   @HiveField(3)
-  List<Recipe> recipes;
+  List<RecipePortion> portions; // Updated to use RecipePortion
 
   @HiveField(4)
   double calories = 0;
@@ -33,12 +34,16 @@ class Meal extends HiveObject {
   @HiveField(8)
   bool isFavorite; // Mutable attribute for favorite status
 
+  @HiveField(9) // New field for the image
+  String? image; // Optional image attribute
+
   Meal({
     required this.id,
     required this.name,
     this.description = "A generic meal. Nothing special.", // Default value
-    required this.recipes,
+    required this.portions, // Updated to use RecipePortion
     this.isFavorite = false, // Default value is false
+    this.image, // Optional image attribute
   });
 
   static const String boxName = 'meals';
@@ -56,7 +61,8 @@ class Meal extends HiveObject {
       id: id,
       name: meal.name,
       description: meal.description,
-      recipes: meal.recipes,
+      portions: meal.portions, // Updated to use portions
+      image: meal.image, // Optional image attribute
     );
 
     // Store the Meal in Hive
@@ -66,7 +72,7 @@ class Meal extends HiveObject {
   }
 
   /// Returns the list of scheduled recipes.
-  List<Recipe> getRecipes() => recipes;
+  List<RecipePortion> getRecipes() => portions;
 
   /// Updates the status of this meal and persists the change.
   // Future<void> updateStatus(MealStatus newStatus) async {
@@ -87,8 +93,8 @@ class Meal extends HiveObject {
   }
 
   // Add a recipe to the Meal.
-  Future<void> addRecipe(Recipe recipe) async {
-    recipes.add(recipe);
+  Future<void> addPortion(RecipePortion portion) async {
+    portions.add(portion);
     await save(); // Persist the change to Hive
   }
 
@@ -106,12 +112,13 @@ class Meal extends HiveObject {
   /// Computes total nutrition across all recipes and stores the values.
   void computeNutrition() {
     double totalCalories = 0, totalProtein = 0, totalCarbs = 0, totalFat = 0;
-    for (var recipe in recipes) {
-      recipe.computeNutrition(); // Ensure recipe nutrition is up-to-date
-      totalCalories += recipe.calories;
-      totalProtein += recipe.protein;
-      totalCarbs += recipe.carbs;
-      totalFat += recipe.fat;
+    for (var portion in portions) {
+      portion.recipe
+          .computeNutrition(); // Ensure recipe nutrition is up-to-date
+      totalCalories += portion.recipe.calories * portion.quantity;
+      totalProtein += portion.recipe.protein * portion.quantity;
+      totalCarbs += portion.recipe.carbs * portion.quantity;
+      totalFat += portion.recipe.fat * portion.quantity;
     }
     calories = totalCalories;
     protein = totalProtein;

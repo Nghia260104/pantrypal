@@ -43,6 +43,9 @@ class Recipe extends HiveObject {
   @HiveField(11)
   double fat = 0;
 
+  @HiveField(12) // New field for the image
+  String? image; // Optional image attribute
+
   Recipe({
     required this.id,
     required this.name,
@@ -52,6 +55,7 @@ class Recipe extends HiveObject {
     required this.briefDescription,
     required this.ingredientRequirements,
     this.isFavorite = false, // Default value is false
+    this.image, // Optional image attribute
   });
 
   static const String boxName = 'recipes';
@@ -73,10 +77,11 @@ class Recipe extends HiveObject {
       difficulty: recipe.difficulty,
       briefDescription: recipe.briefDescription,
       ingredientRequirements: recipe.ingredientRequirements,
+      image: recipe.image, // Optional image attribute
     );
-    newRecipe.computeNutrition(); // Compute nutrition values
-    await box.put(newRecipe.id, newRecipe);
 
+    await box.put(newRecipe.id, newRecipe);
+    newRecipe.computeNutrition(); // Compute nutrition values
     return id;
   }
 
@@ -126,6 +131,8 @@ class Recipe extends HiveObject {
     carbs = totalCarbs;
     fat = totalFat;
 
-    save(); // Persist the updated values to Hive
+    if (isInBox) {
+      save(); // Persist the updated values to Hive
+    }
   }
 }
