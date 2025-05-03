@@ -112,8 +112,7 @@ class MealScreen extends StatelessWidget {
                           CreateRecipeScreen(),
                           id: rootController.currentNavId.value,
                         );
-                      }
-                      else {
+                      } else {
                         Get.to(
                           CreateMealScreen(),
                           id: rootController.currentNavId.value,
@@ -150,10 +149,7 @@ class MealScreen extends StatelessWidget {
         final recipe = list[index];
 
         return Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 8,
-          ),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: GestureDetector(
             onTap: () {
               // e.g. navigate to recipe detail
@@ -168,8 +164,7 @@ class MealScreen extends StatelessWidget {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(8),
                 child: Column(
-                  crossAxisAlignment:
-                      CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // IMAGE PLACEHOLDER
                     Stack(
@@ -184,31 +179,25 @@ class MealScreen extends StatelessWidget {
                         ),
                         // Label in a rounded rectangle
                         Positioned(
-                          top:
-                              8, // Adjust the vertical position
-                          right:
-                              8, // Adjust the horizontal position
+                          top: 8, // Adjust the vertical position
+                          right: 8, // Adjust the horizontal position
                           child: Container(
-                            padding:
-                                const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 4,
-                                ), // Padding inside the label
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 4,
+                            ), // Padding inside the label
                             decoration: BoxDecoration(
                               color:
                                   colors
                                       .buttonColor, // Background color for the label
-                              borderRadius:
-                                  BorderRadius.circular(
-                                    16,
-                                  ), // Fully rounded corners
+                              borderRadius: BorderRadius.circular(
+                                16,
+                              ), // Fully rounded corners
                             ),
                             child: Text(
                               "${recipe.calories.round()} kcal", // The label text
                               style: TextStyle(
-                                color:
-                                    colors
-                                        .buttonContentColor, // Text color
+                                color: colors.buttonContentColor, // Text color
                                 fontWeight: FontWeight.bold,
                                 fontSize: 14,
                               ),
@@ -226,33 +215,26 @@ class MealScreen extends StatelessWidget {
                       child: Padding(
                         padding: const EdgeInsets.all(16),
                         child: Column(
-                          crossAxisAlignment:
-                              CrossAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             // Title + favorite
                             Row(
-                              mainAxisAlignment:
-                                  MainAxisAlignment
-                                      .spaceBetween,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
                                   recipe.name,
                                   style: TextStyle(
-                                    fontWeight:
-                                        FontWeight.w500,
+                                    fontWeight: FontWeight.w500,
                                     fontSize: 20,
-                                    color:
-                                        colors
-                                            .textPrimaryColor,
+                                    color: colors.textPrimaryColor,
                                   ),
                                 ),
                                 Obx(
                                   () => GestureDetector(
                                     onTap:
-                                        () => controller
-                                            .toggleRecipeFavorite(
-                                              recipe.id,
-                                            ),
+                                        () => controller.toggleRecipeFavorite(
+                                          recipe.id,
+                                        ),
                                     child: Icon(
                                       controller.recipeFavoriteStatus[recipe
                                                   .id] ==
@@ -263,10 +245,8 @@ class MealScreen extends StatelessWidget {
                                           controller.recipeFavoriteStatus[recipe
                                                       .id] ==
                                                   true
-                                              ? colors
-                                                  .favoriteColor
-                                              : colors
-                                                  .hintTextColor,
+                                              ? colors.favoriteColor
+                                              : colors.hintTextColor,
                                     ),
                                   ),
                                 ),
@@ -292,20 +272,16 @@ class MealScreen extends StatelessWidget {
                                 // Difficulty
                                 RoundedBox(
                                   borderRadius: 32,
-                                  padding:
-                                      const EdgeInsets.symmetric(
-                                        horizontal: 12,
-                                        vertical: 4,
-                                      ),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 4,
+                                  ),
                                   child: Text(
                                     recipe.difficulty,
                                     style: TextStyle(
                                       fontSize: 14,
-                                      color:
-                                          colors
-                                              .textPrimaryColor,
-                                      fontWeight:
-                                          FontWeight.w600,
+                                      color: colors.textPrimaryColor,
+                                      fontWeight: FontWeight.w600,
                                     ),
                                   ),
                                 ),
@@ -313,20 +289,16 @@ class MealScreen extends StatelessWidget {
                                 // Duration
                                 RoundedBox(
                                   borderRadius: 32,
-                                  padding:
-                                      const EdgeInsets.symmetric(
-                                        horizontal: 12,
-                                        vertical: 4,
-                                      ),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 4,
+                                  ),
                                   child: Text(
                                     '${recipe.duration} min',
                                     style: TextStyle(
                                       fontSize: 14,
-                                      color:
-                                          colors
-                                              .textPrimaryColor,
-                                      fontWeight:
-                                          FontWeight.w600,
+                                      color: colors.textPrimaryColor,
+                                      fontWeight: FontWeight.w600,
                                     ),
                                   ),
                                 ),
@@ -353,23 +325,32 @@ class MealScreen extends StatelessWidget {
     //     child: Text("No meals available", style: TextStyle(color: colors.hintTextColor)),
     //   );
     // }
-    final lengthTest = 3;
+    final meals = controller.meals;
+
+    if (meals.isEmpty) {
+      return Center(
+        child: Text(
+          "No meals available",
+          style: TextStyle(color: colors.hintTextColor),
+        ),
+      );
+    }
+
+    // final lengthTest = 3;
     return ListView.builder(
-      itemCount: lengthTest + 1,
+      itemCount: meals.length + 1,
       itemBuilder: (context, index) {
-        if (index == lengthTest) {
+        if (index == meals.length) {
           return const SizedBox(height: 80);
         }
         // final recipe = list[index];
+        final meal = meals[index];
 
         return Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 8,
-          ),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: GestureDetector(
             onTap: () {
-              // e.g. navigate to recipe detail
+              // e.g. navigate to meal detail
               print('Tapped on meal $index');
               // Get.to(MealDetailScreen(), id: rootController.currentNavId.value);
             },
@@ -378,8 +359,7 @@ class MealScreen extends StatelessWidget {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(8),
                 child: Column(
-                  crossAxisAlignment:
-                      CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // IMAGE PLACEHOLDER
                     Stack(
@@ -390,35 +370,36 @@ class MealScreen extends StatelessWidget {
                           width: double.infinity,
                           decoration: BoxDecoration(
                             color: colors.hintTextColor,
+                            // image:
+                            //     meal.image != null
+                            //         ? DecorationImage(
+                            //           image: FileImage(File(meal.image!)),
+                            //           fit: BoxFit.cover,
+                            //         )
+                            //         : null,
                           ),
                         ),
                         // Label in a rounded rectangle
                         Positioned(
-                          top:
-                              8, // Adjust the vertical position
-                          right:
-                              8, // Adjust the horizontal position
+                          top: 8, // Adjust the vertical position
+                          right: 8, // Adjust the horizontal position
                           child: Container(
-                            padding:
-                                const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 4,
-                                ), // Padding inside the label
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 4,
+                            ), // Padding inside the label
                             decoration: BoxDecoration(
                               color:
                                   colors
                                       .buttonColor, // Background color for the label
-                              borderRadius:
-                                  BorderRadius.circular(
-                                    16,
-                                  ), // Fully rounded corners
+                              borderRadius: BorderRadius.circular(
+                                16,
+                              ), // Fully rounded corners
                             ),
                             child: Text(
-                              "", // The label text
+                              "${meal.calories.round()} kcal", // The label text
                               style: TextStyle(
-                                color:
-                                    colors
-                                        .buttonContentColor, // Text color
+                                color: colors.buttonContentColor, // Text color
                                 fontWeight: FontWeight.bold,
                                 fontSize: 14,
                               ),
@@ -436,45 +417,37 @@ class MealScreen extends StatelessWidget {
                       child: Padding(
                         padding: const EdgeInsets.all(16),
                         child: Column(
-                          crossAxisAlignment:
-                              CrossAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             // Title + favorite
                             Row(
-                              mainAxisAlignment:
-                                  MainAxisAlignment
-                                      .spaceBetween,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
-                                  "We have already died",
+                                  meal.name,
                                   style: TextStyle(
-                                    fontWeight:
-                                        FontWeight.w500,
+                                    fontWeight: FontWeight.w500,
                                     fontSize: 20,
-                                    color:
-                                        colors
-                                            .textPrimaryColor,
+                                    color: colors.textPrimaryColor,
                                   ),
                                 ),
                                 Obx(
                                   () => GestureDetector(
                                     onTap:
-                                        () => controller
-                                            .toggleMealFavorite(
-                                              index,
-                                            ),
+                                        () => controller.toggleMealFavorite(
+                                          meal.id,
+                                        ),
                                     child: Icon(
-                                      controller.mealFavoriteStatus[index] ==
+                                      controller.mealFavoriteStatus[meal.id] ==
                                               true
                                           ? Icons.star
                                           : Icons.star_border,
                                       color:
-                                          controller.mealFavoriteStatus[index] ==
+                                          controller.mealFavoriteStatus[meal
+                                                      .id] ==
                                                   true
-                                              ? colors
-                                                  .favoriteColor
-                                              : colors
-                                                  .hintTextColor,
+                                              ? colors.favoriteColor
+                                              : colors.hintTextColor,
                                     ),
                                   ),
                                 ),
@@ -485,7 +458,7 @@ class MealScreen extends StatelessWidget {
 
                             // Brief description
                             Text(
-                              "At least we died together",
+                              meal.description,
                               style: TextStyle(
                                 fontSize: 16,
                                 color: colors.hintTextColor,
@@ -508,14 +481,16 @@ class MealScreen extends StatelessWidget {
                             ), // Add spacing between "includes" and recipes list
                             // Recipes list
                             Text(
-                              "1001 reasons we die", // Join the recipes into a single string
+                              meal.portions
+                                  .map((portion) => portion.recipe.name)
+                                  .join(
+                                    ", ",
+                                  ), // Join the recipes into a single string
                               style: TextStyle(
                                 fontSize: 14,
-                                color:
-                                    colors.textPrimaryColor,
+                                color: colors.textPrimaryColor,
                               ),
-                              maxLines:
-                                  1, // Limit to one line
+                              maxLines: 1, // Limit to one line
                               overflow:
                                   TextOverflow
                                       .ellipsis, // Add ellipsis if text overflows

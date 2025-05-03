@@ -7,6 +7,13 @@ import 'dart:io';
 
 import 'package:pantrypal/screens/meal/add_recipe_to_meal_modal.dart';
 
+import 'package:pantrypal/models/recipe.dart' as ModelRecipe;
+import 'package:pantrypal/controllers/meal/meal_controller.dart';
+
+import 'package:pantrypal/models/meal.dart';
+// import 'package:pantrypal/models/recipe.dart';
+import 'package:pantrypal/models/recipe_portion.dart';
+
 class CreateMealScreen extends StatelessWidget {
   final CreateMealController controller = Get.put(CreateMealController());
   final RootController rootController = Get.find<RootController>();
@@ -29,6 +36,7 @@ class CreateMealScreen extends StatelessWidget {
             ), // Add padding to the right
             child: ElevatedButton(
               onPressed: () {
+                controller.saveMeal();
                 // Save logic here
               },
               style: ElevatedButton.styleFrom(
@@ -219,7 +227,7 @@ class CreateMealScreen extends StatelessWidget {
                     ElevatedButton(
                       onPressed: () {
                         // Save logic here
-                        controller.addRecipe();
+                        // controller.addRecipe();
                         showDialog(
                           context: context,
                           barrierDismissible: true,
@@ -259,7 +267,8 @@ class CreateMealScreen extends StatelessWidget {
                   }
                   return Column(
                     children:
-                        controller.recipes.map((recipe) {
+                        List.generate(controller.recipes.length, (index) {
+                          final recipe = controller.recipes[index];
                           return Column(
                             children: [
                               Container(
@@ -305,7 +314,7 @@ class CreateMealScreen extends StatelessWidget {
                                             children: [
                                               Expanded(
                                                 child: Text(
-                                                  recipe.name.value,
+                                                  recipe.name,
                                                   maxLines: 2,
                                                   overflow:
                                                       TextOverflow.ellipsis,
@@ -329,7 +338,7 @@ class CreateMealScreen extends StatelessWidget {
                                                   ),
                                                   onPressed:
                                                       () => controller
-                                                          .removeRecipe(recipe),
+                                                          .removeRecipe(index),
                                                 ),
                                               ),
                                             ],
@@ -366,7 +375,7 @@ class CreateMealScreen extends StatelessWidget {
                                                       onPressed:
                                                           () => controller
                                                               .decreaseQuantity(
-                                                                recipe,
+                                                                index,
                                                               ),
                                                       constraints: BoxConstraints(
                                                         minWidth:
@@ -386,7 +395,8 @@ class CreateMealScreen extends StatelessWidget {
                                                             horizontal: 12,
                                                           ),
                                                       child: Text(
-                                                        recipe.quantity.value
+                                                        controller
+                                                            .recipeQuantities[index]
                                                             .toString(),
                                                         style: TextStyle(
                                                           color:
@@ -421,7 +431,7 @@ class CreateMealScreen extends StatelessWidget {
                                                       onPressed:
                                                           () => controller
                                                               .increaseQuantity(
-                                                                recipe,
+                                                                index,
                                                               ),
                                                       constraints: BoxConstraints(
                                                         minWidth:
@@ -466,24 +476,100 @@ class CreateMealScreen extends StatelessWidget {
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: List.generate(4, (index) {
-                            return Expanded(
-                              child: Container(
-                                margin: EdgeInsets.symmetric(horizontal: 4),
-                                padding: EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(8),
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Calories",
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                    color: colors.textPrimaryColor,
+                                  ),
                                 ),
-                                child: Column(
-                                  children: [
-                                    Text("Title $index"),
-                                    Text("Value $index"),
-                                  ],
+                                Obx(
+                                  () => Text(
+                                    "${controller.totalCalories.value.toStringAsFixed(0)} cal",
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: colors.textPrimaryColor,
+                                    ),
+                                  ),
                                 ),
-                              ),
-                            );
-                          }),
+                              ],
+                            ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Protein",
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                    color: colors.textPrimaryColor,
+                                  ),
+                                ),
+                                Obx(
+                                  () => Text(
+                                    "${controller.totalProtein.value.toStringAsFixed(1)} g",
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: colors.textPrimaryColor,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Carbs",
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                    color: colors.textPrimaryColor,
+                                  ),
+                                ),
+                                Obx(
+                                  () => Text(
+                                    "${controller.totalCarbs.value.toStringAsFixed(1)} g",
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: colors.textPrimaryColor,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Fat",
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                    color: colors.textPrimaryColor,
+                                  ),
+                                ),
+                                Obx(
+                                  () => Text(
+                                    "${controller.totalFat.value.toStringAsFixed(1)} g",
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: colors.textPrimaryColor,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
                       ),
                     ],
@@ -500,37 +586,172 @@ class CreateMealScreen extends StatelessWidget {
 
 class CreateMealController extends GetxController {
   var imagePath = ''.obs;
-  var recipes = <Recipe>[].obs;
+  // var recipes = <Recipe>[].obs;
+  var recipes = <ModelRecipe.Recipe>[].obs;
+  var recipeQuantities = <int>[].obs; // Store quantities for each recipe
   var selectedImage = Rx<XFile?>(null);
+
+  MealController mealController = Get.find<MealController>();
+
   TextEditingController mealNameController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
 
-  void addRecipe() {
-    // Implement add recipe logic
-    // recipes.add(Recipe(name: "New Recipeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee", quantity: 1));
-    recipes.add(Recipe(name: "New Recipe", quantity: 1));
+  // Reactive variables for total nutrition
+  var totalCalories = 0.0.obs;
+  var totalProtein = 0.0.obs;
+  var totalCarbs = 0.0.obs;
+  var totalFat = 0.0.obs;
+
+  // @override
+  // void onInit() {
+  //   super.onInit();
+  //   // Recompute totals whenever recipes or quantities change
+  //   // recipes.listen((_) => computeTotalNutrition());
+  //   // recipeQuantities.listen((_) => computeTotalNutrition());
+  // }
+
+  // Method to compute total nutrition
+  void computeTotalNutrition() {
+    double calories = 0, protein = 0, carbs = 0, fat = 0;
+
+    for (int i = 0; i < recipes.length; i++) {
+      final recipe = recipes[i];
+      final quantity = recipeQuantities[i];
+
+      calories += recipe.calories * quantity;
+      protein += recipe.protein * quantity;
+      carbs += recipe.carbs * quantity;
+      fat += recipe.fat * quantity;
+    }
+
+    totalCalories.value = calories;
+    totalProtein.value = protein;
+    totalCarbs.value = carbs;
+    totalFat.value = fat;
   }
 
-  void removeRecipe(Recipe recipe) {
-    recipes.remove(recipe);
+  // var recipePortions = <Map<String, dynamic>>[].obs;
+  // var availableRecipes = <Recipe>[].obs; // List of available recipes
+
+  // @override
+  // void onInit() {
+  //   super.onInit();
+  //   loadAvailableRecipes();
+  // }
+
+  // void loadAvailableRecipes() {
+  //   // Load recipes from the database or controller
+  //   availableRecipes.assignAll(Recipe.all());
+  // }
+
+  void addRecipe(ModelRecipe.Recipe recipe) {
+    recipes.add(recipe);
+    recipeQuantities.add(1); // Default quantity
+    computeTotalNutrition();
   }
 
-  void decreaseQuantity(Recipe recipe) {
-    // Implement decrease quantity logic
-    if (recipe.quantity > 1) {
-      recipe.quantity.value--;
+  // void removeRecipe(Recipe recipe) {
+  //   recipes.remove(recipe);
+  // }
+
+  void removeRecipe(int index) {
+    recipes.removeAt(index);
+    recipeQuantities.removeAt(index);
+    computeTotalNutrition();
+  }
+
+  // void decreaseQuantity(Recipe recipe) {
+  //   // Implement decrease quantity logic
+  //   if (recipe.quantity > 1) {
+  //     recipe.quantity.value--;
+  //   }
+  // }
+
+  // void increaseQuantity(Recipe recipe) {
+  //   // Implement increase quantity logic
+  //   if (recipe.quantity < 10) {
+  //     recipe.quantity.value++;
+  //   }
+  // }
+
+  void increaseQuantity(int index) {
+    recipeQuantities[index]++;
+    computeTotalNutrition();
+  }
+
+  void decreaseQuantity(int index) {
+    if (recipeQuantities[index] > 1) {
+      recipeQuantities[index]--;
+      computeTotalNutrition();
     }
   }
 
-  void increaseQuantity(Recipe recipe) {
-    // Implement increase quantity logic
-    if (recipe.quantity < 10) {
-      recipe.quantity.value++;
+  bool validateMealForm() {
+    if (mealNameController.text.trim().isEmpty) {
+      Get.snackbar("Error", "Meal name is required.");
+      return false;
     }
+
+    if (recipes.isEmpty) {
+      Get.snackbar("Error", "At least one recipe must be added to the meal.");
+      return false;
+    }
+
+    return true; // Form is valid
   }
 
-  void saveMeal() {
-    // Implement save meal logic
+  Future<void> saveMeal() async {
+    if (!validateMealForm()) {
+      return; // Stop if the form is invalid
+    }
+
+    // Use default description if the field is empty
+    final description =
+        descriptionController.text.trim().isEmpty
+            ? "No description for this meal..."
+            : descriptionController.text.trim();
+
+    // Create RecipePortions
+    List<RecipePortion> portions = [];
+    for (int i = 0; i < recipes.length; i++) {
+      portions.add(
+        RecipePortion(
+          recipe: recipes[i],
+          quantity: recipeQuantities[i].toDouble(),
+        ),
+      );
+    }
+
+    // Create and save the Meal
+    final newMeal = Meal(
+      id: 0, // Temporary ID, will be replaced by Hive
+      name: mealNameController.text,
+      description: description,
+      portions: portions,
+      image: selectedImage.value?.path,
+    );
+
+    final newMealId = await Meal.create(newMeal);
+
+    if (newMealId == -1) {
+      Get.snackbar("Error", "Failed to save meal.");
+      return;
+    } else {
+      mealController.meals.add(
+        Meal.getById(newMealId)!,
+      ); // Add to the meal controller
+    }
+
+    Get.snackbar("Success", "Meal saved successfully!");
+    resetData();
+  }
+
+  void resetData() {
+    recipes.clear();
+    recipeQuantities.clear();
+    mealNameController.clear();
+    descriptionController.clear();
+    selectedImage.value = null;
   }
 
   void pickImage() async {
@@ -540,11 +761,11 @@ class CreateMealController extends GetxController {
   }
 }
 
-class Recipe {
-  RxString name;
-  RxInt quantity;
+// class Recipe {
+//   RxString name;
+//   RxInt quantity;
 
-  Recipe({required String name, required int quantity})
-    : name = name.obs,
-      quantity = quantity.obs;
-}
+//   Recipe({required String name, required int quantity})
+//     : name = name.obs,
+//       quantity = quantity.obs;
+// }
