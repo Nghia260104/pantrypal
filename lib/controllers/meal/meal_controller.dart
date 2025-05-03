@@ -19,6 +19,7 @@ class MealController extends GetxController {
   void onInit() {
     super.onInit();
     _loadRecipes();
+    _loadMeals();
   }
 
   void _loadRecipes() {
@@ -28,6 +29,16 @@ class MealController extends GetxController {
     // Populate the favoriteStatus map
     for (var recipe in recipes) {
       recipeFavoriteStatus[recipe.id] = recipe.isFavorite;
+    }
+  }
+
+  void _loadMeals() {
+    // Load all meals from Hive
+    meals.assignAll(Meal.all());
+
+    // Populate the favoriteStatus map for meals
+    for (var meal in meals) {
+      mealFavoriteStatus[meal.id] = meal.isFavorite;
     }
   }
 

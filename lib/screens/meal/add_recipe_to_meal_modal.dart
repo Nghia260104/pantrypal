@@ -3,162 +3,168 @@ import 'package:get/get.dart';
 import 'package:pantrypal/core/theme/theme_colors.dart';
 import 'package:pantrypal/widgets/rounded_box.dart';
 
+import 'package:pantrypal/models/recipe.dart' as ModelRecipe;
+import 'package:pantrypal/screens/meal/create_meal_screen.dart';
+
 class AddRecipeToMealModal extends StatelessWidget {
-  final AddRecipeToMealController controller = Get.put(AddRecipeToMealController());
+  final AddRecipeToMealController controller = Get.put(
+    AddRecipeToMealController(),
+  );
 
   // @override
   // Widget build(BuildContext context) {
   //   final double maxHeight = MediaQuery.of(context).size.height * 0.7;
 
-    // return Padding(
-    //   padding: const EdgeInsets.all(16.0),
-    //   child: Container(
-    //     constraints: BoxConstraints(maxHeight: maxHeight),
-    //     child: Column(
-    //       children: [
-    //         Row(
-    //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-    //           children: [
-    //             GestureDetector(
-    //               onTap: () => Get.back(),
-    //               child: Icon(Icons.close),
-    //             ),
-    //             Text(
-    //               "Add Recipe to Meal",
-    //               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-    //             ),
-    //             SizedBox(width: 24), // Placeholder for alignment
-    //           ],
-    //         ),
-    //         SizedBox(height: 16),
-    //         Obx(() => TabBar(
-    //               controller: controller.tabController,
-    //               tabs: [
-    //                 Tab(text: "All"),
-    //                 Tab(text: "Favorites"),
-    //               ],
-    //             )),
-    //         SizedBox(height: 16),
-    //         Expanded(
-    //           child: Obx(() => ListView.separated(
-    //                 itemCount: controller.recipes.length,
-    //                 separatorBuilder: (_, __) => SizedBox(height: 8),
-    //                 itemBuilder: (context, index) {
-    //                   final recipe = controller.recipes[index];
-    //                   return Container(
-    //                     padding: EdgeInsets.all(12),
-    //                     decoration: BoxDecoration(
-    //                       color: Colors.white,
-    //                       borderRadius: BorderRadius.circular(12),
-    //                       boxShadow: [
-    //                         BoxShadow(
-    //                           color: Colors.black12,
-    //                           blurRadius: 4,
-    //                           offset: Offset(0, 2),
-    //                         ),
-    //                       ],
-    //                     ),
-    //                     child: Row(
-    //                       crossAxisAlignment: CrossAxisAlignment.center,
-    //                       children: [
-    //                         Container(
-    //                           width: 50,
-    //                           height: 50,
-    //                           color: Colors.grey[300],
-    //                         ),
-    //                         SizedBox(width: 12),
-    //                         Expanded(
-    //                           child: Column(
-    //                             crossAxisAlignment: CrossAxisAlignment.start,
-    //                             children: [
-    //                               Text(
-    //                                 recipe.title,
-    //                                 maxLines: 2,
-    //                                 overflow: TextOverflow.ellipsis,
-    //                                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-    //                               ),
-    //                               SizedBox(height: 4),
-    //                               Text(
-    //                                 recipe.description,
-    //                                 maxLines: 1,
-    //                                 overflow: TextOverflow.ellipsis,
-    //                                 style: TextStyle(fontSize: 14, color: Colors.grey[600]),
-    //                               ),
-    //                               SizedBox(height: 8),
-    //                               Row(
-    //                                 children: recipe.tags.map((tag) {
-    //                                   return Container(
-    //                                     padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-    //                                     margin: EdgeInsets.only(right: 8),
-    //                                     decoration: BoxDecoration(
-    //                                       color: Colors.blue[100],
-    //                                       borderRadius: BorderRadius.circular(16),
-    //                                     ),
-    //                                     child: Text(
-    //                                       tag,
-    //                                       style: TextStyle(fontSize: 12, color: Colors.blue[800]),
-    //                                     ),
-    //                                   );
-    //                                 }).toList(),
-    //                               ),
-    //                             ],
-    //                           ),
-    //                         ),
-    //                         ElevatedButton(
-    //                           onPressed: () => controller.addRecipeToMeal(recipe),
-    //                           child: Text("Add"),
-    //                         ),
-    //                       ],
-    //                     ),
-    //                   );
-    //                 },
-    //               )),
-    //         ),
-    //       ],
-    //     ),
-    //   ),
-    // );
-    @override
-    Widget build(BuildContext context) {
-      final colors = Theme.of(context).extension<ThemeColors>()!;
-      return GestureDetector(
-        onTap: () {
-          FocusScope.of(context).unfocus(); // Dismiss the keyboard
-        },
-        child: Dialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              maxHeight:
-                  MediaQuery.of(context).size.height *
-                  0.7, // Limit modal height to 70% of screen height
-            ),
-            child: Container(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Modal Header with Close Button
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const SizedBox(width: 24), // Placeholder for alignment
-                      Text(
-                        'Add Recipe to Meal',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: colors.textPrimaryColor,
-                        ),
+  // return Padding(
+  //   padding: const EdgeInsets.all(16.0),
+  //   child: Container(
+  //     constraints: BoxConstraints(maxHeight: maxHeight),
+  //     child: Column(
+  //       children: [
+  //         Row(
+  //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //           children: [
+  //             GestureDetector(
+  //               onTap: () => Get.back(),
+  //               child: Icon(Icons.close),
+  //             ),
+  //             Text(
+  //               "Add Recipe to Meal",
+  //               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+  //             ),
+  //             SizedBox(width: 24), // Placeholder for alignment
+  //           ],
+  //         ),
+  //         SizedBox(height: 16),
+  //         Obx(() => TabBar(
+  //               controller: controller.tabController,
+  //               tabs: [
+  //                 Tab(text: "All"),
+  //                 Tab(text: "Favorites"),
+  //               ],
+  //             )),
+  //         SizedBox(height: 16),
+  //         Expanded(
+  //           child: Obx(() => ListView.separated(
+  //                 itemCount: controller.recipes.length,
+  //                 separatorBuilder: (_, __) => SizedBox(height: 8),
+  //                 itemBuilder: (context, index) {
+  //                   final recipe = controller.recipes[index];
+  //                   return Container(
+  //                     padding: EdgeInsets.all(12),
+  //                     decoration: BoxDecoration(
+  //                       color: Colors.white,
+  //                       borderRadius: BorderRadius.circular(12),
+  //                       boxShadow: [
+  //                         BoxShadow(
+  //                           color: Colors.black12,
+  //                           blurRadius: 4,
+  //                           offset: Offset(0, 2),
+  //                         ),
+  //                       ],
+  //                     ),
+  //                     child: Row(
+  //                       crossAxisAlignment: CrossAxisAlignment.center,
+  //                       children: [
+  //                         Container(
+  //                           width: 50,
+  //                           height: 50,
+  //                           color: Colors.grey[300],
+  //                         ),
+  //                         SizedBox(width: 12),
+  //                         Expanded(
+  //                           child: Column(
+  //                             crossAxisAlignment: CrossAxisAlignment.start,
+  //                             children: [
+  //                               Text(
+  //                                 recipe.title,
+  //                                 maxLines: 2,
+  //                                 overflow: TextOverflow.ellipsis,
+  //                                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+  //                               ),
+  //                               SizedBox(height: 4),
+  //                               Text(
+  //                                 recipe.description,
+  //                                 maxLines: 1,
+  //                                 overflow: TextOverflow.ellipsis,
+  //                                 style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+  //                               ),
+  //                               SizedBox(height: 8),
+  //                               Row(
+  //                                 children: recipe.tags.map((tag) {
+  //                                   return Container(
+  //                                     padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+  //                                     margin: EdgeInsets.only(right: 8),
+  //                                     decoration: BoxDecoration(
+  //                                       color: Colors.blue[100],
+  //                                       borderRadius: BorderRadius.circular(16),
+  //                                     ),
+  //                                     child: Text(
+  //                                       tag,
+  //                                       style: TextStyle(fontSize: 12, color: Colors.blue[800]),
+  //                                     ),
+  //                                   );
+  //                                 }).toList(),
+  //                               ),
+  //                             ],
+  //                           ),
+  //                         ),
+  //                         ElevatedButton(
+  //                           onPressed: () => controller.addRecipeToMeal(recipe),
+  //                           child: Text("Add"),
+  //                         ),
+  //                       ],
+  //                     ),
+  //                   );
+  //                 },
+  //               )),
+  //         ),
+  //       ],
+  //     ),
+  //   ),
+  // );
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).extension<ThemeColors>()!;
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).unfocus(); // Dismiss the keyboard
+      },
+      child: Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxHeight:
+                MediaQuery.of(context).size.height *
+                0.7, // Limit modal height to 70% of screen height
+          ),
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Modal Header with Close Button
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const SizedBox(width: 24), // Placeholder for alignment
+                    Text(
+                      'Add Recipe to Meal',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: colors.textPrimaryColor,
                       ),
-                      GestureDetector(
-                        onTap: () => Navigator.of(context).pop(), // Close modal
-                        child: Icon(Icons.close, color: colors.hintTextColor),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  Obx(() => Row(
+                    ),
+                    GestureDetector(
+                      onTap: () => Navigator.of(context).pop(), // Close modal
+                      child: Icon(Icons.close, color: colors.hintTextColor),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Obx(
+                  () => Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: List.generate(2, (index) {
                       final isSelected = controller.selectedTab.value == index;
@@ -208,10 +214,12 @@ class AddRecipeToMealModal extends StatelessWidget {
                         ),
                       );
                     }),
-                  )),
-                  const SizedBox(height: 8),
-                  Expanded(
-                    child: Obx(() => ListView.separated(
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Expanded(
+                  child: Obx(
+                    () => ListView.separated(
                       itemCount: controller.recipes.length,
                       separatorBuilder: (_, __) => SizedBox(height: 8),
                       itemBuilder: (context, index) {
@@ -222,7 +230,12 @@ class AddRecipeToMealModal extends StatelessWidget {
                             // Get.back(); // Close modal after adding
                           },
                           child: Container(
-                            padding: EdgeInsets.only(left: 12, right: 4, top: 12, bottom: 12),
+                            padding: EdgeInsets.only(
+                              left: 12,
+                              right: 4,
+                              top: 12,
+                              bottom: 12,
+                            ),
                             decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(12),
@@ -246,45 +259,65 @@ class AddRecipeToMealModal extends StatelessWidget {
                                 SizedBox(width: 12),
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        recipe.title,
+                                        recipe.name,
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
-                                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
                                       SizedBox(height: 4),
                                       Text(
-                                        recipe.description,
+                                        recipe.briefDescription,
                                         maxLines: 2,
                                         overflow: TextOverflow.ellipsis,
-                                        style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.grey[600],
+                                        ),
                                       ),
                                       SizedBox(height: 8),
                                       Row(
-                                        children: recipe.tags.map((tag) {
-                                          return Container(
-                                            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 2),
-                                            margin: EdgeInsets.only(right: 8),
-                                            decoration: BoxDecoration(
-                                              color: colors.secondaryButtonColor,
-                                              borderRadius: BorderRadius.circular(16),
-                                              border: Border.all(
-                                                color: colors.secondaryButtonContentColor.withAlpha(50),
-                                                width: 1.0,
-                                              ),
-                                            ),
-                                            child: Text(
-                                              tag,
-                                              style: TextStyle(
-                                                fontSize: 12, 
-                                                color: colors.secondaryButtonContentColor,
-                                                fontWeight: FontWeight.w500,
-                                              ),
-                                            ),
-                                          );
-                                        }).toList(),
+                                        children:
+                                            recipe.tags.map((tag) {
+                                              return Container(
+                                                padding: EdgeInsets.symmetric(
+                                                  horizontal: 12,
+                                                  vertical: 2,
+                                                ),
+                                                margin: EdgeInsets.only(
+                                                  right: 8,
+                                                ),
+                                                decoration: BoxDecoration(
+                                                  color:
+                                                      colors
+                                                          .secondaryButtonColor,
+                                                  borderRadius:
+                                                      BorderRadius.circular(16),
+                                                  border: Border.all(
+                                                    color: colors
+                                                        .secondaryButtonContentColor
+                                                        .withAlpha(50),
+                                                    width: 1.0,
+                                                  ),
+                                                ),
+                                                child: Text(
+                                                  tag,
+                                                  style: TextStyle(
+                                                    fontSize: 12,
+                                                    color:
+                                                        colors
+                                                            .secondaryButtonContentColor,
+                                                    fontWeight: FontWeight.w500,
+                                                  ),
+                                                ),
+                                              );
+                                            }).toList(),
                                       ),
                                     ],
                                   ),
@@ -294,20 +327,23 @@ class AddRecipeToMealModal extends StatelessWidget {
                           ),
                         );
                       },
-                    )),
+                    ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),
-      );
+      ),
+    );
   }
 }
 
-class AddRecipeToMealController extends GetxController with GetSingleTickerProviderStateMixin {
+class AddRecipeToMealController extends GetxController
+    with GetSingleTickerProviderStateMixin {
   late TabController tabController;
-  var recipes = <Recipe>[].obs;
+  // var recipes = <Recipe>[].obs;
+  var recipes = <ModelRecipe.Recipe>[].obs;
   var selectedTab = 0.obs;
   final titles = ["All", "Favorites"];
 
@@ -322,23 +358,29 @@ class AddRecipeToMealController extends GetxController with GetSingleTickerProvi
 
   void fetchRecipes() {
     // Simulate fetching recipes
-    recipes.value = [
-      Recipe(
-        title: "Spaghetti Carbonara",
-        description: "A classic Italian pasta dish.",
-        tags: ["Pasta", "Italian"],
-      ),
-      Recipe(
-        title: "Chicken Salad",
-        description: "A healthy and delicious salad.",
-        tags: ["Salad", "Healthy"],
-      ),
-    ];
+    // recipes.value = [
+    //   Recipe(
+    //     title: "Spaghetti Carbonara",
+    //     description: "A classic Italian pasta dish.",
+    //     tags: ["Pasta", "Italian"],
+    //   ),
+    //   Recipe(
+    //     title: "Chicken Salad",
+    //     description: "A healthy and delicious salad.",
+    //     tags: ["Salad", "Healthy"],
+    //   ),
+    // ];
+    recipes.value = ModelRecipe.Recipe.all();
   }
 
-  void addRecipeToMeal(Recipe recipe) {
-    // Handle adding recipe to meal
-    print("Added ${recipe.title} to meal");
+  // void addRecipeToMeal(Recipe recipe) {
+  //   // Handle adding recipe to meal
+  //   print("Added ${recipe.title} to meal");
+  // }
+
+  void addRecipeToMeal(ModelRecipe.Recipe recipe) {
+    Get.find<CreateMealController>().addRecipe(recipe);
+    Get.back(); // Close modal after adding
   }
 
   @override
@@ -348,10 +390,10 @@ class AddRecipeToMealController extends GetxController with GetSingleTickerProvi
   }
 }
 
-class Recipe {
-  final String title;
-  final String description;
-  final List<String> tags;
+// class Recipe {
+//   final String title;
+//   final String description;
+//   final List<String> tags;
 
-  Recipe({required this.title, required this.description, required this.tags});
-}
+//   Recipe({required this.title, required this.description, required this.tags});
+// }

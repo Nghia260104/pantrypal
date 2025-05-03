@@ -114,6 +114,14 @@ class Recipe extends HiveObject {
     await save(); // Save the updated state to Hive
   }
 
+  /// Computed property to generate tags dynamically
+  List<String> get tags {
+    return [
+      difficulty, // Add difficulty as the first tag
+      '${duration.toString()} min', // Add duration as the second tag
+    ];
+  }
+
   /// Returns the list of ingredients.
   List<RecipeIngredient> getIngredients() => ingredientRequirements;
 
