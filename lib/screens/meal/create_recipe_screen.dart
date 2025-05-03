@@ -279,7 +279,10 @@ class CreateRecipeScreen extends StatelessWidget {
                     return Container(
                       height: 200,
                       decoration: BoxDecoration(
-                        color: colors.imagePickerColor,
+                        color:
+                            controller.selectedImage.value == null
+                                ? colors.imagePickerColor
+                                : Colors.transparent,
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child:
@@ -298,7 +301,7 @@ class CreateRecipeScreen extends StatelessWidget {
                                     File(controller.selectedImage.value!.path),
                                     fit: BoxFit.cover,
                                   ),
-                                )
+                                ),
                               ),
                     );
                   }),

@@ -11,11 +11,11 @@ import 'enums/notification_type.dart';
 
 class MealPlanner {
   /// Checks if a recipe can be made with available inventory.
-  bool canMake(Recipe recipe) {
+  bool canMake(Recipe recipe, double quantity) {
     for (var ingredient in recipe.ingredientRequirements) {
       final available =
           InventoryItem.getByTemplateId(ingredient.template.id)?.quantity ?? 0;
-      if (available < ingredient.quantity) {
+      if (available < ingredient.quantity * quantity) {
         return false;
       }
     }
@@ -23,15 +23,16 @@ class MealPlanner {
   }
 
   /// Generates a shopping list for missing ingredients.
-  List<Map<String, dynamic>> shoppingList(Recipe recipe) {
+  List<Map<String, dynamic>> shoppingList(Recipe recipe, double quantity) {
     final missingIngredients = <Map<String, dynamic>>[];
     for (var ingredient in recipe.ingredientRequirements) {
       final available =
           InventoryItem.getByTemplateId(ingredient.template.id)?.quantity ?? 0;
-      if (available < ingredient.quantity) {
+      final needed = ingredient.quantity * quantity;
+      if (available < needed) {
         missingIngredients.add({
           'template': ingredient.template,
-          'needed': ingredient.quantity - available,
+          'needed': needed - available,
         });
       }
     }
@@ -40,12 +41,15 @@ class MealPlanner {
 
   /// Schedules a MealPlan and handles related tasks.
   Future<void> schedulePlan(MealPlan mealPlan) async {
-    // Check if all recipes can be made
-    for (var recipe in mealPlan.recipes) {
-      if (!canMake(recipe)) {
+    // Check if all recipe portions can be made
+    for (var portion in mealPlan.portions) {
+      final recipe = portion.recipe;
+      final quantity = portion.quantity;
+
+      if (!canMake(recipe, quantity)) {
         // Add missing ingredients to the shopping cart
         final cart = await ShoppingCart.getCart();
-        for (var item in shoppingList(recipe)) {
+        for (var item in shoppingList(recipe, quantity)) {
           await cart.addItem(item['template'], item['needed']);
         }
       }
@@ -53,7 +57,7 @@ class MealPlanner {
 
     // Save the MealPlan
     await MealPlan.schedule(
-      recipes: mealPlan.recipes,
+      portions: mealPlan.portions, // Updated to use portions
       dateTime: mealPlan.dateTime,
       type: mealPlan.type,
     );

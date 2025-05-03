@@ -4,6 +4,7 @@ import 'recipe.dart';
 import 'enums/meal_type.dart';
 import 'enums/meal_status.dart';
 import 'hive_manager.dart';
+import 'recipe_portion.dart';
 
 part 'meal_plan.g.dart';
 
@@ -22,7 +23,7 @@ class MealPlan extends HiveObject {
   MealStatus status;
 
   @HiveField(4)
-  final List<Recipe> recipes;
+  List<RecipePortion> portions;
 
   @HiveField(5)
   double calories = 0;
@@ -41,14 +42,14 @@ class MealPlan extends HiveObject {
     required this.dateTime,
     required this.type,
     required this.status,
-    required this.recipes,
+    required this.portions,
   });
 
   static const String boxName = 'meal_plans';
 
   /// Schedules a new MealPlan and stores it in Hive.
   static Future<MealPlan> schedule({
-    required List<Recipe> recipes,
+    required List<RecipePortion> portions,
     required DateTime dateTime,
     required MealType type,
   }) async {
@@ -62,7 +63,7 @@ class MealPlan extends HiveObject {
       dateTime: dateTime,
       type: type,
       status: MealStatus.Upcoming,
-      recipes: recipes,
+      portions: portions,
     );
 
     // Store the MealPlan in Hive
@@ -73,19 +74,19 @@ class MealPlan extends HiveObject {
 
   /// Applies a template (Meal) to this MealPlan.
   void applyTemplate(Meal template) {
-    recipes.clear();
-    recipes.addAll(template.recipes);
+    portions.clear();
+    portions.addAll(template.portions);
   }
 
   /// Adds a recipe to the MealPlan.
-  Future<void> addRecipe(Recipe recipe) async {
-    recipes.add(recipe);
+  Future<void> addPortion(RecipePortion portion) async {
+    portions.add(portion);
     await save();
   }
 
   /// Removes a recipe from the MealPlan.
-  Future<void> removeRecipe(Recipe recipe) async {
-    recipes.remove(recipe);
+  Future<void> removePortion(RecipePortion portion) async {
+    portions.remove(portion);
     await save();
   }
 
@@ -110,12 +111,13 @@ class MealPlan extends HiveObject {
   /// Computes total nutrition across all recipes and stores the values.
   void computeNutrition() {
     double totalCalories = 0, totalProtein = 0, totalCarbs = 0, totalFat = 0;
-    for (var recipe in recipes) {
-      recipe.computeNutrition(); // Ensure recipe nutrition is up-to-date
-      totalCalories += recipe.calories;
-      totalProtein += recipe.protein;
-      totalCarbs += recipe.carbs;
-      totalFat += recipe.fat;
+    for (var portion in portions) {
+      portion.recipe
+          .computeNutrition(); // Ensure recipe nutrition is up-to-date
+      totalCalories += portion.recipe.calories * portion.quantity;
+      totalProtein += portion.recipe.protein * portion.quantity;
+      totalCarbs += portion.recipe.carbs * portion.quantity;
+      totalFat += portion.recipe.fat * portion.quantity;
     }
     calories = totalCalories;
     protein = totalProtein;

@@ -17,6 +17,7 @@ import 'meal.dart';
 import 'notification_model.dart';
 import 'cart_item.dart';
 import 'shopping_cart.dart';
+import 'recipe_portion.dart';
 
 class HiveManager {
   /// Call once at app startup:
@@ -39,6 +40,7 @@ class HiveManager {
     Hive.registerAdapter(CartItemAdapter());
     Hive.registerAdapter(ShoppingCartAdapter());
     Hive.registerAdapter(MealPlanAdapter());
+    Hive.registerAdapter(RecipePortionAdapter());
 
     // 3. Open boxes (using the static boxName from each model)
     await Hive.openBox<IngredientTemplate>(IngredientTemplate.boxName);
