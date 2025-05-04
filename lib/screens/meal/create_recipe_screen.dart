@@ -192,6 +192,7 @@ class CreateRecipeController extends GetxController {
       ); // Add to the meal controller
     }
 
+    Get.find<RootController>().handleBack();
     Get.snackbar("Success", "Recipe saved successfully!");
     resetData(); // Reset the form data
     // rootController.handleBack(); // Navigate back to the previous screen
@@ -243,7 +244,7 @@ class CreateRecipeScreen extends StatelessWidget {
             child: ElevatedButton(
               onPressed: () {
                 controller.saveRecipe();
-                rootController.handleBack();
+                // rootController.handleBack();
               }, // Save recipe logic,
               style: ElevatedButton.styleFrom(
                 backgroundColor:
@@ -831,7 +832,7 @@ class CreateRecipeScreen extends StatelessWidget {
                       onPressed: () {
                         // Save recipe logic here
                         controller.saveRecipe();
-                        rootController.handleBack();
+                        // rootController.handleBack();
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor:

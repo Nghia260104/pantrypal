@@ -39,7 +39,7 @@ class CreateMealScreen extends StatelessWidget {
             child: ElevatedButton(
               onPressed: () {
                 controller.saveMeal();
-                rootController.handleBack();
+                // rootController.handleBack();
                 // Save logic here
               },
               style: ElevatedButton.styleFrom(
@@ -65,10 +65,7 @@ class CreateMealScreen extends StatelessWidget {
             () => FocusScope.of(context).unfocus(), // Dismiss keyboard on tap
         child: Column(
           children: [
-            Divider(
-              height: 1,
-              color: colors.hintTextColor.withAlpha(75),
-            ),
+            Divider(height: 1, color: colors.hintTextColor.withAlpha(75)),
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(16),
@@ -103,7 +100,10 @@ class CreateMealScreen extends StatelessWidget {
                                         color: Colors.transparent,
                                         child: Image.file(
                                           File(
-                                            controller.selectedImage.value!.path,
+                                            controller
+                                                .selectedImage
+                                                .value!
+                                                .path,
                                           ),
                                           fit: BoxFit.cover,
                                         ),
@@ -156,28 +156,36 @@ class CreateMealScreen extends StatelessWidget {
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
                           borderSide: BorderSide(
-                            color: colors.secondaryButtonContentColor.withAlpha(50),
+                            color: colors.secondaryButtonContentColor.withAlpha(
+                              50,
+                            ),
                             width: 0.5,
                           ),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
                           borderSide: BorderSide(
-                            color: colors.secondaryButtonContentColor.withAlpha(50),
+                            color: colors.secondaryButtonContentColor.withAlpha(
+                              50,
+                            ),
                             width: 0.5,
                           ),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
                           borderSide: BorderSide(
-                            color: colors.secondaryButtonContentColor.withAlpha(50),
+                            color: colors.secondaryButtonContentColor.withAlpha(
+                              50,
+                            ),
                             width: 0.5,
                           ),
                         ),
                         fillColor: colors.secondaryButtonColor,
                         filled: true,
                       ),
-                      style: TextStyle(color: colors.secondaryButtonContentColor),
+                      style: TextStyle(
+                        color: colors.secondaryButtonContentColor,
+                      ),
                     ),
                     SizedBox(height: 16),
                     Text(
@@ -198,28 +206,36 @@ class CreateMealScreen extends StatelessWidget {
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
                           borderSide: BorderSide(
-                            color: colors.secondaryButtonContentColor.withAlpha(50),
+                            color: colors.secondaryButtonContentColor.withAlpha(
+                              50,
+                            ),
                             width: 0.5,
                           ),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
                           borderSide: BorderSide(
-                            color: colors.secondaryButtonContentColor.withAlpha(50),
+                            color: colors.secondaryButtonContentColor.withAlpha(
+                              50,
+                            ),
                             width: 0.5,
                           ),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
                           borderSide: BorderSide(
-                            color: colors.secondaryButtonContentColor.withAlpha(50),
+                            color: colors.secondaryButtonContentColor.withAlpha(
+                              50,
+                            ),
                             width: 0.5,
                           ),
                         ),
                         fillColor: colors.secondaryButtonColor,
                         filled: true,
                       ),
-                      style: TextStyle(color: colors.secondaryButtonContentColor),
+                      style: TextStyle(
+                        color: colors.secondaryButtonContentColor,
+                      ),
                     ),
                     SizedBox(height: 16),
                     Row(
@@ -276,204 +292,219 @@ class CreateMealScreen extends StatelessWidget {
                       }
                       return Column(
                         children:
-                          List.generate(controller.recipes.length, (index) {
-                            final recipe = controller.recipes[index];
-                            return Column(
-                              children: [
-                                Container(
-                                  decoration: BoxDecoration(
-                                    color: colors.secondaryButtonColor,
-                                    borderRadius: BorderRadius.circular(8.0),
-                                    // boxShadow: [
-                                    //   BoxShadow(
-                                    //     color: Colors.grey.withAlpha(127),
-                                    //     spreadRadius: 1,
-                                    //     blurRadius: 3,
-                                    //     offset: const Offset(0, 2),
-                                    //   ),
-                                    // ],
-                                    border: Border.all(
-                                      color: colors.secondaryButtonContentColor
-                                          .withAlpha(50),
-                                      width: 1,
-                                    ),
-                                  ),
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: 16,
-                                    vertical: 12,
-                                  ),
-                                  child: Row(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Container(
-                                        width: 60,
-                                        height: 60,
-                                        margin: const EdgeInsets.only(top: 4.0),
-                                        decoration: BoxDecoration(
-                                          color: Colors.grey,
-                                        ),
+                            List.generate(controller.recipes.length, (index) {
+                              final recipe = controller.recipes[index];
+                              return Column(
+                                children: [
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      color: colors.secondaryButtonColor,
+                                      borderRadius: BorderRadius.circular(8.0),
+                                      // boxShadow: [
+                                      //   BoxShadow(
+                                      //     color: Colors.grey.withAlpha(127),
+                                      //     spreadRadius: 1,
+                                      //     blurRadius: 3,
+                                      //     offset: const Offset(0, 2),
+                                      //   ),
+                                      // ],
+                                      border: Border.all(
+                                        color: colors
+                                            .secondaryButtonContentColor
+                                            .withAlpha(50),
+                                        width: 1,
                                       ),
-                                      SizedBox(width: 8),
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Row(
-                                              children: [
-                                                Expanded(
-                                                  child: Text(
-                                                    recipe.name,
-                                                    maxLines: 2,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
+                                    ),
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: 16,
+                                      vertical: 12,
+                                    ),
+                                    child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Container(
+                                          width: 60,
+                                          height: 60,
+                                          margin: const EdgeInsets.only(
+                                            top: 4.0,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: Colors.grey,
+                                          ),
+                                        ),
+                                        SizedBox(width: 8),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Row(
+                                                children: [
+                                                  Expanded(
+                                                    child: Text(
+                                                      recipe.name,
+                                                      maxLines: 2,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                      style: TextStyle(
+                                                        color:
+                                                            colors
+                                                                .textPrimaryColor,
+                                                        fontSize: 18,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  SizedBox(
+                                                    height: 24,
+                                                    width: 24,
+                                                    child: IconButton(
+                                                      padding: EdgeInsets.zero,
+                                                      icon: Icon(
+                                                        Icons.close,
+                                                        color:
+                                                            colors
+                                                                .normalIconColor,
+                                                      ),
+                                                      onPressed:
+                                                          () => controller
+                                                              .removeRecipe(
+                                                                index,
+                                                              ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                              SizedBox(height: 4),
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Text(
+                                                    "Quantity:",
                                                     style: TextStyle(
                                                       color:
-                                                          colors.textPrimaryColor,
-                                                      fontSize: 18,
-                                                      fontWeight: FontWeight.w500,
+                                                          colors
+                                                              .textPrimaryColor,
+                                                      fontSize: 16,
                                                     ),
                                                   ),
-                                                ),
-                                                SizedBox(
-                                                  height: 24,
-                                                  width: 24,
-                                                  child: IconButton(
-                                                    padding: EdgeInsets.zero,
-                                                    icon: Icon(
-                                                      Icons.close,
-                                                      color:
-                                                          colors.normalIconColor,
-                                                    ),
-                                                    onPressed:
-                                                        () => controller
-                                                            .removeRecipe(index),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                            SizedBox(height: 4),
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.spaceBetween,
-                                              children: [
-                                                Text(
-                                                  "Quantity:",
-                                                  style: TextStyle(
-                                                    color:
-                                                        colors.textPrimaryColor,
-                                                    fontSize: 16,
-                                                  ),
-                                                ),
-                                                Row(
-                                                  children: [
-                                                    Container(
-                                                      width: 32, // Reduced width
-                                                      height:
-                                                          32, // Reduced height
-                                                      decoration: BoxDecoration(
-                                                        border: Border.all(
-                                                          color: colors
-                                                              .secondaryButtonContentColor
-                                                              .withAlpha(50),
-                                                          width: 1,
+                                                  Row(
+                                                    children: [
+                                                      Container(
+                                                        width:
+                                                            32, // Reduced width
+                                                        height:
+                                                            32, // Reduced height
+                                                        decoration: BoxDecoration(
+                                                          border: Border.all(
+                                                            color: colors
+                                                                .secondaryButtonContentColor
+                                                                .withAlpha(50),
+                                                            width: 1,
+                                                          ),
+                                                          shape:
+                                                              BoxShape.circle,
                                                         ),
-                                                        shape: BoxShape.circle,
-                                                      ),
-                                                      child: IconButton(
-                                                        icon: Icon(
-                                                          Icons.remove,
-                                                          color:
-                                                              colors
-                                                                  .secondaryButtonContentColor,
-                                                          size: 20,
-                                                        ),
-                                                        onPressed:
-                                                            () => controller
-                                                                .decreaseQuantity(
-                                                                  index,
-                                                                ),
-                                                        constraints: BoxConstraints(
-                                                          minWidth:
-                                                              32, // Match the container size
-                                                          minHeight:
-                                                              32, // Match the container size
-                                                        ),
-                                                        padding:
-                                                            EdgeInsets
-                                                                .zero, // Remove extra padding
-                                                      ),
-                                                    ),
-                                                    Obx(() {
-                                                      return Padding(
-                                                        padding:
-                                                            const EdgeInsets.symmetric(
-                                                              horizontal: 12,
-                                                            ),
-                                                        child: Text(
-                                                          controller
-                                                              .recipeQuantities[index]
-                                                              .toString(),
-                                                          style: TextStyle(
+                                                        child: IconButton(
+                                                          icon: Icon(
+                                                            Icons.remove,
                                                             color:
                                                                 colors
-                                                                    .textPrimaryColor,
-                                                            fontSize: 16,
+                                                                    .secondaryButtonContentColor,
+                                                            size: 20,
                                                           ),
+                                                          onPressed:
+                                                              () => controller
+                                                                  .decreaseQuantity(
+                                                                    index,
+                                                                  ),
+                                                          constraints: BoxConstraints(
+                                                            minWidth:
+                                                                32, // Match the container size
+                                                            minHeight:
+                                                                32, // Match the container size
+                                                          ),
+                                                          padding:
+                                                              EdgeInsets
+                                                                  .zero, // Remove extra padding
                                                         ),
-                                                      );
-                                                    }),
-                                                    Container(
-                                                      width: 32, // Reduced width
-                                                      height:
-                                                          32, // Reduced height
-                                                      decoration: BoxDecoration(
-                                                        border: Border.all(
-                                                          color: colors
-                                                              .secondaryButtonContentColor
-                                                              .withAlpha(50),
-                                                          width: 1,
-                                                        ),
-                                                        shape: BoxShape.circle,
                                                       ),
-                                                      child: IconButton(
-                                                        icon: Icon(
-                                                          Icons.add,
-                                                          color:
-                                                              colors
-                                                                  .secondaryButtonContentColor,
-                                                          size: 20,
+                                                      Obx(() {
+                                                        return Padding(
+                                                          padding:
+                                                              const EdgeInsets.symmetric(
+                                                                horizontal: 12,
+                                                              ),
+                                                          child: Text(
+                                                            controller
+                                                                .recipeQuantities[index]
+                                                                .toString(),
+                                                            style: TextStyle(
+                                                              color:
+                                                                  colors
+                                                                      .textPrimaryColor,
+                                                              fontSize: 16,
+                                                            ),
+                                                          ),
+                                                        );
+                                                      }),
+                                                      Container(
+                                                        width:
+                                                            32, // Reduced width
+                                                        height:
+                                                            32, // Reduced height
+                                                        decoration: BoxDecoration(
+                                                          border: Border.all(
+                                                            color: colors
+                                                                .secondaryButtonContentColor
+                                                                .withAlpha(50),
+                                                            width: 1,
+                                                          ),
+                                                          shape:
+                                                              BoxShape.circle,
                                                         ),
-                                                        onPressed:
-                                                            () => controller
-                                                                .increaseQuantity(
-                                                                  index,
-                                                                ),
-                                                        constraints: BoxConstraints(
-                                                          minWidth:
-                                                              32, // Match the container size
-                                                          minHeight:
-                                                              32, // Match the container size
+                                                        child: IconButton(
+                                                          icon: Icon(
+                                                            Icons.add,
+                                                            color:
+                                                                colors
+                                                                    .secondaryButtonContentColor,
+                                                            size: 20,
+                                                          ),
+                                                          onPressed:
+                                                              () => controller
+                                                                  .increaseQuantity(
+                                                                    index,
+                                                                  ),
+                                                          constraints: BoxConstraints(
+                                                            minWidth:
+                                                                32, // Match the container size
+                                                            minHeight:
+                                                                32, // Match the container size
+                                                          ),
+                                                          padding:
+                                                              EdgeInsets
+                                                                  .zero, // Remove extra padding
                                                         ),
-                                                        padding:
-                                                            EdgeInsets
-                                                                .zero, // Remove extra padding
                                                       ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ],
-                                            ),
-                                          ],
+                                                    ],
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
                                         ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
-                                ),
-                                SizedBox(height: 8),
-                              ],
-                            );
-                          }).toList(),
+                                  SizedBox(height: 8),
+                                ],
+                              );
+                            }).toList(),
                       );
                     }),
                     Obx(() {
@@ -759,6 +790,8 @@ class CreateMealController extends GetxController {
         Meal.getById(newMealId)!,
       ); // Add to the meal controller
     }
+
+    Get.find<RootController>().handleBack();
 
     Get.snackbar("Success", "Meal saved successfully!");
     resetData();

@@ -184,6 +184,7 @@ class AddMealToPlanController extends GetxController {
 
     // Notify PlanController to update the list
     Get.find<PlanController>().addMealPlan(mealPlan);
+    Get.find<RootController>().handleBack();
 
     Get.snackbar("Success", "Meal plan saved successfully!");
     resetData();
@@ -223,7 +224,7 @@ class AddMealToPlanScreen extends StatelessWidget {
             child: ElevatedButton(
               onPressed: () {
                 controller.saveMealPlan();
-                rootController.handleBack();
+                // rootController.handleBack();
                 // Save logic here
               },
               style: ElevatedButton.styleFrom(
