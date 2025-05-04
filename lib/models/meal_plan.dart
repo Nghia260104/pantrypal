@@ -5,6 +5,7 @@ import 'enums/meal_type.dart';
 import 'enums/meal_status.dart';
 import 'hive_manager.dart';
 import 'recipe_portion.dart';
+import 'package:flutter/material.dart';
 
 part 'meal_plan.g.dart';
 
@@ -37,21 +38,36 @@ class MealPlan extends HiveObject {
   @HiveField(8)
   double fat = 0;
 
+  @HiveField(9)
+  late String timeOfDayString; // Store TimeOfDay as a String in HH:mm format
+
   MealPlan({
     required this.id,
     required this.dateTime,
     required this.type,
     required this.status,
     required this.portions,
+    required this.timeOfDayString, // Accept TimeOfDay
   });
 
   static const String boxName = 'meal_plans';
+
+  TimeOfDay get timeOfDay {
+    final parts = timeOfDayString.split(':');
+    return TimeOfDay(hour: int.parse(parts[0]), minute: int.parse(parts[1]));
+  }
+
+  set timeOfDay(TimeOfDay value) {
+    timeOfDayString =
+        '${value.hour.toString().padLeft(2, '0')}:${value.minute.toString().padLeft(2, '0')}';
+  }
 
   /// Schedules a new MealPlan and stores it in Hive.
   static Future<MealPlan> schedule({
     required List<RecipePortion> portions,
     required DateTime dateTime,
     required MealType type,
+    required TimeOfDay timeOfDay, // Accept TimeOfDay
   }) async {
     final box = Hive.box<MealPlan>(boxName);
 
@@ -64,6 +80,8 @@ class MealPlan extends HiveObject {
       type: type,
       status: MealStatus.Upcoming,
       portions: portions,
+      timeOfDayString:
+          '${timeOfDay.hour.toString().padLeft(2, '0')}:${timeOfDay.minute.toString().padLeft(2, '0')}', // Convert TimeOfDay to String
     );
 
     // Store the MealPlan in Hive
@@ -94,6 +112,23 @@ class MealPlan extends HiveObject {
   Future<void> updateStatus(MealStatus newStatus) async {
     status = newStatus;
     await save();
+  }
+
+  String get formattedTime {
+    final hour = timeOfDay.hourOfPeriod == 0 ? 12 : timeOfDay.hourOfPeriod;
+    final minute = timeOfDay.minute.toString().padLeft(2, '0');
+    final period = timeOfDay.period == DayPeriod.am ? "AM" : "PM";
+    return "$hour:$minute $period";
+  }
+
+  /// Sorts a list of MealPlan objects by their TimeOfDay.
+  static List<MealPlan> sortByTimeOfDay(List<MealPlan> mealPlans) {
+    mealPlans.sort((a, b) {
+      final aMinutes = a.timeOfDay.hour * 60 + a.timeOfDay.minute;
+      final bMinutes = b.timeOfDay.hour * 60 + b.timeOfDay.minute;
+      return aMinutes.compareTo(bMinutes); // Sort by TimeOfDay
+    });
+    return mealPlans;
   }
 
   /// Retrieves a MealPlan by its ID.

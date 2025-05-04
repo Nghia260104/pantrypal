@@ -8,6 +8,7 @@ import 'meal_plan.dart';
 import 'shopping_cart.dart';
 import 'notification_model.dart';
 import 'enums/notification_type.dart';
+import 'nutrition_goal.dart';
 
 class MealPlanner {
   /// Checks if a recipe can be made with available inventory.
@@ -60,6 +61,7 @@ class MealPlanner {
       portions: mealPlan.portions, // Updated to use portions
       dateTime: mealPlan.dateTime,
       type: mealPlan.type,
+      timeOfDay: mealPlan.timeOfDay, // Updated to use timeOfDay
     );
   }
 
@@ -113,4 +115,25 @@ class MealPlanner {
   Future<ShoppingCart> getCart() async {
     return await ShoppingCart.getCart();
   }
+
+  List<MealPlan> getTodayMeals() {
+    // Return today's meal plans
+    return [];
+  }
+
+  // NutritionGoal? getActiveGoal() {
+  //   final today = DateTime.now();
+  //   return NutritionGoal.all().firstWhere(
+  //     (goal) => goal.isActive(today),
+  //     orElse: () => null,
+  //   );
+  // }
+
+  // List<NotificationModel> checkGoalsForToday() {
+  //   final todayMeals = getTodayMeals();
+  //   // final activeGoal = getActiveGoal();
+  //   //   if (activeGoal == null) return [];
+
+  //   //   return activeGoal.getNotifications(todayMeals);
+  // }
 }

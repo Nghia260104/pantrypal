@@ -18,6 +18,7 @@ import 'notification_model.dart';
 import 'cart_item.dart';
 import 'shopping_cart.dart';
 import 'recipe_portion.dart';
+import 'nutrition_goal.dart';
 
 class HiveManager {
   /// Call once at app startup:
@@ -41,6 +42,7 @@ class HiveManager {
     Hive.registerAdapter(ShoppingCartAdapter());
     Hive.registerAdapter(MealPlanAdapter());
     Hive.registerAdapter(RecipePortionAdapter());
+    Hive.registerAdapter(NutritionGoalAdapter());
 
     // 3. Open boxes (using the static boxName from each model)
     await Hive.openBox<IngredientTemplate>(IngredientTemplate.boxName);
@@ -50,6 +52,7 @@ class HiveManager {
     await Hive.openBox<MealPlan>(MealPlan.boxName);
     await Hive.openBox<NotificationModel>(NotificationModel.boxName);
     await Hive.openBox<ShoppingCart>(ShoppingCart.boxName);
+    await Hive.openBox<NutritionGoal>(NutritionGoal.boxName);
 
     // 4. Open the 'counter' box for managing incremental IDs
     await initializeCounters();
@@ -144,6 +147,18 @@ class HiveManager {
                   .reduce((a, b) => a > b ? a : b)
               : 0;
       counterBox.put('lastMealPlanId', lastId);
+    }
+
+    // Initialize counters for NutritionGoal
+    if (!counterBox.containsKey('lastNutritionGoalId')) {
+      final nutritionGoalBox = Hive.box<NutritionGoal>(NutritionGoal.boxName);
+      final lastId =
+          nutritionGoalBox.values.isNotEmpty
+              ? nutritionGoalBox.values
+                  .map((e) => e.id)
+                  .reduce((a, b) => a > b ? a : b)
+              : 0;
+      counterBox.put('lastNutritionGoalId', lastId);
     }
   }
 
