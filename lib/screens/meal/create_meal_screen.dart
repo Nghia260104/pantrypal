@@ -36,6 +36,8 @@ class CreateMealScreen extends StatelessWidget {
             ), // Add padding to the right
             child: ElevatedButton(
               onPressed: () {
+                controller.saveMeal();
+                rootController.handleBack();
                 // Save logic here
               },
               style: ElevatedButton.styleFrom(
