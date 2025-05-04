@@ -3,6 +3,11 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:pantrypal/controllers/root_controller.dart';
 import 'package:pantrypal/core/theme/theme_colors.dart';
+import 'package:pantrypal/models/recipe.dart' as ModelRecipe;
+import 'package:pantrypal/models/meal_plan.dart';
+import 'package:pantrypal/models/recipe_portion.dart';
+import 'package:pantrypal/models/enums/meal_type.dart';
+import 'package:pantrypal/controllers/plan/plan_controller.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:pantrypal/screens/plan/add_recipe_to_meal_plan_modal.dart';
 import 'package:pantrypal/screens/plan/apply_template_to_meal_plan_modal.dart';
@@ -17,17 +22,17 @@ class Recipe {
   RxInt duration;
   RxInt servings;
 
-    Recipe({
-      required String name,
-      required String description,
-      required int calories,
-      required int duration,
-      int servings = 1,
-    })  : name = name.obs,
-          description = description.obs,
-          calories = calories.obs,
-          duration = duration.obs,
-          servings = servings.obs;
+  Recipe({
+    required String name,
+    required String description,
+    required int calories,
+    required int duration,
+    int servings = 1,
+  }) : name = name.obs,
+       description = description.obs,
+       calories = calories.obs,
+       duration = duration.obs,
+       servings = servings.obs;
 }
 
 class AddMealToPlanController extends GetxController {
@@ -37,13 +42,8 @@ class AddMealToPlanController extends GetxController {
   var selectedDate = DateTime.now().obs;
   var selectedTime = TimeOfDay(hour: 7, minute: 0).obs;
   var mealType = "Breakfast".obs;
-  var recipes = <Recipe>[].obs; // List of selected recipes
-  var mealTypeList = [
-    "Breakfast",
-    "Lunch",
-    "Dinner",
-    "Snack",
-  ];
+  var recipes = <ModelRecipe.Recipe>[].obs; // List of selected recipes
+  var mealTypeList = ["Breakfast", "Lunch", "Dinner", "Snack", "Dessert"];
 
   // Reactive variables for total nutrition
   var totalCalories = 0.0.obs;
@@ -60,24 +60,24 @@ class AddMealToPlanController extends GetxController {
   // }
 
   // Method to compute total nutrition
-  // void computeTotalNutrition() {
-  //   double calories = 0, protein = 0, carbs = 0, fat = 0;
+  void computeTotalNutrition() {
+    double calories = 0, protein = 0, carbs = 0, fat = 0;
 
-  //   for (int i = 0; i < recipes.length; i++) {
-  //     final recipe = recipes[i];
-  //     final quantity = recipeQuantities[i];
+    for (int i = 0; i < recipes.length; i++) {
+      final recipe = recipes[i];
+      final quantity = recipeQuantities[i];
 
-  //     calories += recipe.calories * quantity;
-  //     protein += recipe.protein * quantity;
-  //     carbs += recipe.carbs * quantity;
-  //     fat += recipe.fat * quantity;
-  //   }
+      calories += recipe.calories * quantity;
+      protein += recipe.protein * quantity;
+      carbs += recipe.carbs * quantity;
+      fat += recipe.fat * quantity;
+    }
 
-  //   totalCalories.value = calories;
-  //   totalProtein.value = protein;
-  //   totalCarbs.value = carbs;
-  //   totalFat.value = fat;
-  // }
+    totalCalories.value = calories;
+    totalProtein.value = protein;
+    totalCarbs.value = carbs;
+    totalFat.value = fat;
+  }
 
   // var recipePortions = <Map<String, dynamic>>[].obs;
   // var availableRecipes = <Recipe>[].obs; // List of available recipes
@@ -93,22 +93,22 @@ class AddMealToPlanController extends GetxController {
   //   availableRecipes.assignAll(Recipe.all());
   // }
 
-  // void addRecipe(ModelRecipe.Recipe recipe) {
-  //   recipes.add(recipe);
-  //   recipeQuantities.add(1); // Default quantity
-  //   computeTotalNutrition();
-  // }
-
-  void addRecipe() {
-    recipes.add(
-      Recipe(
-        name: "Recipe ${recipes.length + 1}",
-        description: "Description of Recipe ${recipes.length + 1}",
-        calories: 200,
-        duration: 30,
-      ),
-    );
+  void addRecipe(ModelRecipe.Recipe recipe) {
+    recipes.add(recipe);
+    recipeQuantities.add(1); // Default quantity
+    computeTotalNutrition();
   }
+
+  // void addRecipe() {
+  //   recipes.add(
+  //     Recipe(
+  //       name: "Recipe ${recipes.length + 1}",
+  //       description: "Description of Recipe ${recipes.length + 1}",
+  //       calories: 200,
+  //       duration: 30,
+  //     ),
+  //   );
+  // }
 
   // void removeRecipe(Recipe recipe) {
   //   recipes.remove(recipe);
@@ -116,8 +116,8 @@ class AddMealToPlanController extends GetxController {
 
   void removeRecipe(int index) {
     recipes.removeAt(index);
-    // recipeQuantities.removeAt(index);
-    // computeTotalNutrition();
+    recipeQuantities.removeAt(index);
+    computeTotalNutrition();
   }
 
   // }
@@ -128,88 +128,74 @@ class AddMealToPlanController extends GetxController {
   // }
 
   void increaseQuantity(int index) {
-    // recipeQuantities[index]++;
-    // computeTotalNutrition();
-    recipes[index].servings.value++;
+    recipeQuantities[index]++;
+    computeTotalNutrition();
+    // recipes[index].servings.value++;
   }
 
   void decreaseQuantity(int index) {
-    // if (recipeQuantities[index] > 1) {
-    //   recipeQuantities[index]--;
-    //   computeTotalNutrition();
-    // }
-    if (recipes[index].servings.value > 1) {
-      recipes[index].servings.value--;
+    if (recipeQuantities[index] > 1) {
+      recipeQuantities[index]--;
+      computeTotalNutrition();
     }
   }
 
-  // bool validateMealForm() {
-  //   if (mealNameController.text.trim().isEmpty) {
-  //     Get.snackbar("Error", "Meal name is required.");
-  //     return false;
-  //   }
+  bool validateMealPlanForm() {
+    if (recipes.isEmpty) {
+      Get.snackbar(
+        "Error",
+        "At least one recipe must be added to the meal plan.",
+      );
+      return false;
+    }
+    return true; // Form is valid
+  }
 
-  //   if (recipes.isEmpty) {
-  //     Get.snackbar("Error", "At least one recipe must be added to the meal.");
-  //     return false;
-  //   }
+  Future<void> saveMealPlan() async {
+    if (!validateMealPlanForm()) {
+      return; // Stop if the form is invalid
+    }
 
-  //   return true; // Form is valid
-  // }
+    // Create RecipePortions
+    List<RecipePortion> portions = [];
+    for (int i = 0; i < recipes.length; i++) {
+      portions.add(
+        RecipePortion(
+          recipe: recipes[i],
+          quantity: recipeQuantities[i].toDouble(),
+        ),
+      );
+    }
 
-  // Future<void> saveMeal() async {
-  //   if (!validateMealForm()) {
-  //     return; // Stop if the form is invalid
-  //   }
+    // Create and save the MealPlan
+    final mealPlan = await MealPlan.schedule(
+      portions: portions,
+      dateTime: selectedDate.value,
+      type: MealType.values.firstWhere(
+        (type) => type.toString() == "MealType.${mealType.value}",
+      ),
+      timeOfDay: selectedTime.value,
+    );
 
-  //   // Use default description if the field is empty
-  //   final description =
-  //       descriptionController.text.trim().isEmpty
-  //           ? "No description for this meal..."
-  //           : descriptionController.text.trim();
+    if (mealPlan == null) {
+      Get.snackbar("Error", "Failed to save meal plan.");
+      return;
+    }
 
-  //   // Create RecipePortions
-  //   List<RecipePortion> portions = [];
-  //   for (int i = 0; i < recipes.length; i++) {
-  //     portions.add(
-  //       RecipePortion(
-  //         recipe: recipes[i],
-  //         quantity: recipeQuantities[i].toDouble(),
-  //       ),
-  //     );
-  //   }
+    // Notify PlanController to update the list
+    Get.find<PlanController>().addMealPlan(mealPlan);
 
-  //   // Create and save the Meal
-  //   final newMeal = Meal(
-  //     id: 0, // Temporary ID, will be replaced by Hive
-  //     name: mealNameController.text,
-  //     description: description,
-  //     portions: portions,
-  //     image: selectedImage.value?.path,
-  //   );
+    Get.snackbar("Success", "Meal plan saved successfully!");
+    resetData();
+  }
 
-  //   final newMealId = await Meal.create(newMeal);
-
-  //   if (newMealId == -1) {
-  //     Get.snackbar("Error", "Failed to save meal.");
-  //     return;
-  //   } else {
-  //     mealController.meals.add(
-  //       Meal.getById(newMealId)!,
-  //     ); // Add to the meal controller
-  //   }
-
-  //   Get.snackbar("Success", "Meal saved successfully!");
-  //   resetData();
-  // }
-
-  // void resetData() {
-  //   recipes.clear();
-  //   recipeQuantities.clear();
-  //   mealNameController.clear();
-  //   descriptionController.clear();
-  //   selectedImage.value = null;
-  // }
+  void resetData() {
+    recipes.clear();
+    recipeQuantities.clear();
+    selectedDate.value = DateTime.now();
+    selectedTime.value = TimeOfDay(hour: 7, minute: 0);
+    mealType.value = "Breakfast";
+  }
 }
 
 class AddMealToPlanScreen extends StatelessWidget {
@@ -236,7 +222,7 @@ class AddMealToPlanScreen extends StatelessWidget {
             ), // Add padding to the right
             child: ElevatedButton(
               onPressed: () {
-                // controller.saveMeal();
+                controller.saveMealPlan();
                 rootController.handleBack();
                 // Save logic here
               },
@@ -263,10 +249,7 @@ class AddMealToPlanScreen extends StatelessWidget {
             () => FocusScope.of(context).unfocus(), // Dismiss keyboard on tap
         child: Column(
           children: [
-            Divider(
-              height: 1,
-              color: colors.hintTextColor.withAlpha(75),
-            ),
+            Divider(height: 1, color: colors.hintTextColor.withAlpha(75)),
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(16),
@@ -295,19 +278,29 @@ class AddMealToPlanScreen extends StatelessWidget {
                         // }
                       },
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
                         decoration: BoxDecoration(
                           color: colors.secondaryButtonColor,
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(
-                            color: colors.secondaryButtonContentColor.withAlpha(50),
+                            color: colors.secondaryButtonContentColor.withAlpha(
+                              50,
+                            ),
                           ),
                         ),
                         width: double.infinity,
                         child: Obx(() {
                           return Text(
-                            DateFormat('EEEE, MMMM d, yyyy').format(controller.selectedDate.value.toLocal()),
-                            style: TextStyle(fontSize: 16, color: colors.textPrimaryColor),
+                            DateFormat(
+                              'EEEE, MMMM d, yyyy',
+                            ).format(controller.selectedDate.value.toLocal()),
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: colors.textPrimaryColor,
+                            ),
                           );
                         }),
                       ),
@@ -334,19 +327,26 @@ class AddMealToPlanScreen extends StatelessWidget {
                         }
                       },
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
                         decoration: BoxDecoration(
                           color: colors.secondaryButtonColor,
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(
-                            color: colors.secondaryButtonContentColor.withAlpha(50),
+                            color: colors.secondaryButtonContentColor.withAlpha(
+                              50,
+                            ),
                           ),
                         ),
                         width: double.infinity,
                         child: Obx(() {
                           // Format the selected time
                           final selectedTime = controller.selectedTime.value;
-                          final formattedTime = selectedTime.format(context); // Format time as "hh:mm AM/PM"
+                          final formattedTime = selectedTime.format(
+                            context,
+                          ); // Format time as "hh:mm AM/PM"
                           return Text(
                             formattedTime,
                             style: TextStyle(
@@ -385,9 +385,8 @@ class AddMealToPlanScreen extends StatelessWidget {
                         color: colors.buttonContentColor,
                         fontSize: 16,
                       ),
-                      outlineColor: colors.secondaryButtonContentColor.withAlpha(
-                        50,
-                      ),
+                      outlineColor: colors.secondaryButtonContentColor
+                          .withAlpha(50),
                       outlineStroke: 0.5,
                     ),
                     SizedBox(height: 16),
@@ -408,11 +407,12 @@ class AddMealToPlanScreen extends StatelessWidget {
                         Expanded(
                           child: ElevatedButton(
                             onPressed: () {
-                              controller.addRecipe();
+                              // controller.addRecipe();
                               showDialog(
                                 context: context,
                                 barrierDismissible: true,
-                                builder: (context) => AddRecipeToMealPlanModal(),
+                                builder:
+                                    (context) => AddRecipeToMealPlanModal(),
                               );
                             },
                             style: ElevatedButton.styleFrom(
@@ -427,7 +427,10 @@ class AddMealToPlanScreen extends StatelessWidget {
                                   8,
                                 ), // Rounded rectangle shape
                               ),
-                              minimumSize: Size(0, 50), // Adjust horizontal size to make it smaller
+                              minimumSize: Size(
+                                0,
+                                50,
+                              ), // Adjust horizontal size to make it smaller
                             ),
                             child: Text(
                               "Add Recipe",
@@ -438,19 +441,21 @@ class AddMealToPlanScreen extends StatelessWidget {
                             ),
                           ),
                         ),
-                        SizedBox(width: 16,),
+                        SizedBox(width: 16),
                         Expanded(
                           child: ElevatedButton(
                             onPressed: () {
                               showDialog(
                                 context: context,
                                 barrierDismissible: true,
-                                builder: (context) => ApplyTemplateToMealPlanModal(),
+                                builder:
+                                    (context) => ApplyTemplateToMealPlanModal(),
                               );
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor:
-                                  colors.buttonColor, // Use buttonColor from ThemeColors
+                                  colors
+                                      .buttonColor, // Use buttonColor from ThemeColors
                               foregroundColor:
                                   colors
                                       .buttonContentColor, // Use buttonContentColor for text
@@ -467,7 +472,7 @@ class AddMealToPlanScreen extends StatelessWidget {
                               ),
                             ),
                           ),
-                        )
+                        ),
                       ],
                     ),
                     SizedBox(height: 16),
@@ -485,201 +490,214 @@ class AddMealToPlanScreen extends StatelessWidget {
                       }
                       return Column(
                         children:
-                          List.generate(controller.recipes.length, (index) {
-                            final recipe = controller.recipes[index];
-                            return Column(
-                              children: [
-                                Container(
-                                  decoration: BoxDecoration(
-                                    color: colors.secondaryButtonColor,
-                                    borderRadius: BorderRadius.circular(8.0),
-                                    border: Border.all(
-                                      color: colors.secondaryButtonContentColor
-                                          .withAlpha(50),
-                                      width: 1,
-                                    ),
-                                  ),
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: 16,
-                                    vertical: 12,
-                                  ),
-                                  child: Row(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Container(
-                                        width: 60,
-                                        height: 60,
-                                        margin: const EdgeInsets.only(top: 4.0),
-                                        decoration: BoxDecoration(
-                                          color: Colors.grey,
-                                        ),
+                            List.generate(controller.recipes.length, (index) {
+                              final recipe = controller.recipes[index];
+                              return Column(
+                                children: [
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      color: colors.secondaryButtonColor,
+                                      borderRadius: BorderRadius.circular(8.0),
+                                      border: Border.all(
+                                        color: colors
+                                            .secondaryButtonContentColor
+                                            .withAlpha(50),
+                                        width: 1,
                                       ),
-                                      SizedBox(width: 8),
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Row(
-                                              children: [
-                                                Expanded(
-                                                  child: Text(
-                                                    recipe.name.value,
-                                                    maxLines: 2,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                    style: TextStyle(
-                                                      color:
-                                                          colors.textPrimaryColor,
-                                                      fontSize: 20,
-                                                      fontWeight: FontWeight.w500,
+                                    ),
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: 16,
+                                      vertical: 12,
+                                    ),
+                                    child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Container(
+                                          width: 60,
+                                          height: 60,
+                                          margin: const EdgeInsets.only(
+                                            top: 4.0,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: Colors.grey,
+                                          ),
+                                        ),
+                                        SizedBox(width: 8),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Row(
+                                                children: [
+                                                  Expanded(
+                                                    child: Text(
+                                                      recipe.name,
+                                                      maxLines: 2,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                      style: TextStyle(
+                                                        color:
+                                                            colors
+                                                                .textPrimaryColor,
+                                                        fontSize: 20,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                      ),
                                                     ),
                                                   ),
-                                                ),
-                                                SizedBox(
-                                                  height: 24,
-                                                  width: 24,
-                                                  child: IconButton(
-                                                    padding: EdgeInsets.zero,
-                                                    icon: Icon(
-                                                      Icons.close,
-                                                      color:
-                                                          colors.normalIconColor,
+                                                  SizedBox(
+                                                    height: 24,
+                                                    width: 24,
+                                                    child: IconButton(
+                                                      padding: EdgeInsets.zero,
+                                                      icon: Icon(
+                                                        Icons.close,
+                                                        color:
+                                                            colors
+                                                                .normalIconColor,
+                                                      ),
+                                                      onPressed:
+                                                          () => controller
+                                                              .removeRecipe(
+                                                                index,
+                                                              ),
                                                     ),
-                                                    onPressed: 
-                                                      () => controller.removeRecipe(index),
                                                   ),
-                                                ),
-                                              ],
-                                            ),
-                                            SizedBox(height: 4),
-                                            Text(
-                                              recipe.description.value,
-                                              maxLines: 2,
-                                              overflow:
-                                                  TextOverflow.ellipsis,
-                                              style: TextStyle(
-                                                color:
-                                                    colors.hintTextColor,
-                                                fontSize: 16,
-                                                // fontWeight: FontWeight.w500,
+                                                ],
                                               ),
-                                            ),
-                                            SizedBox(height: 4,),
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.spaceBetween,
-                                              children: [
-                                                Text("Quantity:"),
-                                                Row(
-                                                  children: [
-                                                    Container(
-                                                      width: 32, // Reduced width
-                                                      height:
-                                                          32, // Reduced height
-                                                      decoration: BoxDecoration(
-                                                        border: Border.all(
-                                                          color: colors
-                                                              .secondaryButtonContentColor
-                                                              .withAlpha(50),
-                                                          width: 1,
+                                              SizedBox(height: 4),
+                                              Text(
+                                                recipe.briefDescription,
+                                                maxLines: 2,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: TextStyle(
+                                                  color: colors.hintTextColor,
+                                                  fontSize: 16,
+                                                  // fontWeight: FontWeight.w500,
+                                                ),
+                                              ),
+                                              SizedBox(height: 4),
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Text("Quantity:"),
+                                                  Row(
+                                                    children: [
+                                                      Container(
+                                                        width:
+                                                            32, // Reduced width
+                                                        height:
+                                                            32, // Reduced height
+                                                        decoration: BoxDecoration(
+                                                          border: Border.all(
+                                                            color: colors
+                                                                .secondaryButtonContentColor
+                                                                .withAlpha(50),
+                                                            width: 1,
+                                                          ),
+                                                          shape:
+                                                              BoxShape.circle,
                                                         ),
-                                                        shape: BoxShape.circle,
-                                                      ),
-                                                      child: IconButton(
-                                                        icon: Icon(
-                                                          Icons.remove,
-                                                          color:
-                                                              colors
-                                                                  .secondaryButtonContentColor,
-                                                          size: 20,
-                                                        ),
-                                                        onPressed:
-                                                            () => controller
-                                                                .decreaseQuantity(
-                                                                  index,
-                                                                ),
-                                                        constraints: BoxConstraints(
-                                                          minWidth:
-                                                              32, // Match the container size
-                                                          minHeight:
-                                                              32, // Match the container size
-                                                        ),
-                                                        padding:
-                                                            EdgeInsets
-                                                                .zero, // Remove extra padding
-                                                      ),
-                                                    ),
-                                                    Obx(() {
-                                                      return Padding(
-                                                        padding:
-                                                            const EdgeInsets.symmetric(
-                                                              horizontal: 12,
-                                                            ),
-                                                        child: Text(
-                                                          recipe.servings.value
-                                                              .toString(),
-                                                          style: TextStyle(
+                                                        child: IconButton(
+                                                          icon: Icon(
+                                                            Icons.remove,
                                                             color:
                                                                 colors
-                                                                    .textPrimaryColor,
-                                                            fontSize: 16,
+                                                                    .secondaryButtonContentColor,
+                                                            size: 20,
                                                           ),
+                                                          onPressed:
+                                                              () => controller
+                                                                  .decreaseQuantity(
+                                                                    index,
+                                                                  ),
+                                                          constraints: BoxConstraints(
+                                                            minWidth:
+                                                                32, // Match the container size
+                                                            minHeight:
+                                                                32, // Match the container size
+                                                          ),
+                                                          padding:
+                                                              EdgeInsets
+                                                                  .zero, // Remove extra padding
                                                         ),
-                                                      );
-                                                    }),
-                                                    Container(
-                                                      width: 32, // Reduced width
-                                                      height:
-                                                          32, // Reduced height
-                                                      decoration: BoxDecoration(
-                                                        border: Border.all(
-                                                          color: colors
-                                                              .secondaryButtonContentColor
-                                                              .withAlpha(50),
-                                                          width: 1,
-                                                        ),
-                                                        shape: BoxShape.circle,
                                                       ),
-                                                      child: IconButton(
-                                                        icon: Icon(
-                                                          Icons.add,
-                                                          color:
-                                                              colors
-                                                                  .secondaryButtonContentColor,
-                                                          size: 20,
+                                                      Obx(() {
+                                                        return Padding(
+                                                          padding:
+                                                              const EdgeInsets.symmetric(
+                                                                horizontal: 12,
+                                                              ),
+                                                          child: Text(
+                                                            controller
+                                                                .recipeQuantities[index]
+                                                                .toString(),
+                                                            style: TextStyle(
+                                                              color:
+                                                                  colors
+                                                                      .textPrimaryColor,
+                                                              fontSize: 16,
+                                                            ),
+                                                          ),
+                                                        );
+                                                      }),
+                                                      Container(
+                                                        width:
+                                                            32, // Reduced width
+                                                        height:
+                                                            32, // Reduced height
+                                                        decoration: BoxDecoration(
+                                                          border: Border.all(
+                                                            color: colors
+                                                                .secondaryButtonContentColor
+                                                                .withAlpha(50),
+                                                            width: 1,
+                                                          ),
+                                                          shape:
+                                                              BoxShape.circle,
                                                         ),
-                                                        onPressed:
-                                                            () => controller
-                                                                .increaseQuantity(
-                                                                  index,
-                                                                ),
-                                                        constraints: BoxConstraints(
-                                                          minWidth:
-                                                              32, // Match the container size
-                                                          minHeight:
-                                                              32, // Match the container size
+                                                        child: IconButton(
+                                                          icon: Icon(
+                                                            Icons.add,
+                                                            color:
+                                                                colors
+                                                                    .secondaryButtonContentColor,
+                                                            size: 20,
+                                                          ),
+                                                          onPressed:
+                                                              () => controller
+                                                                  .increaseQuantity(
+                                                                    index,
+                                                                  ),
+                                                          constraints: BoxConstraints(
+                                                            minWidth:
+                                                                32, // Match the container size
+                                                            minHeight:
+                                                                32, // Match the container size
+                                                          ),
+                                                          padding:
+                                                              EdgeInsets
+                                                                  .zero, // Remove extra padding
                                                         ),
-                                                        padding:
-                                                            EdgeInsets
-                                                                .zero, // Remove extra padding
                                                       ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ],
-                                            ),
-                                          ],
+                                                    ],
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
                                         ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
-                                ),
-                                SizedBox(height: 8),
-                              ],
-                            );
-                          }
-                        ).toList(),
+                                  SizedBox(height: 8),
+                                ],
+                              );
+                            }).toList(),
                       );
                     }),
                     Obx(() {

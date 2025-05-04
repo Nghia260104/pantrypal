@@ -7,9 +7,11 @@ import 'package:pantrypal/screens/plan/add_meal_to_plan_screen.dart';
 // import 'package:pantrypal/screens/meal/create_recipe_screen.dart';
 // import 'package:pantrypal/screens/meal/meal_detail_screen.dart';
 // import 'package:pantrypal/screens/meal/recipe_detail_screen.dart';
+import 'package:pantrypal/models/meal_plan.dart';
 import 'package:pantrypal/widgets/rounded_box.dart';
 import 'package:pantrypal/controllers/plan/plan_controller.dart';
 import 'package:pantrypal/widgets/filled_bar.dart';
+import 'package:pantrypal/models/enums/meal_status.dart';
 
 class PlanScreen extends StatelessWidget {
   final RootController rootController = Get.find<RootController>();
@@ -156,29 +158,48 @@ class PlanScreen extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: List.generate(5, (index) {
                           if (index == 1 || index == 3) {
-                            return SizedBox(width: 16,);
+                            return SizedBox(width: 16);
                           }
                           return Expanded(
                             child: RoundedBox(
-                              color: (index == 0 ? colors.proteinDisplayColor : 
-                              (index == 2 ? colors.carbsDisplayColor : colors.fatDisplayColor)),
-                              outlineColor: (index == 0 ? colors.proteinDisplayColor : 
-                              (index == 2 ? colors.carbsDisplayColor : colors.fatDisplayColor)),
+                              color:
+                                  (index == 0
+                                      ? colors.proteinDisplayColor
+                                      : (index == 2
+                                          ? colors.carbsDisplayColor
+                                          : colors.fatDisplayColor)),
+                              outlineColor:
+                                  (index == 0
+                                      ? colors.proteinDisplayColor
+                                      : (index == 2
+                                          ? colors.carbsDisplayColor
+                                          : colors.fatDisplayColor)),
                               outlineStroke: 0,
-                              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 4,
+                              ),
                               child: Column(
                                 children: [
                                   Text(
                                     nutritions[index],
-                                    style: TextStyle(color: colors.hintTextColor),
+                                    style: TextStyle(
+                                      color: colors.hintTextColor,
+                                    ),
                                   ),
                                   Text(
                                     "${(index + 1) * 10}g",
-                                    style: TextStyle(color: colors.textPrimaryColor, fontSize: 16, fontWeight: FontWeight.bold),
+                                    style: TextStyle(
+                                      color: colors.textPrimaryColor,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
                                   Text(
                                     "/ ${(index + 1) * 20}g",
-                                    style: TextStyle(color: colors.hintTextColor),
+                                    style: TextStyle(
+                                      color: colors.hintTextColor,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -199,6 +220,13 @@ class PlanScreen extends StatelessWidget {
   }
 
   Widget _buildMealPlannerTab(ThemeColors colors) {
+    final today = DateTime.now();
+    final todayMealPlans =
+        controller.mealPlans.where((mealPlan) {
+          return mealPlan.dateTime.year == today.year &&
+              mealPlan.dateTime.month == today.month &&
+              mealPlan.dateTime.day == today.day;
+        }).toList();
     return Container(
       color: colors.backgroundColor,
       child: Padding(
@@ -217,87 +245,120 @@ class PlanScreen extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 16),
-              Column(
-                children: controller.mealBoxes.expand((meal) {
-                  final statusTextColor =
-                      meal["status"] == "Completed"
-                          ? colors.completedTextColor
-                          : meal["status"] == "Current"
-                          ? colors.currentTextColor
-                          : colors.upcomingTextColor;
-                  final statusColor =
-                      meal["status"] == "Completed"
-                          ? colors.completedColor
-                          : meal["status"] == "Current"
-                          ? colors.currentColor
-                          : colors.upcomingColor;
+              // Meal Plans List
+              if (todayMealPlans.isEmpty)
+                Center(
+                  child: Text(
+                    "No meal plans scheduled for today.",
+                    style: TextStyle(color: colors.hintTextColor, fontSize: 16),
+                  ),
+                )
+              else
+                Column(
+                  children:
+                      todayMealPlans.expand((mealPlan) {
+                        final statusTextColor =
+                            mealPlan.status == MealStatus.Completed
+                                ? colors.completedTextColor
+                                : mealPlan.status == MealStatus.Ongoing
+                                ? colors.currentTextColor
+                                : colors.upcomingTextColor;
+                        final statusColor =
+                            mealPlan.status == MealStatus.Completed
+                                ? colors.completedColor
+                                : mealPlan.status == MealStatus.Ongoing
+                                ? colors.currentColor
+                                : colors.upcomingColor;
 
-                  return [
-                    RoundedBox(
-                      padding: EdgeInsets.all(12),
-                      color: colors.mainContainerColor,
-                      child: Row(
-                        mainAxisAlignment:
-                            MainAxisAlignment.spaceBetween,
-                        children: [
-                          Column(
-                            crossAxisAlignment:
-                                CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                meal["title"] as String,
-                                style: TextStyle(
-                                  color: colors.textPrimaryColor,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
+                        return [
+                          RoundedBox(
+                            padding: EdgeInsets.all(12),
+                            color: colors.mainContainerColor,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                // Left Section: Meal Details
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      // Meal Type
+                                      Text(
+                                        mealPlan.type.name,
+                                        style: TextStyle(
+                                          color: colors.textPrimaryColor,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      SizedBox(height: 4),
+
+                                      // Time and Calories
+                                      Text(
+                                        "${mealPlan.formattedTime} • ${mealPlan.calories.round()} kcal",
+                                        style: TextStyle(
+                                          color: colors.hintTextColor,
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                      SizedBox(height: 4),
+
+                                      // List of Recipe Names
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children:
+                                            mealPlan.portions.map((portion) {
+                                              return Text(
+                                                portion.recipe.name,
+                                                style: TextStyle(
+                                                  color:
+                                                      colors.textPrimaryColor,
+                                                  fontSize: 14,
+                                                ),
+                                              );
+                                            }).toList(),
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                              SizedBox(height: 4),
-                              Text(
-                                "${meal["time"]} • ${meal["kcal"]} kcal",
-                                style: TextStyle(
-                                  color: colors.hintTextColor,
+
+                                // Right Section: Status Badge
+                                Container(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 6,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: statusColor,
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Text(
+                                    mealPlan.status.name,
+                                    style: TextStyle(
+                                      color: statusTextColor,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
                                 ),
-                              ),
-                              SizedBox(height: 4),
-                              Text(
-                                "Random",
-                                style: TextStyle(
-                                  color: colors.textPrimaryColor,
-                                ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-                          Container(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 6,
-                            ),
-                            decoration: BoxDecoration(
-                              color: statusColor,
-                            ),
-                            child: Text(
-                              meal["status"] as String,
-                              style: TextStyle(
-                                color: statusTextColor,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: 12), // 👈 spacing after each box
-                  ];
-                }).toList(),
-              ),
+                          SizedBox(height: 12), // Spacing after each box
+                        ];
+                      }).toList(),
+                ),
               SizedBox(height: 16),
               ElevatedButton(
                 onPressed: () {
                   // Save recipe logic here
                   // controller.saveRecipe();
                   // rootController.handleBack();
-                  Get.to(AddMealToPlanScreen(), id: rootController.currentNavId.value);
+                  Get.to(
+                    AddMealToPlanScreen(),
+                    id: rootController.currentNavId.value,
+                  );
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor:

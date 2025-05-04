@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pantrypal/controllers/meal/meal_controller.dart';
+import 'package:pantrypal/controllers/plan/plan_controller.dart';
 import 'package:pantrypal/core/theme/theme_colors.dart';
+import 'package:pantrypal/screens/plan/add_meal_to_plan_screen.dart';
 import 'package:pantrypal/widgets/rounded_box.dart';
 
 import 'package:pantrypal/models/recipe.dart' as ModelRecipe;
@@ -37,7 +39,7 @@ class AddRecipeToMealPlanModal extends StatelessWidget {
                   children: [
                     const SizedBox(width: 24), // Placeholder for alignment
                     Text(
-                      'Add Recipe to Meal',
+                      'Add Recipe to Plan',
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -272,7 +274,20 @@ class AddRecipeToMealPlanController extends GetxController {
   // }
 
   void addRecipeToMealPlan(ModelRecipe.Recipe recipe) {
-    // Get.find<CreateMealController>().addRecipe(recipe);
+    final addMealController = Get.find<AddMealToPlanController>();
+
+    // Check if the recipe already exists in the list
+    final existingIndex = addMealController.recipes.indexWhere(
+      (r) => r.id == recipe.id,
+    );
+
+    if (existingIndex != -1) {
+      // If the recipe exists, increase its quantity
+      addMealController.increaseQuantity(existingIndex);
+    } else {
+      // If the recipe does not exist, add it to the list
+      addMealController.addRecipe(recipe);
+    }
     Get.back(); // Close modal after adding
   }
 }

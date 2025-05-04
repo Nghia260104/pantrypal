@@ -385,7 +385,20 @@ class AddRecipeToMealController extends GetxController {
   // }
 
   void addRecipeToMeal(ModelRecipe.Recipe recipe) {
-    Get.find<CreateMealController>().addRecipe(recipe);
+    final createMealController = Get.find<CreateMealController>();
+
+    // Check if the recipe already exists in the list
+    final existingIndex = createMealController.recipes.indexWhere(
+      (r) => r.id == recipe.id,
+    );
+
+    if (existingIndex != -1) {
+      // If the recipe exists, increase its quantity
+      createMealController.increaseQuantity(existingIndex);
+    } else {
+      // If the recipe does not exist, add it to the list
+      createMealController.addRecipe(recipe);
+    }
     Get.back(); // Close modal after adding
   }
 
