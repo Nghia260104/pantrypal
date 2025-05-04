@@ -1,5 +1,5 @@
 import 'package:hive_ce/hive.dart';
-import 'recipe.dart';
+// import 'recipe.dart';
 import 'hive_manager.dart';
 import 'recipe_portion.dart'; // Import the RecipePortion class
 

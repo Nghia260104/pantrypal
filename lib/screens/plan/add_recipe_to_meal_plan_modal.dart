@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pantrypal/controllers/meal/meal_controller.dart';
-import 'package:pantrypal/controllers/plan/plan_controller.dart';
+// import 'package:pantrypal/controllers/plan/plan_controller.dart';
 import 'package:pantrypal/core/theme/theme_colors.dart';
 import 'package:pantrypal/screens/plan/add_meal_to_plan_screen.dart';
 import 'package:pantrypal/widgets/rounded_box.dart';

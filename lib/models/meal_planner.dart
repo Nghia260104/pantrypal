@@ -1,14 +1,14 @@
-import 'package:hive_ce/hive.dart';
+// import 'package:hive_ce/hive.dart';
 // import 'ingredient_template.dart';
 import 'enums/meal_status.dart';
 import 'inventory_item.dart';
 import 'recipe.dart';
-import 'meal.dart';
+// import 'meal.dart';
 import 'meal_plan.dart';
 import 'shopping_cart.dart';
 import 'notification_model.dart';
 import 'enums/notification_type.dart';
-import 'nutrition_goal.dart';
+// import 'nutrition_goal.dart';
 
 class MealPlanner {
   /// Checks if a recipe can be made with available inventory.

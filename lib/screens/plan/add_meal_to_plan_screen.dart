@@ -8,10 +8,10 @@ import 'package:pantrypal/models/meal_plan.dart';
 import 'package:pantrypal/models/recipe_portion.dart';
 import 'package:pantrypal/models/enums/meal_type.dart';
 import 'package:pantrypal/controllers/plan/plan_controller.dart';
-import 'package:image_picker/image_picker.dart';
+// import 'package:image_picker/image_picker.dart';
 import 'package:pantrypal/screens/plan/add_recipe_to_meal_plan_modal.dart';
 import 'package:pantrypal/screens/plan/apply_template_to_meal_plan_modal.dart';
-import 'dart:io';
+// import 'dart:io';
 
 import 'package:pantrypal/widgets/custom_dropdown_button.dart';
 
@@ -177,10 +177,10 @@ class AddMealToPlanController extends GetxController {
       timeOfDay: selectedTime.value,
     );
 
-    if (mealPlan == null) {
-      Get.snackbar("Error", "Failed to save meal plan.");
-      return;
-    }
+    // if (mealPlan == null) {
+    //   Get.snackbar("Error", "Failed to save meal plan.");
+    //   return;
+    // }
 
     // Notify PlanController to update the list
     Get.find<PlanController>().addMealPlan(mealPlan);

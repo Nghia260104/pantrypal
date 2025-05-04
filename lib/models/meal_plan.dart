@@ -1,6 +1,6 @@
 import 'package:hive_ce/hive.dart';
 import 'meal.dart';
-import 'recipe.dart';
+// import 'recipe.dart';
 import 'enums/meal_type.dart';
 import 'enums/meal_status.dart';
 import 'hive_manager.dart';

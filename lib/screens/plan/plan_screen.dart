@@ -7,7 +7,7 @@ import 'package:pantrypal/screens/plan/add_meal_to_plan_screen.dart';
 // import 'package:pantrypal/screens/meal/create_recipe_screen.dart';
 // import 'package:pantrypal/screens/meal/meal_detail_screen.dart';
 // import 'package:pantrypal/screens/meal/recipe_detail_screen.dart';
-import 'package:pantrypal/models/meal_plan.dart';
+// import 'package:pantrypal/models/meal_plan.dart';
 import 'package:pantrypal/widgets/rounded_box.dart';
 import 'package:pantrypal/controllers/plan/plan_controller.dart';
 import 'package:pantrypal/widgets/filled_bar.dart';
