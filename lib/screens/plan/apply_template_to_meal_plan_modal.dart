@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pantrypal/controllers/meal/meal_controller.dart';
 import 'package:pantrypal/core/theme/theme_colors.dart';
+// import 'package:pantrypal/screens/meal/create_meal_screen.dart';
+import 'package:pantrypal/screens/plan/add_meal_to_plan_screen.dart';
 import 'package:pantrypal/widgets/rounded_box.dart';
+import 'package:pantrypal/models/meal.dart';
 
-import 'package:pantrypal/models/recipe.dart' as ModelRecipe;
+// import 'package:pantrypal/models/recipe.dart' as ModelRecipe;
 
 class ApplyTemplateToMealPlanModal extends StatelessWidget {
   final ApplyTemplateToMealPlanController controller = Get.put(
@@ -149,7 +152,7 @@ class ApplyTemplateToMealPlanModal extends StatelessWidget {
                   children: [
                     const SizedBox(width: 24), // Placeholder for alignment
                     Text(
-                      'Add Recipe to Meal',
+                      'Apply Template',
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -221,13 +224,13 @@ class ApplyTemplateToMealPlanModal extends StatelessWidget {
                   child: Obx(
                     () => ListView.separated(
                       shrinkWrap: true,
-                      itemCount: controller.recipes.length,
+                      itemCount: controller.filteredMeals.length,
                       separatorBuilder: (_, __) => SizedBox(height: 8),
                       itemBuilder: (context, index) {
-                        final recipe = controller.recipes[index];
+                        final meal = controller.filteredMeals[index];
                         return GestureDetector(
                           onTap: () {
-                            controller.applyTemplateToMealPlan(recipe);
+                            controller.applyTemplateToMealPlan(meal);
                             // Get.back(); // Close modal after adding
                           },
                           child: Container(
@@ -264,7 +267,7 @@ class ApplyTemplateToMealPlanModal extends StatelessWidget {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        recipe.name,
+                                        meal.name,
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
                                         style: TextStyle(
@@ -274,7 +277,7 @@ class ApplyTemplateToMealPlanModal extends StatelessWidget {
                                       ),
                                       SizedBox(height: 4),
                                       Text(
-                                        recipe.briefDescription,
+                                        meal.description,
                                         maxLines: 2,
                                         overflow: TextOverflow.ellipsis,
                                         style: TextStyle(
@@ -283,43 +286,62 @@ class ApplyTemplateToMealPlanModal extends StatelessWidget {
                                         ),
                                       ),
                                       SizedBox(height: 8),
-                                      Row(
-                                        children:
-                                            recipe.tags.map((tag) {
-                                              return Container(
-                                                padding: EdgeInsets.symmetric(
-                                                  horizontal: 12,
-                                                  vertical: 2,
-                                                ),
-                                                margin: EdgeInsets.only(
-                                                  right: 8,
-                                                ),
-                                                decoration: BoxDecoration(
-                                                  color:
-                                                      colors
-                                                          .secondaryButtonColor,
-                                                  borderRadius:
-                                                      BorderRadius.circular(16),
-                                                  border: Border.all(
-                                                    color: colors
-                                                        .secondaryButtonContentColor
-                                                        .withAlpha(50),
-                                                    width: 1.0,
-                                                  ),
-                                                ),
-                                                child: Text(
-                                                  tag,
-                                                  style: TextStyle(
-                                                    fontSize: 12,
-                                                    color:
-                                                        colors
-                                                            .secondaryButtonContentColor,
-                                                    fontWeight: FontWeight.w500,
-                                                  ),
-                                                ),
-                                              );
-                                            }).toList(),
+                                      // List of Recipe Names (Truncated to 2 Rows)
+                                      Text(
+                                        meal.portions
+                                            .map(
+                                              (portion) => portion.recipe.name,
+                                            )
+                                            .join(", "),
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color:
+                                              Colors
+                                                  .grey[800], // Slightly darker gray for distinction
+                                          // fontStyle:
+                                          //     FontStyle
+                                          //         .italic, // Italicized for differentiation
+                                        ),
                                       ),
+                                      // Row(
+                                      //   children:
+                                      //       meal.tags.map((tag) {
+                                      //         return Container(
+                                      //           padding: EdgeInsets.symmetric(
+                                      //             horizontal: 12,
+                                      //             vertical: 2,
+                                      //           ),
+                                      //           margin: EdgeInsets.only(
+                                      //             right: 8,
+                                      //           ),
+                                      //           decoration: BoxDecoration(
+                                      //             color:
+                                      //                 colors
+                                      //                     .secondaryButtonColor,
+                                      //             borderRadius:
+                                      //                 BorderRadius.circular(16),
+                                      //             border: Border.all(
+                                      //               color: colors
+                                      //                   .secondaryButtonContentColor
+                                      //                   .withAlpha(50),
+                                      //               width: 1.0,
+                                      //             ),
+                                      //           ),
+                                      //           child: Text(
+                                      //             tag,
+                                      //             style: TextStyle(
+                                      //               fontSize: 12,
+                                      //               color:
+                                      //                   colors
+                                      //                       .secondaryButtonContentColor,
+                                      //               fontWeight: FontWeight.w500,
+                                      //             ),
+                                      //           ),
+                                      //         );
+                                      //       }).toList(),
+                                      // ),
                                     ],
                                   ),
                                 ),
@@ -340,28 +362,34 @@ class ApplyTemplateToMealPlanModal extends StatelessWidget {
   }
 }
 
-class ApplyTemplateToMealPlanController extends GetxController{
+class ApplyTemplateToMealPlanController extends GetxController {
   // var recipes = <Recipe>[].obs;
 
   final MealController mealController = Get.find<MealController>();
-  var recipes = <ModelRecipe.Recipe>[].obs;
+  // var recipes = <ModelRecipe.Recipe>[].obs;
+  var meals = <Meal>[].obs; // List of meals
   var selectedTab = 0.obs;
   final titles = ["All", "Favorites"];
 
   @override
   void onInit() {
     super.onInit();
-    fetchRecipes();
+    fetchMeals();
 
-    mealController.recipes.listen((templates) {
+    mealController.meals.listen((templates) {
       // Update the ingredient templates when they change
-      fetchRecipes();
+      fetchMeals();
+    });
+
+    mealController.mealFavoriteStatus.listen((_) {
+      // print("Meal favorite status changed");
+      fetchMeals();
     });
   }
 
   void toggleTab(int index) => selectedTab.value = index;
 
-  void fetchRecipes() {
+  void fetchMeals() {
     // Simulate fetching recipes
     // recipes.value = [
     //   Recipe(
@@ -375,7 +403,7 @@ class ApplyTemplateToMealPlanController extends GetxController{
     //     tags: ["Salad", "Healthy"],
     //   ),
     // ];
-    recipes.assignAll(ModelRecipe.Recipe.all());
+    meals.assignAll(Meal.all());
   }
 
   // void addRecipeToMeal(Recipe recipe) {
@@ -383,8 +411,19 @@ class ApplyTemplateToMealPlanController extends GetxController{
   //   print("Added ${recipe.title} to meal");
   // }
 
-  void applyTemplateToMealPlan(ModelRecipe.Recipe recipe) {
+  List<Meal> get filteredMeals {
+    if (selectedTab.value == 0) {
+      // All meals
+      return meals;
+    } else {
+      // Favorites only
+      return meals.where((meal) => meal.isFavorite).toList();
+    }
+  }
+
+  void applyTemplateToMealPlan(Meal meal) {
     // Get.find<CreateMealController>().addRecipe(recipe);
+    Get.find<AddMealToPlanController>().applyTemplate(meal.portions);
     Get.back(); // Close modal after adding
   }
 }

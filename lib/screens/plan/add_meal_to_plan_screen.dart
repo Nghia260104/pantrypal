@@ -99,6 +99,16 @@ class AddMealToPlanController extends GetxController {
     computeTotalNutrition();
   }
 
+  void applyTemplate(List<RecipePortion> portions) {
+    recipes.clear();
+    recipeQuantities.clear();
+    for (var portion in portions) {
+      recipes.add(portion.recipe);
+      recipeQuantities.add(portion.quantity.toInt());
+    }
+    computeTotalNutrition();
+  }
+
   // void addRecipe() {
   //   recipes.add(
   //     Recipe(

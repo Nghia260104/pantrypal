@@ -111,10 +111,10 @@ class AddRecipeToMealPlanModal extends StatelessWidget {
                   child: Obx(
                     () => ListView.separated(
                       shrinkWrap: true,
-                      itemCount: controller.recipes.length,
+                      itemCount: controller.filteredRecipes.length,
                       separatorBuilder: (_, __) => SizedBox(height: 8),
                       itemBuilder: (context, index) {
-                        final recipe = controller.recipes[index];
+                        final recipe = controller.filteredRecipes[index];
                         return GestureDetector(
                           onTap: () {
                             controller.addRecipeToMealPlan(recipe);
@@ -247,6 +247,11 @@ class AddRecipeToMealPlanController extends GetxController {
       // Update the ingredient templates when they change
       fetchRecipes();
     });
+
+    mealController.recipeFavoriteStatus.listen((_) {
+      // Update the ingredient templates when they change
+      fetchRecipes();
+    });
   }
 
   void toggleTab(int index) => selectedTab.value = index;
@@ -272,6 +277,16 @@ class AddRecipeToMealPlanController extends GetxController {
   //   // Handle adding recipe to meal
   //   print("Added ${recipe.title} to meal");
   // }
+
+  List<ModelRecipe.Recipe> get filteredRecipes {
+    if (selectedTab.value == 0) {
+      // All recipes
+      return recipes;
+    } else {
+      // Favorites only
+      return recipes.where((recipe) => recipe.isFavorite).toList();
+    }
+  }
 
   void addRecipeToMealPlan(ModelRecipe.Recipe recipe) {
     final addMealController = Get.find<AddMealToPlanController>();
