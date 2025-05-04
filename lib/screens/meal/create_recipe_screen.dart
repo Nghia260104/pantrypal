@@ -269,10 +269,7 @@ class CreateRecipeScreen extends StatelessWidget {
         },
         child: Column(
           children: [
-            Divider(
-              color: colors.hintTextColor.withAlpha(50),
-              thickness: 1,
-            ),
+            Divider(color: colors.hintTextColor.withAlpha(50), thickness: 1),
             Expanded(
               child: SingleChildScrollView(
                 padding: EdgeInsets.all(16),
@@ -304,7 +301,9 @@ class CreateRecipeScreen extends StatelessWidget {
                                     borderRadius: BorderRadius.circular(8),
                                     child: Center(
                                       child: Image.file(
-                                        File(controller.selectedImage.value!.path),
+                                        File(
+                                          controller.selectedImage.value!.path,
+                                        ),
                                         fit: BoxFit.cover,
                                       ),
                                     ),
@@ -347,28 +346,36 @@ class CreateRecipeScreen extends StatelessWidget {
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
                           borderSide: BorderSide(
-                            color: colors.secondaryButtonContentColor.withAlpha(50),
+                            color: colors.secondaryButtonContentColor.withAlpha(
+                              50,
+                            ),
                             width: 0.5,
                           ),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
                           borderSide: BorderSide(
-                            color: colors.secondaryButtonContentColor.withAlpha(50),
+                            color: colors.secondaryButtonContentColor.withAlpha(
+                              50,
+                            ),
                             width: 0.5,
                           ),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
                           borderSide: BorderSide(
-                            color: colors.secondaryButtonContentColor.withAlpha(50),
+                            color: colors.secondaryButtonContentColor.withAlpha(
+                              50,
+                            ),
                             width: 0.5,
                           ),
                         ),
                         fillColor: colors.secondaryButtonColor,
                         filled: true,
                       ),
-                      style: TextStyle(color: colors.secondaryButtonContentColor),
+                      style: TextStyle(
+                        color: colors.secondaryButtonContentColor,
+                      ),
                     ),
                     SizedBox(height: 16),
                     Text(
@@ -390,28 +397,36 @@ class CreateRecipeScreen extends StatelessWidget {
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
                           borderSide: BorderSide(
-                            color: colors.secondaryButtonContentColor.withAlpha(50),
+                            color: colors.secondaryButtonContentColor.withAlpha(
+                              50,
+                            ),
                             width: 0.5,
                           ),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
                           borderSide: BorderSide(
-                            color: colors.secondaryButtonContentColor.withAlpha(50),
+                            color: colors.secondaryButtonContentColor.withAlpha(
+                              50,
+                            ),
                             width: 0.5,
                           ),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
                           borderSide: BorderSide(
-                            color: colors.secondaryButtonContentColor.withAlpha(50),
+                            color: colors.secondaryButtonContentColor.withAlpha(
+                              50,
+                            ),
                             width: 0.5,
                           ),
                         ),
                         fillColor: colors.secondaryButtonColor,
                         filled: true,
                       ),
-                      style: TextStyle(color: colors.secondaryButtonContentColor),
+                      style: TextStyle(
+                        color: colors.secondaryButtonContentColor,
+                      ),
                     ),
                     SizedBox(height: 16),
                     Text(
@@ -502,9 +517,8 @@ class CreateRecipeScreen extends StatelessWidget {
                         color: colors.buttonContentColor,
                         fontSize: 16,
                       ),
-                      outlineColor: colors.secondaryButtonContentColor.withAlpha(
-                        50,
-                      ),
+                      outlineColor: colors.secondaryButtonContentColor
+                          .withAlpha(50),
                       outlineStroke: 0.5,
                     ),
                     SizedBox(height: 16),
@@ -547,7 +561,8 @@ class CreateRecipeScreen extends StatelessWidget {
                               return Column(
                                 children: [
                                   Row(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
                                     children: [
                                       // Ingredient Name Dropdown (Expanded)
                                       Expanded(
@@ -583,7 +598,18 @@ class CreateRecipeScreen extends StatelessWidget {
                                         // ),
                                         child: CustomDropdownButton(
                                           selectedValue: name,
-                                          items: controller.uniqueIngredientNames,
+                                          items:
+                                              controller.uniqueIngredientNames
+                                                  .where(
+                                                    (ingredientName) =>
+                                                        !controller.ingredients.any(
+                                                          (ingredient) =>
+                                                              ingredient["name"]
+                                                                  .value ==
+                                                              ingredientName,
+                                                        ),
+                                                  )
+                                                  .toList(), // Exclude already-added ingredients
                                           onChanged: (value) {
                                             name.value = value;
                                             var curUnitsList =
@@ -604,10 +630,12 @@ class CreateRecipeScreen extends StatelessWidget {
                                           },
                                           textStyle: TextStyle(
                                             color:
-                                                colors.secondaryButtonContentColor,
+                                                colors
+                                                    .secondaryButtonContentColor,
                                             fontSize: 16,
                                           ),
-                                          buttonColor: colors.secondaryButtonColor,
+                                          buttonColor:
+                                              colors.secondaryButtonColor,
                                           selectedColor: colors.buttonColor,
                                           selectedText: TextStyle(
                                             color: colors.buttonContentColor,
@@ -637,9 +665,8 @@ class CreateRecipeScreen extends StatelessWidget {
                                           decoration: InputDecoration(
                                             hintText: "Qty",
                                             border: OutlineInputBorder(
-                                              borderRadius: BorderRadius.circular(
-                                                8,
-                                              ),
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
                                               borderSide: BorderSide(
                                                 color: colors
                                                     .secondaryButtonContentColor
@@ -648,9 +675,8 @@ class CreateRecipeScreen extends StatelessWidget {
                                               ),
                                             ),
                                             enabledBorder: OutlineInputBorder(
-                                              borderRadius: BorderRadius.circular(
-                                                8,
-                                              ),
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
                                               borderSide: BorderSide(
                                                 color: colors
                                                     .secondaryButtonContentColor
@@ -659,9 +685,8 @@ class CreateRecipeScreen extends StatelessWidget {
                                               ),
                                             ),
                                             focusedBorder: OutlineInputBorder(
-                                              borderRadius: BorderRadius.circular(
-                                                8,
-                                              ),
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
                                               borderSide: BorderSide(
                                                 color: colors
                                                     .secondaryButtonContentColor
@@ -669,11 +694,13 @@ class CreateRecipeScreen extends StatelessWidget {
                                                 width: 0.5,
                                               ),
                                             ),
-                                            contentPadding: EdgeInsets.symmetric(
-                                              horizontal: 8,
-                                              vertical: 14,
-                                            ),
-                                            fillColor: colors.secondaryButtonColor,
+                                            contentPadding:
+                                                EdgeInsets.symmetric(
+                                                  horizontal: 8,
+                                                  vertical: 14,
+                                                ),
+                                            fillColor:
+                                                colors.secondaryButtonColor,
                                             filled: true,
                                           ),
                                           controller: TextEditingController(
@@ -682,7 +709,8 @@ class CreateRecipeScreen extends StatelessWidget {
                                             ..selection =
                                                 TextSelection.fromPosition(
                                                   TextPosition(
-                                                    offset: quantity.value.length,
+                                                    offset:
+                                                        quantity.value.length,
                                                   ),
                                                 ),
                                         ),
@@ -707,10 +735,12 @@ class CreateRecipeScreen extends StatelessWidget {
                                           ),
                                           textStyle: TextStyle(
                                             color:
-                                                colors.secondaryButtonContentColor,
+                                                colors
+                                                    .secondaryButtonContentColor,
                                             fontSize: 16,
                                           ),
-                                          buttonColor: colors.secondaryButtonColor,
+                                          buttonColor:
+                                              colors.secondaryButtonColor,
                                           selectedColor: colors.buttonColor,
                                           selectedText: TextStyle(
                                             color: colors.buttonContentColor,
@@ -764,21 +794,27 @@ class CreateRecipeScreen extends StatelessWidget {
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
                           borderSide: BorderSide(
-                            color: colors.secondaryButtonContentColor.withAlpha(50),
+                            color: colors.secondaryButtonContentColor.withAlpha(
+                              50,
+                            ),
                             width: 0.5,
                           ),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
                           borderSide: BorderSide(
-                            color: colors.secondaryButtonContentColor.withAlpha(50),
+                            color: colors.secondaryButtonContentColor.withAlpha(
+                              50,
+                            ),
                             width: 0.5,
                           ),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
                           borderSide: BorderSide(
-                            color: colors.secondaryButtonContentColor.withAlpha(50),
+                            color: colors.secondaryButtonContentColor.withAlpha(
+                              50,
+                            ),
                             width: 0.5,
                           ),
                         ),
@@ -799,7 +835,8 @@ class CreateRecipeScreen extends StatelessWidget {
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor:
-                            colors.buttonColor, // Use buttonColor from ThemeColors
+                            colors
+                                .buttonColor, // Use buttonColor from ThemeColors
                         foregroundColor:
                             colors
                                 .buttonContentColor, // Use buttonContentColor for text
