@@ -15,7 +15,12 @@ import 'package:pantrypal/models/enums/meal_status.dart';
 
 class PlanScreen extends StatelessWidget {
   final RootController rootController = Get.find<RootController>();
-  final PlanController controller = Get.put(PlanController());
+
+  // Lazy initialization of PlanController
+  // cái put nằm trong HomeController, t cần cái đó để update lại meal plan mỗi khi có meal plan mới
+
+  // final PlanController controller = Get.put(PlanController());
+  final PlanController controller = Get.find<PlanController>();
 
   final List<String> nutritions = ["Protein", "", "Carbs", "", "Fat"];
 

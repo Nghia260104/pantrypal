@@ -74,11 +74,34 @@ class MealPlan extends HiveObject {
     // Get the next incremental ID
     final id = await HiveManager().getNextId('lastMealPlanId');
 
+    // Calculate the initial status
+    final now = TimeOfDay.now();
+    final currentMinutes = now.hour * 60 + now.minute;
+    final mealMinutes = timeOfDay.hour * 60 + timeOfDay.minute;
+
+    final isBreakfastLunchDinner =
+        type == MealType.Breakfast ||
+        type == MealType.Lunch ||
+        type == MealType.Dinner;
+
+    // Determine the Ongoing period
+    final ongoingDuration = isBreakfastLunchDinner ? 60 : 30;
+
+    MealStatus initialStatus;
+    if (currentMinutes < mealMinutes) {
+      initialStatus = MealStatus.Upcoming;
+    } else if (currentMinutes >= mealMinutes &&
+        currentMinutes <= mealMinutes + ongoingDuration) {
+      initialStatus = MealStatus.Ongoing;
+    } else {
+      initialStatus = MealStatus.Completed;
+    }
+
     final mealPlan = MealPlan(
       id: id,
       dateTime: dateTime,
       type: type,
-      status: MealStatus.Upcoming,
+      status: initialStatus,
       portions: portions,
       timeOfDayString:
           '${timeOfDay.hour.toString().padLeft(2, '0')}:${timeOfDay.minute.toString().padLeft(2, '0')}', // Convert TimeOfDay to String

@@ -6,6 +6,7 @@ import 'package:pantrypal/controllers/root_controller.dart';
 import 'package:pantrypal/core/theme/theme_colors.dart';
 import 'package:pantrypal/widgets/filled_bar.dart';
 import 'package:pantrypal/widgets/rounded_box.dart';
+import 'package:pantrypal/models/enums/meal_status.dart';
 
 class HomeScreen extends StatelessWidget {
   final HomeController controller = Get.put(HomeController());
@@ -17,9 +18,7 @@ class HomeScreen extends StatelessWidget {
     {"icon": Icons.shopping_cart_outlined, "title": "Plan"},
   ];
 
-  final List<String> nutritions = [
-    "Protein", "", "Carbs", "", "Fat",
-  ];
+  final List<String> nutritions = ["Protein", "", "Carbs", "", "Fat"];
 
   @override
   Widget build(BuildContext context) {
@@ -175,29 +174,48 @@ class HomeScreen extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: List.generate(5, (index) {
                             if (index == 1 || index == 3) {
-                              return SizedBox(width: 16,);
+                              return SizedBox(width: 16);
                             }
                             return Expanded(
                               child: RoundedBox(
-                                color: (index == 0 ? colors.proteinDisplayColor : 
-                                (index == 2 ? colors.carbsDisplayColor : colors.fatDisplayColor)),
-                                outlineColor: (index == 0 ? colors.proteinDisplayColor : 
-                                (index == 2 ? colors.carbsDisplayColor : colors.fatDisplayColor)),
+                                color:
+                                    (index == 0
+                                        ? colors.proteinDisplayColor
+                                        : (index == 2
+                                            ? colors.carbsDisplayColor
+                                            : colors.fatDisplayColor)),
+                                outlineColor:
+                                    (index == 0
+                                        ? colors.proteinDisplayColor
+                                        : (index == 2
+                                            ? colors.carbsDisplayColor
+                                            : colors.fatDisplayColor)),
                                 outlineStroke: 0,
-                                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 4,
+                                ),
                                 child: Column(
                                   children: [
                                     Text(
                                       nutritions[index],
-                                      style: TextStyle(color: colors.hintTextColor),
+                                      style: TextStyle(
+                                        color: colors.hintTextColor,
+                                      ),
                                     ),
                                     Text(
                                       "${(index + 1) * 10}g",
-                                      style: TextStyle(color: colors.textPrimaryColor, fontSize: 16, fontWeight: FontWeight.bold),
+                                      style: TextStyle(
+                                        color: colors.textPrimaryColor,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
                                     Text(
                                       "/ ${(index + 1) * 20}g",
-                                      style: TextStyle(color: colors.hintTextColor),
+                                      style: TextStyle(
+                                        color: colors.hintTextColor,
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -327,7 +345,8 @@ class HomeScreen extends StatelessWidget {
                     children: List.generate(3, (index) {
                       return Material(
                         color:
-                            colors.mainContainerColor, // Ensure the background is transparent
+                            colors
+                                .mainContainerColor, // Ensure the background is transparent
                         child: InkWell(
                           onTap: () {
                             rootController.changeTab(index + 1);
@@ -451,81 +470,121 @@ class HomeScreen extends StatelessWidget {
                   SizedBox(height: 16),
 
                   // Meal List
-                  Column(
-                    children:
-                        controller.mealBoxes.expand((meal) {
-                          final statusTextColor =
-                              meal["status"] == "Completed"
-                                  ? colors.completedTextColor
-                                  : meal["status"] == "Current"
-                                  ? colors.currentTextColor
-                                  : colors.upcomingTextColor;
-                          final statusColor =
-                              meal["status"] == "Completed"
-                                  ? colors.completedColor
-                                  : meal["status"] == "Current"
-                                  ? colors.currentColor
-                                  : colors.upcomingColor;
+                  Obx(() {
+                    final filteredMealPlans = controller.filteredMealPlans;
 
-                          return [
-                            RoundedBox(
-                              padding: EdgeInsets.all(12),
-                              color: colors.mainContainerColor,
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        meal["title"] as String,
+                    if (filteredMealPlans.isEmpty) {
+                      return Center(
+                        child: Text(
+                          "No meal plans available.",
+                          style: TextStyle(
+                            color: colors.hintTextColor,
+                            fontSize: 16,
+                          ),
+                        ),
+                      );
+                    }
+
+                    return Column(
+                      children:
+                          filteredMealPlans.expand((mealPlan) {
+                            final statusTextColor =
+                                mealPlan.status == MealStatus.Completed
+                                    ? colors.completedTextColor
+                                    : mealPlan.status == MealStatus.Ongoing
+                                    ? colors.currentTextColor
+                                    : colors.upcomingTextColor;
+                            final statusColor =
+                                mealPlan.status == MealStatus.Completed
+                                    ? colors.completedColor
+                                    : mealPlan.status == MealStatus.Ongoing
+                                    ? colors.currentColor
+                                    : colors.upcomingColor;
+
+                            return [
+                              RoundedBox(
+                                padding: EdgeInsets.all(12),
+                                color: colors.mainContainerColor,
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    // Left Section: Meal Details
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          // Meal Type
+                                          Text(
+                                            mealPlan.type.name,
+                                            style: TextStyle(
+                                              color: colors.textPrimaryColor,
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          SizedBox(height: 4),
+
+                                          // Time and Calories
+                                          Text(
+                                            "${mealPlan.formattedTime} • ${mealPlan.calories.round()} kcal",
+                                            style: TextStyle(
+                                              color: colors.hintTextColor,
+                                              fontSize: 14,
+                                            ),
+                                          ),
+                                          SizedBox(height: 4),
+
+                                          // List of Recipe Names
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children:
+                                                mealPlan.portions.map((
+                                                  portion,
+                                                ) {
+                                                  return Text(
+                                                    portion.recipe.name,
+                                                    style: TextStyle(
+                                                      color:
+                                                          colors
+                                                              .textPrimaryColor,
+                                                      fontSize: 14,
+                                                    ),
+                                                  );
+                                                }).toList(),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+
+                                    // Right Section: Status Badge
+                                    Container(
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: 12,
+                                        vertical: 6,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: statusColor,
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: Text(
+                                        mealPlan.status.name,
                                         style: TextStyle(
-                                          color: colors.textPrimaryColor,
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
+                                          color: statusTextColor,
+                                          fontWeight: FontWeight.w500,
                                         ),
                                       ),
-                                      SizedBox(height: 4),
-                                      Text(
-                                        "${meal["time"]} • ${meal["kcal"]} kcal",
-                                        style: TextStyle(
-                                          color: colors.hintTextColor,
-                                        ),
-                                      ),
-                                      SizedBox(height: 4),
-                                      Text(
-                                        "Random",
-                                        style: TextStyle(
-                                          color: colors.textPrimaryColor,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  Container(
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: 12,
-                                      vertical: 6,
                                     ),
-                                    decoration: BoxDecoration(
-                                      color: statusColor,
-                                    ),
-                                    child: Text(
-                                      meal["status"] as String,
-                                      style: TextStyle(
-                                        color: statusTextColor,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
-                            ),
-                            SizedBox(height: 12), // 👈 spacing after each box
-                          ];
-                        }).toList(),
-                  ),
+                              SizedBox(height: 12), // Spacing after each box
+                            ];
+                          }).toList(),
+                    );
+                  }),
                 ],
               ),
             ),

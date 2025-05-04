@@ -1,6 +1,7 @@
 // lib/models/hive_manager.dart
 
 import 'package:hive_ce_flutter/hive_flutter.dart';
+import 'package:pantrypal/controllers/home/home_controller.dart';
 import 'package:pantrypal/models/meal_plan.dart';
 
 // Enums
@@ -19,6 +20,12 @@ import 'cart_item.dart';
 import 'shopping_cart.dart';
 import 'recipe_portion.dart';
 import 'nutrition_goal.dart';
+
+// To update meal plan statuses periodically
+import 'dart:async';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:pantrypal/controllers/plan/plan_controller.dart';
 
 class HiveManager {
   /// Call once at app startup:
@@ -56,6 +63,9 @@ class HiveManager {
 
     // 4. Open the 'counter' box for managing incremental IDs
     await initializeCounters();
+
+    // Start the MealPlan status updater
+    startMealPlanStatusUpdater();
 
     // Done — now your boxes are ready to use throughout the app.
   }
@@ -168,5 +178,49 @@ class HiveManager {
     final nextId = currentId + 1;
     await counterBox.put(key, nextId);
     return nextId;
+  }
+
+  /// Starts a periodic script to update MealPlan statuses every minute.
+  static void startMealPlanStatusUpdater() {
+    Timer.periodic(Duration(minutes: 1), (timer) async {
+      final now = TimeOfDay.now();
+      final currentMinutes = now.hour * 60 + now.minute;
+
+      // Fetch all meal plans from the Hive database
+      final mealPlans = MealPlan.all();
+
+      for (var mealPlan in mealPlans) {
+        final mealMinutes =
+            mealPlan.timeOfDay.hour * 60 + mealPlan.timeOfDay.minute;
+        final isBreakfastLunchDinner =
+            mealPlan.type == MealType.Breakfast ||
+            mealPlan.type == MealType.Lunch ||
+            mealPlan.type == MealType.Dinner;
+
+        // Determine the Ongoing period
+        final ongoingDuration = isBreakfastLunchDinner ? 60 : 30;
+
+        if (currentMinutes < mealMinutes) {
+          // Before the meal time
+          mealPlan.status = MealStatus.Upcoming;
+        } else if (currentMinutes >= mealMinutes &&
+            currentMinutes <= mealMinutes + ongoingDuration) {
+          // Within the Ongoing period
+          mealPlan.status = MealStatus.Ongoing;
+        } else {
+          // After the Ongoing period
+          mealPlan.status = MealStatus.Completed;
+        }
+
+        // Save the updated status to Hive
+        await mealPlan.save();
+      }
+
+      // Update the PlanController's mealPlans list
+      final planController = Get.find<PlanController>();
+      final homeController = Get.find<HomeController>();
+      planController.fetchMealPlans();
+      homeController.fetchMealPlans();
+    });
   }
 }
