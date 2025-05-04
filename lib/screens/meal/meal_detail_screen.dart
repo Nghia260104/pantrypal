@@ -322,7 +322,7 @@ class MealDetailScreen extends StatelessWidget {
                                         child: Row(
                                           children: [
                                             Text(
-                                              "${portion.quantity.round().toString()} serving",
+                                              "${portion.quantity.round().toString()} serving(s)",
                                               style: TextStyle(
                                                 fontSize: 14,
                                                 color:

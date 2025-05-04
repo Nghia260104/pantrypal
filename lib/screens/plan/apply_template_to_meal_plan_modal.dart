@@ -5,11 +5,10 @@ import 'package:pantrypal/core/theme/theme_colors.dart';
 import 'package:pantrypal/widgets/rounded_box.dart';
 
 import 'package:pantrypal/models/recipe.dart' as ModelRecipe;
-import 'package:pantrypal/screens/meal/create_meal_screen.dart';
 
-class AddRecipeToMealModal extends StatelessWidget {
-  final AddRecipeToMealController controller = Get.put(
-    AddRecipeToMealController(),
+class ApplyTemplateToMealPlanModal extends StatelessWidget {
+  final ApplyTemplateToMealPlanController controller = Get.put(
+    ApplyTemplateToMealPlanController(),
   );
 
   // @override
@@ -228,7 +227,7 @@ class AddRecipeToMealModal extends StatelessWidget {
                         final recipe = controller.recipes[index];
                         return GestureDetector(
                           onTap: () {
-                            controller.addRecipeToMeal(recipe);
+                            controller.applyTemplateToMealPlan(recipe);
                             // Get.back(); // Close modal after adding
                           },
                           child: Container(
@@ -341,7 +340,7 @@ class AddRecipeToMealModal extends StatelessWidget {
   }
 }
 
-class AddRecipeToMealController extends GetxController {
+class ApplyTemplateToMealPlanController extends GetxController{
   // var recipes = <Recipe>[].obs;
 
   final MealController mealController = Get.find<MealController>();
@@ -384,14 +383,9 @@ class AddRecipeToMealController extends GetxController {
   //   print("Added ${recipe.title} to meal");
   // }
 
-  void addRecipeToMeal(ModelRecipe.Recipe recipe) {
-    Get.find<CreateMealController>().addRecipe(recipe);
+  void applyTemplateToMealPlan(ModelRecipe.Recipe recipe) {
+    // Get.find<CreateMealController>().addRecipe(recipe);
     Get.back(); // Close modal after adding
-  }
-
-  @override
-  void onClose() {
-    super.onClose();
   }
 }
 

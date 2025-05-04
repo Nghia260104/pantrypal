@@ -19,7 +19,7 @@ class MealScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: colors.appbarColor,
         title: const Text("Meal Suggestions"),
       ),
       body: Obx(

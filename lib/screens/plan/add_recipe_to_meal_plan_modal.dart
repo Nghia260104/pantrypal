@@ -5,125 +5,12 @@ import 'package:pantrypal/core/theme/theme_colors.dart';
 import 'package:pantrypal/widgets/rounded_box.dart';
 
 import 'package:pantrypal/models/recipe.dart' as ModelRecipe;
-import 'package:pantrypal/screens/meal/create_meal_screen.dart';
 
-class AddRecipeToMealModal extends StatelessWidget {
-  final AddRecipeToMealController controller = Get.put(
-    AddRecipeToMealController(),
+class AddRecipeToMealPlanModal extends StatelessWidget {
+  final AddRecipeToMealPlanController controller = Get.put(
+    AddRecipeToMealPlanController(),
   );
 
-  // @override
-  // Widget build(BuildContext context) {
-  //   final double maxHeight = MediaQuery.of(context).size.height * 0.7;
-
-  // return Padding(
-  //   padding: const EdgeInsets.all(16.0),
-  //   child: Container(
-  //     constraints: BoxConstraints(maxHeight: maxHeight),
-  //     child: Column(
-  //       children: [
-  //         Row(
-  //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //           children: [
-  //             GestureDetector(
-  //               onTap: () => Get.back(),
-  //               child: Icon(Icons.close),
-  //             ),
-  //             Text(
-  //               "Add Recipe to Meal",
-  //               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-  //             ),
-  //             SizedBox(width: 24), // Placeholder for alignment
-  //           ],
-  //         ),
-  //         SizedBox(height: 16),
-  //         Obx(() => TabBar(
-  //               controller: controller.tabController,
-  //               tabs: [
-  //                 Tab(text: "All"),
-  //                 Tab(text: "Favorites"),
-  //               ],
-  //             )),
-  //         SizedBox(height: 16),
-  //         Expanded(
-  //           child: Obx(() => ListView.separated(
-  //                 itemCount: controller.recipes.length,
-  //                 separatorBuilder: (_, __) => SizedBox(height: 8),
-  //                 itemBuilder: (context, index) {
-  //                   final recipe = controller.recipes[index];
-  //                   return Container(
-  //                     padding: EdgeInsets.all(12),
-  //                     decoration: BoxDecoration(
-  //                       color: Colors.white,
-  //                       borderRadius: BorderRadius.circular(12),
-  //                       boxShadow: [
-  //                         BoxShadow(
-  //                           color: Colors.black12,
-  //                           blurRadius: 4,
-  //                           offset: Offset(0, 2),
-  //                         ),
-  //                       ],
-  //                     ),
-  //                     child: Row(
-  //                       crossAxisAlignment: CrossAxisAlignment.center,
-  //                       children: [
-  //                         Container(
-  //                           width: 50,
-  //                           height: 50,
-  //                           color: Colors.grey[300],
-  //                         ),
-  //                         SizedBox(width: 12),
-  //                         Expanded(
-  //                           child: Column(
-  //                             crossAxisAlignment: CrossAxisAlignment.start,
-  //                             children: [
-  //                               Text(
-  //                                 recipe.title,
-  //                                 maxLines: 2,
-  //                                 overflow: TextOverflow.ellipsis,
-  //                                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-  //                               ),
-  //                               SizedBox(height: 4),
-  //                               Text(
-  //                                 recipe.description,
-  //                                 maxLines: 1,
-  //                                 overflow: TextOverflow.ellipsis,
-  //                                 style: TextStyle(fontSize: 14, color: Colors.grey[600]),
-  //                               ),
-  //                               SizedBox(height: 8),
-  //                               Row(
-  //                                 children: recipe.tags.map((tag) {
-  //                                   return Container(
-  //                                     padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-  //                                     margin: EdgeInsets.only(right: 8),
-  //                                     decoration: BoxDecoration(
-  //                                       color: Colors.blue[100],
-  //                                       borderRadius: BorderRadius.circular(16),
-  //                                     ),
-  //                                     child: Text(
-  //                                       tag,
-  //                                       style: TextStyle(fontSize: 12, color: Colors.blue[800]),
-  //                                     ),
-  //                                   );
-  //                                 }).toList(),
-  //                               ),
-  //                             ],
-  //                           ),
-  //                         ),
-  //                         ElevatedButton(
-  //                           onPressed: () => controller.addRecipeToMeal(recipe),
-  //                           child: Text("Add"),
-  //                         ),
-  //                       ],
-  //                     ),
-  //                   );
-  //                 },
-  //               )),
-  //         ),
-  //       ],
-  //     ),
-  //   ),
-  // );
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).extension<ThemeColors>()!;
@@ -228,7 +115,7 @@ class AddRecipeToMealModal extends StatelessWidget {
                         final recipe = controller.recipes[index];
                         return GestureDetector(
                           onTap: () {
-                            controller.addRecipeToMeal(recipe);
+                            controller.addRecipeToMealPlan(recipe);
                             // Get.back(); // Close modal after adding
                           },
                           child: Container(
@@ -341,7 +228,7 @@ class AddRecipeToMealModal extends StatelessWidget {
   }
 }
 
-class AddRecipeToMealController extends GetxController {
+class AddRecipeToMealPlanController extends GetxController {
   // var recipes = <Recipe>[].obs;
 
   final MealController mealController = Get.find<MealController>();
@@ -384,14 +271,9 @@ class AddRecipeToMealController extends GetxController {
   //   print("Added ${recipe.title} to meal");
   // }
 
-  void addRecipeToMeal(ModelRecipe.Recipe recipe) {
-    Get.find<CreateMealController>().addRecipe(recipe);
+  void addRecipeToMealPlan(ModelRecipe.Recipe recipe) {
+    // Get.find<CreateMealController>().addRecipe(recipe);
     Get.back(); // Close modal after adding
-  }
-
-  @override
-  void onClose() {
-    super.onClose();
   }
 }
 

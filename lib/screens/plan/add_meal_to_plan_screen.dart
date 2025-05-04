@@ -1,21 +1,219 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:pantrypal/controllers/root_controller.dart';
 import 'package:pantrypal/core/theme/theme_colors.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:pantrypal/screens/plan/add_recipe_to_meal_plan_modal.dart';
+import 'package:pantrypal/screens/plan/apply_template_to_meal_plan_modal.dart';
 import 'dart:io';
 
-import 'package:pantrypal/screens/meal/add_recipe_to_meal_modal.dart';
+import 'package:pantrypal/widgets/custom_dropdown_button.dart';
 
-import 'package:pantrypal/models/recipe.dart' as ModelRecipe;
-import 'package:pantrypal/controllers/meal/meal_controller.dart';
+class Recipe {
+  RxString name;
+  RxString description;
+  RxInt calories;
+  RxInt duration;
+  RxInt servings;
 
-import 'package:pantrypal/models/meal.dart';
-// import 'package:pantrypal/models/recipe.dart';
-import 'package:pantrypal/models/recipe_portion.dart';
+    Recipe({
+      required String name,
+      required String description,
+      required int calories,
+      required int duration,
+      int servings = 1,
+    })  : name = name.obs,
+          description = description.obs,
+          calories = calories.obs,
+          duration = duration.obs,
+          servings = servings.obs;
+}
 
-class CreateMealScreen extends StatelessWidget {
-  final CreateMealController controller = Get.put(CreateMealController());
+class AddMealToPlanController extends GetxController {
+  // var recipes = <Recipe>[].obs;
+  // var recipes = <ModelRecipe.Recipe>[].obs;
+  var recipeQuantities = <int>[].obs; // Store quantities for each recipe
+  var selectedDate = DateTime.now().obs;
+  var selectedTime = TimeOfDay(hour: 7, minute: 0).obs;
+  var mealType = "Breakfast".obs;
+  var recipes = <Recipe>[].obs; // List of selected recipes
+  var mealTypeList = [
+    "Breakfast",
+    "Lunch",
+    "Dinner",
+    "Snack",
+  ];
+
+  // Reactive variables for total nutrition
+  var totalCalories = 0.0.obs;
+  var totalProtein = 0.0.obs;
+  var totalCarbs = 0.0.obs;
+  var totalFat = 0.0.obs;
+
+  // @override
+  // void onInit() {
+  //   super.onInit();
+  //   // Recompute totals whenever recipes or quantities change
+  //   // recipes.listen((_) => computeTotalNutrition());
+  //   // recipeQuantities.listen((_) => computeTotalNutrition());
+  // }
+
+  // Method to compute total nutrition
+  // void computeTotalNutrition() {
+  //   double calories = 0, protein = 0, carbs = 0, fat = 0;
+
+  //   for (int i = 0; i < recipes.length; i++) {
+  //     final recipe = recipes[i];
+  //     final quantity = recipeQuantities[i];
+
+  //     calories += recipe.calories * quantity;
+  //     protein += recipe.protein * quantity;
+  //     carbs += recipe.carbs * quantity;
+  //     fat += recipe.fat * quantity;
+  //   }
+
+  //   totalCalories.value = calories;
+  //   totalProtein.value = protein;
+  //   totalCarbs.value = carbs;
+  //   totalFat.value = fat;
+  // }
+
+  // var recipePortions = <Map<String, dynamic>>[].obs;
+  // var availableRecipes = <Recipe>[].obs; // List of available recipes
+
+  // @override
+  // void onInit() {
+  //   super.onInit();
+  //   loadAvailableRecipes();
+  // }
+
+  // void loadAvailableRecipes() {
+  //   // Load recipes from the database or controller
+  //   availableRecipes.assignAll(Recipe.all());
+  // }
+
+  // void addRecipe(ModelRecipe.Recipe recipe) {
+  //   recipes.add(recipe);
+  //   recipeQuantities.add(1); // Default quantity
+  //   computeTotalNutrition();
+  // }
+
+  void addRecipe() {
+    recipes.add(
+      Recipe(
+        name: "Recipe ${recipes.length + 1}",
+        description: "Description of Recipe ${recipes.length + 1}",
+        calories: 200,
+        duration: 30,
+      ),
+    );
+  }
+
+  // void removeRecipe(Recipe recipe) {
+  //   recipes.remove(recipe);
+  // }
+
+  void removeRecipe(int index) {
+    recipes.removeAt(index);
+    // recipeQuantities.removeAt(index);
+    // computeTotalNutrition();
+  }
+
+  // }
+  // void removeRecipe(int index) {
+  //   recipes.removeAt(index);
+  //   recipeQuantities.removeAt(index);
+  //   computeTotalNutrition();
+  // }
+
+  void increaseQuantity(int index) {
+    // recipeQuantities[index]++;
+    // computeTotalNutrition();
+    recipes[index].servings.value++;
+  }
+
+  void decreaseQuantity(int index) {
+    // if (recipeQuantities[index] > 1) {
+    //   recipeQuantities[index]--;
+    //   computeTotalNutrition();
+    // }
+    if (recipes[index].servings.value > 1) {
+      recipes[index].servings.value--;
+    }
+  }
+
+  // bool validateMealForm() {
+  //   if (mealNameController.text.trim().isEmpty) {
+  //     Get.snackbar("Error", "Meal name is required.");
+  //     return false;
+  //   }
+
+  //   if (recipes.isEmpty) {
+  //     Get.snackbar("Error", "At least one recipe must be added to the meal.");
+  //     return false;
+  //   }
+
+  //   return true; // Form is valid
+  // }
+
+  // Future<void> saveMeal() async {
+  //   if (!validateMealForm()) {
+  //     return; // Stop if the form is invalid
+  //   }
+
+  //   // Use default description if the field is empty
+  //   final description =
+  //       descriptionController.text.trim().isEmpty
+  //           ? "No description for this meal..."
+  //           : descriptionController.text.trim();
+
+  //   // Create RecipePortions
+  //   List<RecipePortion> portions = [];
+  //   for (int i = 0; i < recipes.length; i++) {
+  //     portions.add(
+  //       RecipePortion(
+  //         recipe: recipes[i],
+  //         quantity: recipeQuantities[i].toDouble(),
+  //       ),
+  //     );
+  //   }
+
+  //   // Create and save the Meal
+  //   final newMeal = Meal(
+  //     id: 0, // Temporary ID, will be replaced by Hive
+  //     name: mealNameController.text,
+  //     description: description,
+  //     portions: portions,
+  //     image: selectedImage.value?.path,
+  //   );
+
+  //   final newMealId = await Meal.create(newMeal);
+
+  //   if (newMealId == -1) {
+  //     Get.snackbar("Error", "Failed to save meal.");
+  //     return;
+  //   } else {
+  //     mealController.meals.add(
+  //       Meal.getById(newMealId)!,
+  //     ); // Add to the meal controller
+  //   }
+
+  //   Get.snackbar("Success", "Meal saved successfully!");
+  //   resetData();
+  // }
+
+  // void resetData() {
+  //   recipes.clear();
+  //   recipeQuantities.clear();
+  //   mealNameController.clear();
+  //   descriptionController.clear();
+  //   selectedImage.value = null;
+  // }
+}
+
+class AddMealToPlanScreen extends StatelessWidget {
+  final AddMealToPlanController controller = Get.put(AddMealToPlanController());
   final RootController rootController = Get.find<RootController>();
 
   @override
@@ -30,7 +228,7 @@ class CreateMealScreen extends StatelessWidget {
           icon: Icon(Icons.arrow_back),
           onPressed: () => rootController.handleBack(),
         ),
-        title: Text("Create Meal"),
+        title: Text("Add to Meal Plan"),
         actions: [
           Padding(
             padding: const EdgeInsets.only(
@@ -38,7 +236,7 @@ class CreateMealScreen extends StatelessWidget {
             ), // Add padding to the right
             child: ElevatedButton(
               onPressed: () {
-                controller.saveMeal();
+                // controller.saveMeal();
                 rootController.handleBack();
                 // Save logic here
               },
@@ -75,193 +273,204 @@ class CreateMealScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    Text(
+                      "Date",
+                      style: TextStyle(
+                        fontSize: 18,
+                        color: colors.textPrimaryColor,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    SizedBox(height: 8),
                     GestureDetector(
-                      onTap: controller.pickImage,
-                      child: Obx(() {
-                        return Container(
-                          height: 200,
-                          decoration: BoxDecoration(
-                            color:
-                                controller.selectedImage.value == null
-                                    ? colors.imagePickerColor
-                                    : Colors.transparent,
-                            borderRadius: BorderRadius.circular(8),
+                      onTap: () {
+                        // final pickedDate = await showDatePicker(
+                        //   context: context,
+                        //   initialDate: DateTime.now(),
+                        //   firstDate: DateTime(2000),
+                        //   lastDate: DateTime(2100),
+                        // );
+                        // if (pickedDate != null) {
+                        //   controller.selectedDate.value = pickedDate;
+                        // }
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        decoration: BoxDecoration(
+                          color: colors.secondaryButtonColor,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: colors.secondaryButtonContentColor.withAlpha(50),
                           ),
-                          child:
-                              controller.selectedImage.value == null
-                                  ? Center(
-                                    child: Icon(
-                                      Icons.camera_alt_outlined,
-                                      size: 50,
-                                      color: colors.hintTextColor,
-                                    ),
-                                  )
-                                  : ClipRRect(
-                                    borderRadius: BorderRadius.circular(8),
-                                    child: Center(
-                                      child: Container(
-                                        color: Colors.transparent,
-                                        child: Image.file(
-                                          File(
-                                            controller.selectedImage.value!.path,
-                                          ),
-                                          fit: BoxFit.cover,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
+                        ),
+                        width: double.infinity,
+                        child: Obx(() {
+                          return Text(
+                            DateFormat('EEEE, MMMM d, yyyy').format(controller.selectedDate.value.toLocal()),
+                            style: TextStyle(fontSize: 16, color: colors.textPrimaryColor),
+                          );
+                        }),
+                      ),
+                    ),
+                    SizedBox(height: 16),
+                    Text(
+                      "Time",
+                      style: TextStyle(
+                        fontSize: 18,
+                        color: colors.textPrimaryColor,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    SizedBox(height: 8),
+                    GestureDetector(
+                      onTap: () async {
+                        final pickedTime = await showTimePicker(
+                          context: context,
+                          initialTime: TimeOfDay.now(),
                         );
-                      }),
-                    ),
-                    Obx(() {
-                      return controller.selectedImage.value == null
-                          ? Center(
-                            child: Padding(
-                              padding: const EdgeInsets.only(top: 8.0),
-                              child: Text(
-                                "Tap to add a photo",
-                                style: TextStyle(
-                                  color: colors.hintTextColor,
-                                  fontSize: 16,
-                                ),
-                              ),
+                        if (pickedTime != null) {
+                          // Update the selected time in the controller
+                          controller.selectedTime.value = pickedTime;
+                        }
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        decoration: BoxDecoration(
+                          color: colors.secondaryButtonColor,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: colors.secondaryButtonContentColor.withAlpha(50),
+                          ),
+                        ),
+                        width: double.infinity,
+                        child: Obx(() {
+                          // Format the selected time
+                          final selectedTime = controller.selectedTime.value;
+                          final formattedTime = selectedTime.format(context); // Format time as "hh:mm AM/PM"
+                          return Text(
+                            formattedTime,
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: colors.secondaryButtonContentColor,
                             ),
-                          )
-                          : SizedBox.shrink();
-                    }),
-                    SizedBox(height: 16),
-                    Text(
-                      "Meal Information",
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: colors.textPrimaryColor,
+                          );
+                        }),
                       ),
                     ),
                     SizedBox(height: 16),
+
+                    // Time
                     Text(
-                      "Meal Name*",
+                      "Meal Type",
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 18,
                         color: colors.textPrimaryColor,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
                     SizedBox(height: 8),
-                    TextField(
-                      controller: controller.mealNameController,
-                      decoration: InputDecoration(
-                        hintText: "e.g., Lovely Breakfast",
-                        hintStyle: TextStyle(color: colors.hintTextColor),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: BorderSide(
-                            color: colors.secondaryButtonContentColor.withAlpha(50),
-                            width: 0.5,
-                          ),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: BorderSide(
-                            color: colors.secondaryButtonContentColor.withAlpha(50),
-                            width: 0.5,
-                          ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: BorderSide(
-                            color: colors.secondaryButtonContentColor.withAlpha(50),
-                            width: 0.5,
-                          ),
-                        ),
-                        fillColor: colors.secondaryButtonColor,
-                        filled: true,
+                    CustomDropdownButton(
+                      selectedValue: controller.mealType,
+                      items: controller.mealTypeList,
+                      onChanged: (value) {
+                        controller.mealType.value = value;
+                      },
+                      textStyle: TextStyle(
+                        color: colors.secondaryButtonContentColor,
+                        fontSize: 16,
                       ),
-                      style: TextStyle(color: colors.secondaryButtonContentColor),
+                      buttonColor: colors.secondaryButtonColor,
+                      selectedColor: colors.buttonColor,
+                      selectedText: TextStyle(
+                        color: colors.buttonContentColor,
+                        fontSize: 16,
+                      ),
+                      outlineColor: colors.secondaryButtonContentColor.withAlpha(
+                        50,
+                      ),
+                      outlineStroke: 0.5,
                     ),
                     SizedBox(height: 16),
+
+                    // Recipes list
                     Text(
-                      "Description (Optional)",
+                      "Recipes",
                       style: TextStyle(
-                        fontSize: 16,
-                        color: colors.textPrimaryColor,
+                        fontSize: 18,
                         fontWeight: FontWeight.w500,
+                        color: colors.textPrimaryColor,
                       ),
                     ),
                     SizedBox(height: 8),
-                    TextField(
-                      maxLines: 3,
-                      controller: controller.descriptionController,
-                      decoration: InputDecoration(
-                        hintText: "Briefly describe your meal",
-                        hintStyle: TextStyle(color: colors.hintTextColor),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: BorderSide(
-                            color: colors.secondaryButtonContentColor.withAlpha(50),
-                            width: 0.5,
-                          ),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: BorderSide(
-                            color: colors.secondaryButtonContentColor.withAlpha(50),
-                            width: 0.5,
-                          ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: BorderSide(
-                            color: colors.secondaryButtonContentColor.withAlpha(50),
-                            width: 0.5,
-                          ),
-                        ),
-                        fillColor: colors.secondaryButtonColor,
-                        filled: true,
-                      ),
-                      style: TextStyle(color: colors.secondaryButtonContentColor),
-                    ),
-                    SizedBox(height: 16),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          "Recipes",
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: colors.textPrimaryColor,
-                          ),
-                        ),
-                        ElevatedButton(
-                          onPressed: () {
-                            // Save logic here
-                            // controller.addRecipe();
-                            showDialog(
-                              context: context,
-                              barrierDismissible: true,
-                              builder: (context) => AddRecipeToMealModal(),
-                            );
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor:
-                                colors
-                                    .buttonColor, // Use buttonColor from ThemeColors
-                            foregroundColor:
-                                colors
-                                    .buttonContentColor, // Use buttonContentColor for text
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(
-                                8,
-                              ), // Rounded rectangle shape
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: () {
+                              controller.addRecipe();
+                              showDialog(
+                                context: context,
+                                barrierDismissible: true,
+                                builder: (context) => AddRecipeToMealPlanModal(),
+                              );
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor:
+                                  colors
+                                      .buttonColor, // Use buttonColor from ThemeColors
+                              foregroundColor:
+                                  colors
+                                      .buttonContentColor, // Use buttonContentColor for text
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(
+                                  8,
+                                ), // Rounded rectangle shape
+                              ),
+                              minimumSize: Size(0, 50), // Adjust horizontal size to make it smaller
                             ),
-                            // maximumSize: Size(80, 40), // Adjust horizontal size to make it smaller
+                            child: Text(
+                              "Add Recipe",
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: colors.buttonContentColor,
+                              ),
+                            ),
                           ),
-                          child: Text("Add"),
                         ),
+                        SizedBox(width: 16,),
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: () {
+                              showDialog(
+                                context: context,
+                                barrierDismissible: true,
+                                builder: (context) => ApplyTemplateToMealPlanModal(),
+                              );
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor:
+                                  colors.buttonColor, // Use buttonColor from ThemeColors
+                              foregroundColor:
+                                  colors
+                                      .buttonContentColor, // Use buttonContentColor for text
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              minimumSize: Size(0, 50),
+                            ),
+                            child: Text(
+                              "Apply Template",
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: colors.buttonContentColor,
+                              ),
+                            ),
+                          ),
+                        )
                       ],
                     ),
-                    SizedBox(height: 8),
+                    SizedBox(height: 16),
                     Obx(() {
                       if (controller.recipes.isEmpty) {
                         return Center(
@@ -284,14 +493,6 @@ class CreateMealScreen extends StatelessWidget {
                                   decoration: BoxDecoration(
                                     color: colors.secondaryButtonColor,
                                     borderRadius: BorderRadius.circular(8.0),
-                                    // boxShadow: [
-                                    //   BoxShadow(
-                                    //     color: Colors.grey.withAlpha(127),
-                                    //     spreadRadius: 1,
-                                    //     blurRadius: 3,
-                                    //     offset: const Offset(0, 2),
-                                    //   ),
-                                    // ],
                                     border: Border.all(
                                       color: colors.secondaryButtonContentColor
                                           .withAlpha(50),
@@ -323,14 +524,14 @@ class CreateMealScreen extends StatelessWidget {
                                               children: [
                                                 Expanded(
                                                   child: Text(
-                                                    recipe.name,
+                                                    recipe.name.value,
                                                     maxLines: 2,
                                                     overflow:
                                                         TextOverflow.ellipsis,
                                                     style: TextStyle(
                                                       color:
                                                           colors.textPrimaryColor,
-                                                      fontSize: 18,
+                                                      fontSize: 20,
                                                       fontWeight: FontWeight.w500,
                                                     ),
                                                   ),
@@ -345,26 +546,31 @@ class CreateMealScreen extends StatelessWidget {
                                                       color:
                                                           colors.normalIconColor,
                                                     ),
-                                                    onPressed:
-                                                        () => controller
-                                                            .removeRecipe(index),
+                                                    onPressed: 
+                                                      () => controller.removeRecipe(index),
                                                   ),
                                                 ),
                                               ],
                                             ),
                                             SizedBox(height: 4),
+                                            Text(
+                                              recipe.description.value,
+                                              maxLines: 2,
+                                              overflow:
+                                                  TextOverflow.ellipsis,
+                                              style: TextStyle(
+                                                color:
+                                                    colors.hintTextColor,
+                                                fontSize: 16,
+                                                // fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                            SizedBox(height: 4,),
                                             Row(
                                               mainAxisAlignment:
                                                   MainAxisAlignment.spaceBetween,
                                               children: [
-                                                Text(
-                                                  "Quantity:",
-                                                  style: TextStyle(
-                                                    color:
-                                                        colors.textPrimaryColor,
-                                                    fontSize: 16,
-                                                  ),
-                                                ),
+                                                Text("Quantity:"),
                                                 Row(
                                                   children: [
                                                     Container(
@@ -411,8 +617,7 @@ class CreateMealScreen extends StatelessWidget {
                                                               horizontal: 12,
                                                             ),
                                                         child: Text(
-                                                          controller
-                                                              .recipeQuantities[index]
+                                                          recipe.servings.value
                                                               .toString(),
                                                           style: TextStyle(
                                                             color:
@@ -473,7 +678,8 @@ class CreateMealScreen extends StatelessWidget {
                                 SizedBox(height: 8),
                               ],
                             );
-                          }).toList(),
+                          }
+                        ).toList(),
                       );
                     }),
                     Obx(() {
@@ -601,189 +807,3 @@ class CreateMealScreen extends StatelessWidget {
     );
   }
 }
-
-class CreateMealController extends GetxController {
-  var imagePath = ''.obs;
-  // var recipes = <Recipe>[].obs;
-  var recipes = <ModelRecipe.Recipe>[].obs;
-  var recipeQuantities = <int>[].obs; // Store quantities for each recipe
-  var selectedImage = Rx<XFile?>(null);
-
-  MealController mealController = Get.find<MealController>();
-
-  TextEditingController mealNameController = TextEditingController();
-  TextEditingController descriptionController = TextEditingController();
-
-  // Reactive variables for total nutrition
-  var totalCalories = 0.0.obs;
-  var totalProtein = 0.0.obs;
-  var totalCarbs = 0.0.obs;
-  var totalFat = 0.0.obs;
-
-  // @override
-  // void onInit() {
-  //   super.onInit();
-  //   // Recompute totals whenever recipes or quantities change
-  //   // recipes.listen((_) => computeTotalNutrition());
-  //   // recipeQuantities.listen((_) => computeTotalNutrition());
-  // }
-
-  // Method to compute total nutrition
-  void computeTotalNutrition() {
-    double calories = 0, protein = 0, carbs = 0, fat = 0;
-
-    for (int i = 0; i < recipes.length; i++) {
-      final recipe = recipes[i];
-      final quantity = recipeQuantities[i];
-
-      calories += recipe.calories * quantity;
-      protein += recipe.protein * quantity;
-      carbs += recipe.carbs * quantity;
-      fat += recipe.fat * quantity;
-    }
-
-    totalCalories.value = calories;
-    totalProtein.value = protein;
-    totalCarbs.value = carbs;
-    totalFat.value = fat;
-  }
-
-  // var recipePortions = <Map<String, dynamic>>[].obs;
-  // var availableRecipes = <Recipe>[].obs; // List of available recipes
-
-  // @override
-  // void onInit() {
-  //   super.onInit();
-  //   loadAvailableRecipes();
-  // }
-
-  // void loadAvailableRecipes() {
-  //   // Load recipes from the database or controller
-  //   availableRecipes.assignAll(Recipe.all());
-  // }
-
-  void addRecipe(ModelRecipe.Recipe recipe) {
-    recipes.add(recipe);
-    recipeQuantities.add(1); // Default quantity
-    computeTotalNutrition();
-  }
-
-  // void removeRecipe(Recipe recipe) {
-  //   recipes.remove(recipe);
-  // }
-
-  void removeRecipe(int index) {
-    recipes.removeAt(index);
-    recipeQuantities.removeAt(index);
-    computeTotalNutrition();
-  }
-
-  // void decreaseQuantity(Recipe recipe) {
-  //   // Implement decrease quantity logic
-  //   if (recipe.quantity > 1) {
-  //     recipe.quantity.value--;
-  //   }
-  // }
-
-  // void increaseQuantity(Recipe recipe) {
-  //   // Implement increase quantity logic
-  //   if (recipe.quantity < 10) {
-  //     recipe.quantity.value++;
-  //   }
-  // }
-
-  void increaseQuantity(int index) {
-    recipeQuantities[index]++;
-    computeTotalNutrition();
-  }
-
-  void decreaseQuantity(int index) {
-    if (recipeQuantities[index] > 1) {
-      recipeQuantities[index]--;
-      computeTotalNutrition();
-    }
-  }
-
-  bool validateMealForm() {
-    if (mealNameController.text.trim().isEmpty) {
-      Get.snackbar("Error", "Meal name is required.");
-      return false;
-    }
-
-    if (recipes.isEmpty) {
-      Get.snackbar("Error", "At least one recipe must be added to the meal.");
-      return false;
-    }
-
-    return true; // Form is valid
-  }
-
-  Future<void> saveMeal() async {
-    if (!validateMealForm()) {
-      return; // Stop if the form is invalid
-    }
-
-    // Use default description if the field is empty
-    final description =
-        descriptionController.text.trim().isEmpty
-            ? "No description for this meal..."
-            : descriptionController.text.trim();
-
-    // Create RecipePortions
-    List<RecipePortion> portions = [];
-    for (int i = 0; i < recipes.length; i++) {
-      portions.add(
-        RecipePortion(
-          recipe: recipes[i],
-          quantity: recipeQuantities[i].toDouble(),
-        ),
-      );
-    }
-
-    // Create and save the Meal
-    final newMeal = Meal(
-      id: 0, // Temporary ID, will be replaced by Hive
-      name: mealNameController.text,
-      description: description,
-      portions: portions,
-      image: selectedImage.value?.path,
-    );
-
-    final newMealId = await Meal.create(newMeal);
-
-    if (newMealId == -1) {
-      Get.snackbar("Error", "Failed to save meal.");
-      return;
-    } else {
-      mealController.meals.add(
-        Meal.getById(newMealId)!,
-      ); // Add to the meal controller
-    }
-
-    Get.snackbar("Success", "Meal saved successfully!");
-    resetData();
-  }
-
-  void resetData() {
-    recipes.clear();
-    recipeQuantities.clear();
-    mealNameController.clear();
-    descriptionController.clear();
-    selectedImage.value = null;
-  }
-
-  void pickImage() async {
-    final ImagePicker picker = ImagePicker();
-    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
-    selectedImage.value = image;
-  }
-}
-
-// class Recipe {
-//   RxString name;
-//   RxInt quantity;
-
-//   Recipe({required String name, required int quantity})
-//     : name = name.obs,
-//       quantity = quantity.obs;
-// }
