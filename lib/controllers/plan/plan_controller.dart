@@ -12,7 +12,8 @@ class PlanController extends GetxController {
   var currentFat = 0.0.obs;
   var goalKcal = 2000.obs; // Default goal calories
   var isEditing = false.obs;
-
+  // var hasUpcomingMeals = false.obs;
+  // var isMealPlanEmpty = false.obs;
   final minGoalKcal = 500;
   final maxGoalKcal = 5000;
 
@@ -137,5 +138,30 @@ class PlanController extends GetxController {
     final mealPlan = mealPlans.firstWhere((m) => m.id == mealPlanId);
     await mealPlan.delete();
     mealPlans.removeWhere((m) => m.id == mealPlanId);
+  }
+
+  /// Check if there is at least one upcoming meal for today
+  bool hasUpcomingMeals() {
+    final today = DateTime.now();
+    return mealPlans.any(
+      (mealPlan) =>
+          mealPlan.status == MealStatus.Upcoming &&
+          mealPlan.dateTime.year == today.year &&
+          mealPlan.dateTime.month == today.month &&
+          mealPlan.dateTime.day == today.day,
+    );
+  }
+
+  /// Check if the meal plan list is empty
+  bool isMealPlanEmpty() {
+    final today = DateTime.now();
+    return mealPlans
+        .where(
+          (mealPlan) =>
+              mealPlan.dateTime.year == today.year &&
+              mealPlan.dateTime.month == today.month &&
+              mealPlan.dateTime.day == today.day,
+        )
+        .isEmpty;
   }
 }

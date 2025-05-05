@@ -309,116 +309,184 @@ class HomeScreen extends StatelessWidget {
                       ),
                     ),
                     SizedBox(height: 8),
-                    Column(
-                      children: [
-                        Obx(() {
-                          final description =
-                              ingredientsController
-                                  .getExpiringSoonDescription();
-                          if (description == null) {
-                            return SizedBox.shrink(); // Hide the alert if no description
-                          }
+                    Obx(() {
+                      final expiringSoonDescription =
+                          ingredientsController.getExpiringSoonDescription();
+                      final hasUpcomingMeals =
+                          planController.hasUpcomingMeals();
+                      final isMealPlanEmpty = planController.isMealPlanEmpty();
 
-                          return GestureDetector(
-                            onTap: () {
-                              // Handle onTap
-                              rootController.changeTab(1);
-                            },
-                            child: RoundedBox(
-                              color: colors.expiredAlertColor,
-                              outlineColor: colors.expiredAlertOutlineColor,
-                              outlineStroke: 1,
-                              padding: EdgeInsets.all(14),
-                              child: Row(
-                                children: [
-                                  CircleAvatar(
-                                    backgroundColor:
-                                        colors.expiredAlertOutlineColor,
-                                    child: Icon(
-                                      Icons.flatware,
-                                      color: colors.expiredAlertIconColor,
-                                    ),
-                                  ),
-                                  SizedBox(width: 8),
-                                  Expanded(
-                                    // Allow the text to take up remaining space
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          "Expiring Soon",
-                                          style: TextStyle(
-                                            color: colors.textPrimaryColor,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                        SizedBox(height: 4),
-                                        Text(
-                                          description,
-                                          style: TextStyle(
-                                            color: colors.hintTextColor,
-                                          ),
-                                          maxLines:
-                                              3, // Optional: Limit the number of lines
-                                          overflow:
-                                              TextOverflow
-                                                  .ellipsis, // Add ellipsis if text overflows
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
+                      // If both alerts are hidden, display the fallback message
+                      if (expiringSoonDescription == null &&
+                          !hasUpcomingMeals &&
+                          !isMealPlanEmpty) {
+                        return Center(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            child: Text(
+                              "You have nothing to worry about!",
+                              style: TextStyle(
+                                color: colors.hintTextColor,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
                               ),
                             ),
-                          );
-                        }),
-                        SizedBox(height: 8),
-                        GestureDetector(
-                          onTap: () {
-                            // Handle onTap
-                          },
-                          child: RoundedBox(
-                            color: colors.mealPrepAlertColor,
-                            outlineColor: colors.mealPrepAlertOutlineColor,
-                            padding: EdgeInsets.all(12),
-                            outlineStroke: 1,
-                            child: Row(
-                              children: [
-                                CircleAvatar(
-                                  backgroundColor:
-                                      colors.mealPrepAlertOutlineColor,
-                                  child: Icon(
-                                    Icons.fastfood,
-                                    color: colors.mealPrepAlertIconColor,
-                                  ),
-                                ),
-                                SizedBox(width: 8),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                          ),
+                        );
+                      }
+
+                      return Column(
+                        children: [
+                          // Expiry Alert
+                          if (expiringSoonDescription != null)
+                            GestureDetector(
+                              onTap: () {
+                                rootController.changeTab(
+                                  1,
+                                ); // Navigate to Ingredients tab
+                              },
+                              child: RoundedBox(
+                                color: colors.expiredAlertColor,
+                                outlineColor: colors.expiredAlertOutlineColor,
+                                outlineStroke: 1,
+                                padding: EdgeInsets.all(12),
+                                child: Row(
                                   children: [
-                                    Text(
-                                      "Meal Prep Reminder",
-                                      style: TextStyle(
-                                        color: colors.textPrimaryColor,
-                                        fontWeight: FontWeight.bold,
+                                    CircleAvatar(
+                                      backgroundColor:
+                                          colors.expiredAlertOutlineColor,
+                                      child: Icon(
+                                        Icons.warning_amber_rounded,
+                                        color: colors.expiredAlertIconColor,
                                       ),
                                     ),
-                                    Text(
-                                      "Description for alert ",
-                                      style: TextStyle(
-                                        color: colors.hintTextColor,
+                                    SizedBox(width: 8),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            "Expiring Soon",
+                                            style: TextStyle(
+                                              color: colors.textPrimaryColor,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          Text(
+                                            expiringSoonDescription,
+                                            style: TextStyle(
+                                              color: colors.hintTextColor,
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
                                   ],
                                 ),
-                              ],
+                              ),
                             ),
-                          ),
-                        ),
-                        SizedBox(height: 8),
-                      ],
-                    ),
+                          SizedBox(height: 4),
+                          // Meal Prep Alert
+                          if (hasUpcomingMeals)
+                            GestureDetector(
+                              onTap: () {
+                                rootController.changeTab(3);
+                              },
+                              child: RoundedBox(
+                                color: colors.mealPrepAlertColor,
+                                outlineColor: colors.mealPrepAlertOutlineColor,
+                                outlineStroke: 1,
+                                padding: EdgeInsets.all(12),
+                                child: Row(
+                                  children: [
+                                    CircleAvatar(
+                                      backgroundColor:
+                                          colors.mealPrepAlertOutlineColor,
+                                      child: Icon(
+                                        Icons.fastfood,
+                                        color: colors.mealPrepAlertIconColor,
+                                      ),
+                                    ),
+                                    SizedBox(width: 8),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            "Prepare your meal!",
+                                            style: TextStyle(
+                                              color: colors.textPrimaryColor,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          Text(
+                                            "Before you get too lazy to eat...",
+                                            style: TextStyle(
+                                              color: colors.hintTextColor,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+
+                          // Create Meal Plan Alert
+                          if (isMealPlanEmpty)
+                            GestureDetector(
+                              onTap: () {
+                                rootController.changeTab(
+                                  2,
+                                ); // Navigate to Plan tab
+                              },
+                              child: RoundedBox(
+                                color: colors.mealPrepAlertColor,
+                                outlineColor: colors.mealPrepAlertOutlineColor,
+                                outlineStroke: 1,
+                                padding: EdgeInsets.all(14),
+                                child: Row(
+                                  children: [
+                                    CircleAvatar(
+                                      backgroundColor:
+                                          colors.mealPrepAlertOutlineColor,
+                                      child: Icon(
+                                        Icons.lightbulb_outline,
+                                        color: colors.mealPrepAlertIconColor,
+                                      ),
+                                    ),
+                                    SizedBox(width: 8),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            "You are what you eat...",
+                                            style: TextStyle(
+                                              color: colors.textPrimaryColor,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          Text(
+                                            "Create a meal plan now!",
+                                            style: TextStyle(
+                                              color: colors.hintTextColor,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                        ],
+                      );
+                    }),
                     SizedBox(height: 16),
 
                     // Quick Access
