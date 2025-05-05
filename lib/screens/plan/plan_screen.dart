@@ -137,19 +137,35 @@ class PlanScreen extends StatelessWidget {
                             !controller.isEditing.value;
                       },
                       child: Container(
-                        padding: const EdgeInsets.all(8), // Padding inside the rounded box
+                        padding: const EdgeInsets.all(
+                          8,
+                        ), // Padding inside the rounded box
                         decoration: BoxDecoration(
-                          color: controller.isEditing.value ? colors.buttonColor : colors.secondaryButtonColor, // Background color
-                          borderRadius: BorderRadius.circular(50), // Fully rounded
-                          border: controller.isEditing.value ? null : Border.all(
-                            color: colors.secondaryButtonContentColor.withAlpha(50),
-                            width: 1.0,
-                          ),
+                          color:
+                              controller.isEditing.value
+                                  ? colors.buttonColor
+                                  : colors
+                                      .secondaryButtonColor, // Background color
+                          borderRadius: BorderRadius.circular(
+                            50,
+                          ), // Fully rounded
+                          border:
+                              controller.isEditing.value
+                                  ? null
+                                  : Border.all(
+                                    color: colors.secondaryButtonContentColor
+                                        .withAlpha(50),
+                                    width: 1.0,
+                                  ),
                         ),
                         child: Icon(
                           Icons.edit, // Edit icon
                           size: 20,
-                          color: controller.isEditing.value ? colors.buttonContentColor : colors.secondaryButtonContentColor, // Icon color
+                          color:
+                              controller.isEditing.value
+                                  ? colors.buttonContentColor
+                                  : colors
+                                      .secondaryButtonContentColor, // Icon color
                         ),
                       ),
                     ),
@@ -167,7 +183,7 @@ class PlanScreen extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            "Calories",
+                            "You'd like to get:",
                             style: TextStyle(
                               color: colors.textPrimaryColor,
                               fontWeight: FontWeight.w600,
@@ -178,9 +194,13 @@ class PlanScreen extends StatelessWidget {
                             children: [
                               Obx(() {
                                 return SizedBox(
-                                  width: 70, // Set a fixed width for the text field
+                                  width:
+                                      70, // Set a fixed width for the text field
                                   child: TextField(
-                                    enabled: controller.isEditing.value, // Enable only if editing
+                                    enabled:
+                                        controller
+                                            .isEditing
+                                            .value, // Enable only if editing
                                     keyboardType: TextInputType.number,
                                     controller: controller.goalKcalController,
                                     onChanged: (value) {
@@ -190,7 +210,8 @@ class PlanScreen extends StatelessWidget {
                                             controller.minGoalKcal.toString();
                                         controller.goalKcal.value =
                                             controller.minGoalKcal;
-                                      } else if (intValue > controller.maxGoalKcal) {
+                                      } else if (intValue >
+                                          controller.maxGoalKcal) {
                                         controller.goalKcalController.text =
                                             controller.maxGoalKcal.toString();
                                         controller.goalKcal.value =
@@ -200,6 +221,9 @@ class PlanScreen extends StatelessWidget {
                                             intValue.toString();
                                         controller.goalKcal.value = intValue;
                                       }
+                                      controller.updateDailyGoal(
+                                        controller.goalKcal.value,
+                                      ); // Update the goal in the database
                                     },
                                     decoration: InputDecoration(
                                       isDense: true,
@@ -210,21 +234,27 @@ class PlanScreen extends StatelessWidget {
                                       border: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(8),
                                         borderSide: BorderSide(
-                                          color: colors.secondaryButtonContentColor,
+                                          color:
+                                              colors
+                                                  .secondaryButtonContentColor,
                                           width: 1.0,
                                         ),
                                       ),
                                       disabledBorder: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(8),
                                         borderSide: BorderSide(
-                                          color: colors.secondaryButtonContentColor.withAlpha(50),
+                                          color: colors
+                                              .secondaryButtonContentColor
+                                              .withAlpha(50),
                                           width: 1.0,
                                         ),
                                       ),
                                       enabledBorder: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(8),
                                         borderSide: BorderSide(
-                                          color: colors.secondaryButtonContentColor.withAlpha(100),
+                                          color: colors
+                                              .secondaryButtonContentColor
+                                              .withAlpha(100),
                                           width: 1.0,
                                         ),
                                       ),
@@ -235,9 +265,11 @@ class PlanScreen extends StatelessWidget {
                                           width: 1.0,
                                         ),
                                       ),
-                                      fillColor: controller.isEditing.value
-                                          ? colors.secondaryButtonColor.withOpacity(0.1)
-                                          : colors.secondaryButtonColor,
+                                      fillColor:
+                                          controller.isEditing.value
+                                              ? colors.secondaryButtonColor
+                                                  .withOpacity(0.1)
+                                              : colors.secondaryButtonColor,
                                       filled: true,
                                     ),
                                     style: TextStyle(
@@ -262,14 +294,19 @@ class PlanScreen extends StatelessWidget {
 
                       // Slider (Visible only when editing)
                       Obx(() {
-                        if (!controller.isEditing.value) return SizedBox.shrink();
+                        if (!controller.isEditing.value)
+                          return SizedBox.shrink();
                         return Slider(
                           value: controller.goalKcal.value.toDouble(),
                           min: controller.minGoalKcal.toDouble(),
                           max: controller.maxGoalKcal.toDouble(),
                           onChanged: (value) {
                             controller.goalKcal.value = value.toInt();
-                            controller.goalKcalController.text = value.toInt().toString();
+                            controller.goalKcalController.text =
+                                value.toInt().toString();
+                            controller.updateDailyGoal(
+                              value.toInt(),
+                            ); // Update the goal in the database
                           },
                           activeColor: colors.progressColor,
                           inactiveColor: colors.backgroundColor,
@@ -306,10 +343,30 @@ class PlanScreen extends StatelessWidget {
                               fontSize: 16,
                             ),
                           ),
-                          Text(
-                            "${controller.currentKcal.value} / ${controller.goalKcal.value} kcal",
-                            style: TextStyle(color: colors.textPrimaryColor),
-                          ),
+                          Obx(() {
+                            final isGoalReached =
+                                controller.currentKcal.value >=
+                                controller.goalKcal.value;
+                            return Row(
+                              children: [
+                                Text(
+                                  "${controller.currentKcal.value} / ${controller.goalKcal.value} kcal ",
+                                  style: TextStyle(
+                                    color:
+                                        isGoalReached
+                                            ? Colors.green
+                                            : colors.textPrimaryColor,
+                                  ),
+                                ),
+                                if (isGoalReached)
+                                  Icon(
+                                    Icons.check_circle,
+                                    color: Colors.green,
+                                    size: 16,
+                                  ),
+                              ],
+                            );
+                          }),
                         ],
                       ),
                       SizedBox(height: 8),
@@ -327,6 +384,32 @@ class PlanScreen extends StatelessWidget {
                           if (index == 1 || index == 3) {
                             return SizedBox(width: 16);
                           }
+
+                          // Get the current progress for each nutrient
+                          final double currentValue =
+                              index == 0
+                                  ? controller.currentProtein.value
+                                  : (index == 2
+                                      ? controller.currentCarbs.value
+                                      : controller.currentFat.value);
+
+                          // Calculate the nutrient goals dynamically based on the slider value (X)
+                          final double sliderValue =
+                              controller.goalKcal.value.toDouble();
+                          final double nutrientGoal =
+                              index == 0
+                                  ? sliderValue *
+                                      0.5 /
+                                      4 // Protein: 50% of calories, divided by 4
+                                  : (index == 2
+                                      ? sliderValue *
+                                          0.3 /
+                                          4 // Carbs: 30% of calories, divided by 4
+                                      : sliderValue *
+                                          0.2 /
+                                          9); // Fat: 20% of calories, divided by 9
+
+                          final isGoalReached = currentValue >= nutrientGoal;
                           return Expanded(
                             child: RoundedBox(
                               color:
@@ -348,22 +431,37 @@ class PlanScreen extends StatelessWidget {
                               ),
                               child: Column(
                                 children: [
-                                  Text(
-                                    nutritions[index],
-                                    style: TextStyle(
-                                      color: colors.hintTextColor,
-                                    ),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        "${nutritions[index]} ",
+                                        style: TextStyle(
+                                          color: colors.hintTextColor,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                      if (isGoalReached)
+                                        Icon(
+                                          Icons.check_circle,
+                                          color: Colors.green,
+                                          size: 16,
+                                        ),
+                                    ],
                                   ),
                                   Text(
-                                    "${(index + 1) * 10}g",
+                                    "${currentValue.toStringAsFixed(1)}",
                                     style: TextStyle(
                                       color: colors.textPrimaryColor,
                                       fontSize: 16,
-                                      fontWeight: FontWeight.bold,
+                                      fontWeight:
+                                          isGoalReached
+                                              ? FontWeight.bold
+                                              : FontWeight.w400,
                                     ),
                                   ),
                                   Text(
-                                    "/ ${(index + 1) * 20}g",
+                                    "/ ${nutrientGoal.toStringAsFixed(1)}g",
                                     style: TextStyle(
                                       color: colors.hintTextColor,
                                     ),

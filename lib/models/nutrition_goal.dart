@@ -1,6 +1,7 @@
 import 'package:hive_ce/hive.dart';
 import 'meal_plan.dart';
 import 'notification_model.dart';
+import 'hive_manager.dart';
 
 part 'nutrition_goal.g.dart';
 
@@ -38,6 +39,37 @@ class NutritionGoal extends HiveObject {
   });
 
   static const String boxName = 'nutritionGoal';
+
+  /// Creates and stores a new [NutritionGoal] in Hive.
+  static Future<int> create({
+    required DateTime startDate,
+    required DateTime endDate,
+    required double targetCalories,
+    double targetProtein = 0.0,
+    double targetCarbs = 0.0,
+    double targetFat = 0.0,
+  }) async {
+    final box = Hive.box<NutritionGoal>(boxName);
+
+    // Get the next incremental ID
+    final hiveManager = HiveManager();
+    final id = await hiveManager.getNextId('lastNutritionGoalId');
+
+    // Create the new NutritionGoal
+    final newGoal = NutritionGoal(
+      id: id,
+      startDate: startDate,
+      endDate: endDate,
+      targetCalories: targetCalories,
+      targetProtein: targetProtein,
+      targetCarbs: targetCarbs,
+      targetFat: targetFat,
+    );
+
+    // Store the NutritionGoal in Hive
+    await box.put(newGoal.id, newGoal);
+    return id;
+  }
 
   void setTargets({
     required double calories,
@@ -81,14 +113,14 @@ class NutritionGoal extends HiveObject {
   }
 
   static NutritionGoal? getById(int id) {
-    return Hive.box<NutritionGoal>('nutrition_goals').get(id);
+    return Hive.box<NutritionGoal>(boxName).get(id);
   }
 
   static List<NutritionGoal> all() {
-    return Hive.box<NutritionGoal>('nutrition_goals').values.toList();
+    return Hive.box<NutritionGoal>(boxName).values.toList();
   }
 
   static void remove(int id) {
-    Hive.box<NutritionGoal>('nutrition_goals').delete(id);
+    Hive.box<NutritionGoal>(boxName).delete(id);
   }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 // import 'package:intl/intl.dart';
 import 'package:pantrypal/controllers/home/home_controller.dart';
+import 'package:pantrypal/controllers/plan/plan_controller.dart';
 import 'package:pantrypal/controllers/root_controller.dart';
 import 'package:pantrypal/core/theme/theme_colors.dart';
 import 'package:pantrypal/widgets/filled_bar.dart';
@@ -10,6 +11,7 @@ import 'package:pantrypal/models/enums/meal_status.dart';
 
 class HomeScreen extends StatelessWidget {
   final HomeController controller = Get.put(HomeController());
+  final PlanController planController = Get.put(PlanController());
   final RootController rootController = Get.find<RootController>();
 
   final List<Map<String, dynamic>> quickAccess = [
@@ -120,10 +122,7 @@ class HomeScreen extends StatelessWidget {
           // color: colors.backgroundColor,
           // color: Colors.white,
           children: [
-            Divider(
-              height: 1,
-              color: colors.hintTextColor.withAlpha(50),
-            ),
+            Divider(height: 1, color: colors.hintTextColor.withAlpha(50)),
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.only(top: 8, left: 16, right: 16),
@@ -161,16 +160,37 @@ class HomeScreen extends StatelessWidget {
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
-                              Text(
-                                "${controller.num.value} / 2000 kcal",
-                                style: TextStyle(color: colors.textPrimaryColor),
-                              ),
+                              Obx(() {
+                                final isGoalReached =
+                                    planController.currentKcal.value >=
+                                    planController.goalKcal.value;
+                                return Row(
+                                  children: [
+                                    Text(
+                                      "${planController.currentKcal.value} / ${planController.goalKcal.value} kcal ",
+                                      style: TextStyle(
+                                        color:
+                                            isGoalReached
+                                                ? Colors.green
+                                                : colors.textPrimaryColor,
+                                      ),
+                                    ),
+                                    if (isGoalReached)
+                                      Icon(
+                                        Icons.check_circle,
+                                        color: Colors.green,
+                                        size: 16,
+                                      ),
+                                  ],
+                                );
+                              }),
                             ],
                           ),
                           SizedBox(height: 8),
                           FilledBar(
-                            currentValue: 1200,
-                            maxValue: 2000,
+                            currentValue:
+                                planController.currentKcal.value.toDouble(),
+                            maxValue: planController.goalKcal.value.toDouble(),
                             height: 8,
                             fillColor: colors.progressColor,
                             backgroundColor: colors.backgroundColor,
@@ -182,6 +202,32 @@ class HomeScreen extends StatelessWidget {
                               if (index == 1 || index == 3) {
                                 return SizedBox(width: 16);
                               }
+                              // Get the current progress for each nutrient
+                              final double currentValue =
+                                  index == 0
+                                      ? planController.currentProtein.value
+                                      : (index == 2
+                                          ? planController.currentCarbs.value
+                                          : planController.currentFat.value);
+
+                              // Calculate the nutrient goals dynamically
+                              final double sliderValue =
+                                  planController.goalKcal.value.toDouble();
+                              final double nutrientGoal =
+                                  index == 0
+                                      ? sliderValue *
+                                          0.5 /
+                                          4 // Protein: 50% of calories, divided by 4
+                                      : (index == 2
+                                          ? sliderValue *
+                                              0.3 /
+                                              4 // Carbs: 30% of calories, divided by 4
+                                          : sliderValue *
+                                              0.2 /
+                                              9); // Fat: 20% of calories, divided by 9
+
+                              final isGoalReached =
+                                  currentValue >= nutrientGoal;
                               return Expanded(
                                 child: RoundedBox(
                                   color:
@@ -203,22 +249,38 @@ class HomeScreen extends StatelessWidget {
                                   ),
                                   child: Column(
                                     children: [
-                                      Text(
-                                        nutritions[index],
-                                        style: TextStyle(
-                                          color: colors.hintTextColor,
-                                        ),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            "${nutritions[index]} ",
+                                            style: TextStyle(
+                                              color: colors.hintTextColor,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                          if (isGoalReached)
+                                            Icon(
+                                              Icons.check_circle,
+                                              color: Colors.green,
+                                              size: 16,
+                                            ),
+                                        ],
                                       ),
                                       Text(
-                                        "${(index + 1) * 10}g",
+                                        "${currentValue.toStringAsFixed(1)}",
                                         style: TextStyle(
                                           color: colors.textPrimaryColor,
                                           fontSize: 16,
-                                          fontWeight: FontWeight.bold,
+                                          fontWeight:
+                                              isGoalReached
+                                                  ? FontWeight.bold
+                                                  : FontWeight.w400,
                                         ),
                                       ),
                                       Text(
-                                        "/ ${(index + 1) * 20}g",
+                                        "/ ${nutrientGoal.toStringAsFixed(1)}g",
                                         style: TextStyle(
                                           color: colors.hintTextColor,
                                         ),
@@ -383,10 +445,12 @@ class HomeScreen extends StatelessWidget {
                                       quickAccess[index]["icon"],
                                       color:
                                           (index == 0
-                                              ? colors.quickAccessIngredientColor
+                                              ? colors
+                                                  .quickAccessIngredientColor
                                               : (index == 1
                                                   ? colors.quickAccessMealColor
-                                                  : colors.quickAccessPlanColor)),
+                                                  : colors
+                                                      .quickAccessPlanColor)),
                                     ),
                                   ),
                                   SizedBox(height: 8),
@@ -439,12 +503,14 @@ class HomeScreen extends StatelessWidget {
                                         controller.selectedMealIndex.value ==
                                                 index
                                             ? colors.selectedSecondaryTabColor
-                                            : colors.unselectedSecondaryTabColor,
+                                            : colors
+                                                .unselectedSecondaryTabColor,
                                     color:
                                         controller.selectedMealIndex.value ==
                                                 index
                                             ? colors.selectedSecondaryTabColor
-                                            : colors.unselectedSecondaryTabColor,
+                                            : colors
+                                                .unselectedSecondaryTabColor,
                                     child: Center(
                                       child: Text(
                                         (index == 0
@@ -573,7 +639,9 @@ class HomeScreen extends StatelessWidget {
                                         ),
                                         decoration: BoxDecoration(
                                           color: statusColor,
-                                          borderRadius: BorderRadius.circular(8),
+                                          borderRadius: BorderRadius.circular(
+                                            8,
+                                          ),
                                         ),
                                         child: Text(
                                           mealPlan.status.name,

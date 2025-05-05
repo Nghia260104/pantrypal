@@ -180,47 +180,81 @@ class HiveManager {
     return nextId;
   }
 
-  /// Starts a periodic script to update MealPlan statuses every minute.
   static void startMealPlanStatusUpdater() {
+    // Execute the callback immediately
+    _updateMealPlanStatusAndProgress();
+
+    // Start the periodic timer
     Timer.periodic(Duration(minutes: 1), (timer) async {
-      final now = TimeOfDay.now();
-      final currentMinutes = now.hour * 60 + now.minute;
+      _updateMealPlanStatusAndProgress();
+    });
+  }
 
-      // Fetch all meal plans from the Hive database
-      final mealPlans = MealPlan.all();
+  // Helper function to update meal plan statuses and progress
+  static Future<void> _updateMealPlanStatusAndProgress() async {
+    final now = TimeOfDay.now();
+    final currentMinutes = now.hour * 60 + now.minute;
 
-      for (var mealPlan in mealPlans) {
-        final mealMinutes =
-            mealPlan.timeOfDay.hour * 60 + mealPlan.timeOfDay.minute;
-        final isBreakfastLunchDinner =
-            mealPlan.type == MealType.Breakfast ||
-            mealPlan.type == MealType.Lunch ||
-            mealPlan.type == MealType.Dinner;
+    // Fetch all meal plans from the Hive database
+    final mealPlans = MealPlan.all();
 
-        // Determine the Ongoing period
-        final ongoingDuration = isBreakfastLunchDinner ? 60 : 30;
+    // Initialize variables to track nutritional progress
+    double totalCalories = 0;
+    double totalProtein = 0;
+    double totalCarbs = 0;
+    double totalFat = 0;
 
-        if (currentMinutes < mealMinutes) {
-          // Before the meal time
-          mealPlan.status = MealStatus.Upcoming;
-        } else if (currentMinutes >= mealMinutes &&
-            currentMinutes <= mealMinutes + ongoingDuration) {
-          // Within the Ongoing period
-          mealPlan.status = MealStatus.Ongoing;
-        } else {
-          // After the Ongoing period
-          mealPlan.status = MealStatus.Completed;
-        }
+    for (var mealPlan in mealPlans) {
+      final mealMinutes =
+          mealPlan.timeOfDay.hour * 60 + mealPlan.timeOfDay.minute;
+      final isBreakfastLunchDinner =
+          mealPlan.type == MealType.Breakfast ||
+          mealPlan.type == MealType.Lunch ||
+          mealPlan.type == MealType.Dinner;
 
-        // Save the updated status to Hive
-        await mealPlan.save();
+      // Determine the Ongoing period
+      final ongoingDuration = isBreakfastLunchDinner ? 60 : 30;
+
+      if (currentMinutes < mealMinutes) {
+        // Before the meal time
+        mealPlan.status = MealStatus.Upcoming;
+      } else if (currentMinutes >= mealMinutes &&
+          currentMinutes <= mealMinutes + ongoingDuration) {
+        // Within the Ongoing period
+        mealPlan.status = MealStatus.Ongoing;
+      } else {
+        // After the Ongoing period
+        mealPlan.status = MealStatus.Completed;
       }
 
-      // Update the PlanController's mealPlans list
-      final planController = Get.find<PlanController>();
-      final homeController = Get.find<HomeController>();
-      planController.fetchMealPlans();
-      homeController.fetchMealPlans();
-    });
+      // If the meal plan is completed and is for today, add its nutritional values
+      final today = DateTime.now();
+      if (mealPlan.status == MealStatus.Completed &&
+          mealPlan.dateTime.year == today.year &&
+          mealPlan.dateTime.month == today.month &&
+          mealPlan.dateTime.day == today.day) {
+        totalCalories += mealPlan.calories;
+        totalProtein += mealPlan.protein;
+        totalCarbs += mealPlan.carbs;
+        totalFat += mealPlan.fat;
+      }
+
+      // Save the updated status to Hive
+      await mealPlan.save();
+    }
+
+    // Update the PlanController's mealPlans list
+    final planController = Get.find<PlanController>();
+    final homeController = Get.find<HomeController>();
+    planController.fetchMealPlans();
+
+    // Update the nutritional progress in PlanController
+    planController.updateNutritionalProgress(
+      totalCalories: totalCalories,
+      totalProtein: totalProtein,
+      totalCarbs: totalCarbs,
+      totalFat: totalFat,
+    );
+    homeController.fetchMealPlans();
   }
 }
