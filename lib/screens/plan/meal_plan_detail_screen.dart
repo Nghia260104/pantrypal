@@ -126,22 +126,12 @@ class MealPlanDetailScreen extends StatelessWidget {
                               ),
                             ),
                             SizedBox(height: 4),
-                            Container(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 6,
-                              ),
-                              decoration: BoxDecoration(
-                                color: colors.secondaryButtonColor,
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              child: Text(
-                                mealPlan.type.name,
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: colors.secondaryButtonContentColor,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                            Text(
+                              mealPlan.type.name,
+                              style: TextStyle(
+                                fontSize: 15,
+                                color: colors.textPrimaryColor,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
                           ],
