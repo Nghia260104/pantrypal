@@ -1,25 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pantrypal/controllers/root_controller.dart';
-import 'package:pantrypal/controllers/meal/meal_controller.dart';
 import 'package:pantrypal/core/theme/theme_colors.dart';
 import 'package:pantrypal/widgets/rounded_box.dart';
 
-class MealDetailController extends GetxController {
-  var isFavorite = false.obs;
-
-  void toggleFavorite() {
-    isFavorite.value = !isFavorite.value;
-  }
+class MealPlanDetailController extends GetxController {
 }
 
-class MealDetailScreen extends StatelessWidget {
-  final int mealId;
+class MealPlanDetailScreen extends StatelessWidget {
+  // final int mealId;
 
-  MealDetailScreen({required this.mealId});
+  // MealDetailScreen({required this.mealId});
 
-  final MealDetailController controller = Get.put(MealDetailController());
-  final MealController mealController = Get.find<MealController>();
+  final MealPlanDetailController controller = Get.put(MealPlanDetailController());
+  // final MealController mealController = Get.find<MealController>();
   final RootController rootController = Get.find<RootController>();
 
   late final meal;
@@ -29,74 +23,26 @@ class MealDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).extension<ThemeColors>()!;
-    final meal = mealController.meals.firstWhere((meal) => meal.id == mealId);
+    // final meal = mealController.meals.firstWhere((meal) => meal.id == mealId);
     // controller.setMeal(meal);
     return Scaffold(
       backgroundColor: colors.backgroundColor,
+      appBar: AppBar(
+        backgroundColor: colors.appbarColor,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () => rootController.handleBack(),
+        ),
+        title: Text(
+          "Meal Type",
+          style: TextStyle(
+            color: colors.textPrimaryColor,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
       body: Column(
         children: [
-          // Image Section
-          Stack(
-            children: [
-              Container(
-                height: 250,
-                color: Colors.grey,
-                width: double.infinity,
-              ),
-              Positioned(
-                top: 40,
-                left: 16,
-                child: GestureDetector(
-                  onTap: () => rootController.handleBack(),
-                  child: Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color:
-                          colors
-                              .secondaryButtonColor, // Semi-transparent background
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      Icons.arrow_back,
-                      color: colors.secondaryButtonContentColor,
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
-                top: 40,
-                right: 16,
-                child: Obx(() {
-                  final isFavorite =
-                      mealController.mealFavoriteStatus[mealId] ?? false;
-                  return GestureDetector(
-                    onTap:
-                        () => {
-                          // Toggle favorite status
-                          mealController.toggleMealFavorite(mealId),
-                        },
-                    child: Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: colors.secondaryButtonColor,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        isFavorite ? Icons.star : Icons.star_border,
-                        color:
-                            isFavorite
-                                ? colors.favoriteColor
-                                : colors.secondaryButtonContentColor,
-                      ),
-                    ),
-                  );
-                }),
-              ),
-            ],
-          ),
-
           // Scrollable Content Section
           Expanded(
             child: SingleChildScrollView(
@@ -104,19 +50,55 @@ class MealDetailScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Meal Title
-                  Text(
-                    meal.name,
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: colors.textPrimaryColor,
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
+                    decoration: BoxDecoration(
+                      color: colors.secondaryButtonColor,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: colors.secondaryButtonContentColor.withAlpha(
+                          50,
+                        ),
+                      ),
+                    ),
+                    width: double.infinity,
+                    child: Text(
+                      // DateFormat(
+                      //   'EEEE, MMMM d, yyyy',
+                      // ).format(controller.selectedDate.value.toLocal()),
+                      "Date",
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: colors.textPrimaryColor,
+                      ),
                     ),
                   ),
-                  SizedBox(height: 8),
-                  Text(
-                    meal.description,
-                    style: TextStyle(fontSize: 16, color: colors.hintTextColor),
+                  SizedBox(height: 16),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
+                    decoration: BoxDecoration(
+                      color: colors.secondaryButtonColor,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: colors.secondaryButtonContentColor.withAlpha(
+                          50,
+                        ),
+                      ),
+                    ),
+                    width: double.infinity,
+                    child: Text(
+                        "Time",
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: colors.secondaryButtonContentColor,
+                        ),
+                      ),
                   ),
                   SizedBox(height: 32),
 
@@ -283,7 +265,7 @@ class MealDetailScreen extends StatelessWidget {
                                           children: [
                                             Icon(
                                               Icons.access_time,
-                                              size: 18,
+                                              size: 16,
                                               color:
                                                   colors
                                                       .secondaryButtonContentColor,
@@ -350,7 +332,7 @@ class MealDetailScreen extends StatelessWidget {
                       backgroundColor: colors.dangerButtonColor,
                     ),
                     child: Text(
-                      "Delete Meal",
+                      "Delete Meal Plan",
                       style: TextStyle(
                         color: colors.dangerButtonContentColor,
                         fontSize: 20,
@@ -379,7 +361,7 @@ class MealDetailScreen extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
           ),
           title: Text(
-            'Delete Meal',
+            'Delete Meal Plan',
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
@@ -402,10 +384,10 @@ class MealDetailScreen extends StatelessWidget {
             ),
             ElevatedButton(
               onPressed: () {
-                mealController.deleteMeal(mealId);
+                // mealController.deleteMeal(mealId);
                 Navigator.of(context).pop(); // Close the modal
-                rootController
-                    .handleBack(); // Navigate back to the previous screen
+                // rootController
+                //     .handleBack(); // Navigate back to the previous screen
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor:
