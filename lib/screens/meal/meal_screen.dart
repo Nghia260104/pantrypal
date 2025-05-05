@@ -8,6 +8,7 @@ import 'package:pantrypal/screens/meal/meal_detail_screen.dart';
 import 'package:pantrypal/screens/meal/recipe_detail_screen.dart';
 import 'package:pantrypal/widgets/rounded_box.dart';
 import 'package:pantrypal/controllers/meal/meal_controller.dart';
+import 'package:pantrypal/widgets/custom_dropdown_button.dart'; // Ensure this is the correct path
 
 class MealScreen extends StatelessWidget {
   final MealController controller = Get.put(MealController());
@@ -87,10 +88,13 @@ class MealScreen extends StatelessWidget {
                 const SizedBox(height: 16),
                 Expanded(
                   child: Obx(() {
-                    if (controller.selectedTab.value != 0) {
+                    if (controller.selectedTab.value == 1) {
                       return _buildMyRecipesTab(colors);
-                    } else {
+                    } else if (controller.selectedTab.value == 0) {
                       return _buildMyMealsTab(colors);
+                    } else {
+                      return _buildMyRecipesTab(colors);
+                      // return _buildFavoritesTab(colors);
                     }
                   }),
                 ),
