@@ -6,7 +6,7 @@ import 'package:pantrypal/core/theme/theme_colors.dart';
 import 'package:pantrypal/controllers/ingredients/ingredients_controller.dart';
 
 class IngredientsScreen extends StatelessWidget {
-  final IngredientsController controller = Get.put(IngredientsController());
+  final IngredientsController controller = Get.find<IngredientsController>();
 
   @override
   Widget build(BuildContext context) {

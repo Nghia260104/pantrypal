@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 // import 'package:intl/intl.dart';
 import 'package:pantrypal/controllers/home/home_controller.dart';
+import 'package:pantrypal/controllers/ingredients/ingredients_controller.dart';
 import 'package:pantrypal/controllers/plan/plan_controller.dart';
 import 'package:pantrypal/controllers/root_controller.dart';
 import 'package:pantrypal/core/theme/theme_colors.dart';
@@ -11,6 +12,8 @@ import 'package:pantrypal/models/enums/meal_status.dart';
 
 class HomeScreen extends StatelessWidget {
   final HomeController controller = Get.put(HomeController());
+  final IngredientsController ingredientsController =
+      Get.find<IngredientsController>();
   final PlanController planController = Get.find<PlanController>();
   final RootController rootController = Get.find<RootController>();
 
@@ -308,48 +311,68 @@ class HomeScreen extends StatelessWidget {
                     SizedBox(height: 8),
                     Column(
                       children: [
-                        GestureDetector(
-                          onTap: () {
-                            // Handle onTap
-                          },
-                          child: RoundedBox(
-                            color: colors.expiredAlertColor,
-                            outlineColor: colors.expiredAlertOutlineColor,
-                            outlineStroke: 1,
-                            padding: EdgeInsets.all(14),
-                            child: Row(
-                              children: [
-                                CircleAvatar(
-                                  backgroundColor:
-                                      colors.expiredAlertOutlineColor,
-                                  child: Icon(
-                                    Icons.flatware,
-                                    color: colors.expiredAlertIconColor,
+                        Obx(() {
+                          final description =
+                              ingredientsController
+                                  .getExpiringSoonDescription();
+                          if (description == null) {
+                            return SizedBox.shrink(); // Hide the alert if no description
+                          }
+
+                          return GestureDetector(
+                            onTap: () {
+                              // Handle onTap
+                              rootController.changeTab(1);
+                            },
+                            child: RoundedBox(
+                              color: colors.expiredAlertColor,
+                              outlineColor: colors.expiredAlertOutlineColor,
+                              outlineStroke: 1,
+                              padding: EdgeInsets.all(14),
+                              child: Row(
+                                children: [
+                                  CircleAvatar(
+                                    backgroundColor:
+                                        colors.expiredAlertOutlineColor,
+                                    child: Icon(
+                                      Icons.flatware,
+                                      color: colors.expiredAlertIconColor,
+                                    ),
                                   ),
-                                ),
-                                SizedBox(width: 8),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      "Expiring Soon",
-                                      style: TextStyle(
-                                        color: colors.textPrimaryColor,
-                                        fontWeight: FontWeight.bold,
-                                      ),
+                                  SizedBox(width: 8),
+                                  Expanded(
+                                    // Allow the text to take up remaining space
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          "Expiring Soon",
+                                          style: TextStyle(
+                                            color: colors.textPrimaryColor,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        SizedBox(height: 4),
+                                        Text(
+                                          description,
+                                          style: TextStyle(
+                                            color: colors.hintTextColor,
+                                          ),
+                                          maxLines:
+                                              3, // Optional: Limit the number of lines
+                                          overflow:
+                                              TextOverflow
+                                                  .ellipsis, // Add ellipsis if text overflows
+                                        ),
+                                      ],
                                     ),
-                                    Text(
-                                      "Description for alert ",
-                                      style: TextStyle(
-                                        color: colors.hintTextColor,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                        ),
+                          );
+                        }),
                         SizedBox(height: 8),
                         GestureDetector(
                           onTap: () {

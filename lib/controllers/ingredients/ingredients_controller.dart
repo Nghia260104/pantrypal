@@ -308,4 +308,43 @@ class IngredientsController extends GetxController {
     // Clear the checked items
     checkedItems.clear();
   }
+
+  /// Get the number of expired ingredients
+  int getExpiredCount() {
+    final now = DateTime.now();
+    return items.where((item) {
+      final expirationDate = item['expirationDate'];
+      return expirationDate != null &&
+          (item['expirationDate'].difference(now).inDays <= 0);
+    }).length;
+  }
+
+  /// Get the number of ingredients about to expire (within 3 days)
+  int getAboutToExpireCount() {
+    final now = DateTime.now();
+    return items.where((item) {
+      final expirationDate = item['expirationDate'];
+      if (expirationDate == null) return false;
+      final daysLeft = expirationDate.difference(now).inDays;
+      return daysLeft > 0 && daysLeft <= 3;
+    }).length;
+  }
+
+  /// Generate the dynamic description for the "Expiring Soon" alert
+  String? getExpiringSoonDescription() {
+    final expiredCount = getExpiredCount();
+    final aboutToExpireCount = getAboutToExpireCount();
+
+    if (expiredCount == 0 && aboutToExpireCount == 0) {
+      return null; // No alert if no expired or about-to-expire items
+    }
+
+    if (expiredCount > 0 && aboutToExpireCount > 0) {
+      return "Some of your items became unedible!\nSome will suffer the same fate soon!";
+    } else if (expiredCount > 0) {
+      return "Some of your ingredients have evolved to be unedible!";
+    } else {
+      return "Act now because some of your items will turn to rot soon!";
+    }
+  }
 }

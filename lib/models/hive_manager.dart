@@ -1,7 +1,7 @@
 // lib/models/hive_manager.dart
 
 import 'package:hive_ce_flutter/hive_flutter.dart';
-import 'package:pantrypal/controllers/home/home_controller.dart';
+// import 'package:pantrypal/controllers/home/home_controller.dart';
 import 'package:pantrypal/models/meal_plan.dart';
 
 // Enums
