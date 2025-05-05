@@ -14,6 +14,7 @@ class MealController extends GetxController {
   var selectedTab = 0.obs;
   var recipeFavoriteStatus = <int, bool>{}.obs;
   var mealFavoriteStatus = <int, bool>{}.obs;
+  var selectedFilter = "Meals".obs;
 
   @override
   void onInit() {

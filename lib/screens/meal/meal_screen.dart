@@ -21,7 +21,13 @@ class MealScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: colors.appbarColor,
-        title: const Text("Meal Suggestions"),
+        title: const Text(
+          "Meal Suggestions",
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
       ),
       body: Obx(
         () => Stack(
@@ -93,8 +99,8 @@ class MealScreen extends StatelessWidget {
                     } else if (controller.selectedTab.value == 0) {
                       return _buildMyMealsTab(colors);
                     } else {
-                      return _buildMyRecipesTab(colors);
-                      // return _buildFavoritesTab(colors);
+                      // return _buildMyRecipesTab(colors);
+                      return _buildFavoritesTab(colors);
                     }
                   }),
                 ),
@@ -514,6 +520,73 @@ class MealScreen extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+
+  Widget _buildFavoritesTab(ThemeColors colors) {
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Obx(
+              () => Text(
+                '0 (Tự add data đi) item(s)',
+                style: TextStyle(
+                  fontSize: 18,
+                  color: colors.textPrimaryColor,
+                ),
+              ),
+            ),
+            CustomDropdownButton(
+              selectedValue:
+                  controller
+                      .selectedFilter, // Pass the reactive variable
+              items: [
+                "Meals",
+                "Recipes",
+              ], // Dropdown items
+              onChanged: (value) {
+                controller.selectedFilter.value =
+                    value; // Update the selected filter
+              },
+              width: 150, // Set the width of the dropdown button
+              height: 45, // Set the height of the dropdown button
+              textStyle: TextStyle(
+                fontSize: 16,
+                color: colors.hintTextColor,
+              ), // Customize text style
+              selectedText: TextStyle(
+                fontSize: 16,
+                color: colors.buttonContentColor,
+              ),
+              selectedColor: colors.buttonColor,
+              buttonColor:
+                  colors
+                      .secondaryButtonColor, // Set the button background color
+              outlineColor:
+                  colors
+                      .secondaryButtonContentColor, // Set the outline color
+              iconColor:
+                  colors
+                      .secondaryButtonContentColor, // Set the dropdown arrow color
+              outlineStroke: 0.5,
+            ),
+          ],
+        ),
+        SizedBox(height: 16),
+        Expanded(
+          child: Obx(
+            () {
+              if (controller.selectedFilter.value == "Meals") {
+                return _buildMyMealsTab(colors);
+              } else {
+                return _buildMyRecipesTab(colors);
+              }
+            },
+          ),
+        ),
+      ],
     );
   }
 }

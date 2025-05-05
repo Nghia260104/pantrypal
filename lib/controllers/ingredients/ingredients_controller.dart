@@ -30,56 +30,56 @@ class IngredientsController extends GetxController {
         InventoryItem.all(); // Retrieve all inventory items from Hive
 
     if (storedInventoryItems.isEmpty) {
-      // If no inventory items exist, initialize with sample data (optional)
-      final sampleInventory = [
-        InventoryItem(
-          id: 1,
-          template: IngredientTemplate(
-            id: 1,
-            name: 'Milk',
-            defaultUnit: 'liters',
-            proteinPerUnit: 3.4,
-            carbsPerUnit: 4.8,
-            fatPerUnit: 3.3,
-          ),
-          quantity: 2.0,
-          expirationDate: DateTime.now().add(const Duration(days: 7)),
-          dateAdded: DateTime.now(),
-        ),
-        InventoryItem(
-          id: 2,
-          template: IngredientTemplate(
-            id: 2,
-            name: 'Eggs',
-            defaultUnit: 'pieces',
-            proteinPerUnit: 6.0,
-            carbsPerUnit: 0.6,
-            fatPerUnit: 5.3,
-          ),
-          quantity: 12.0,
-          expirationDate: DateTime.now().add(const Duration(days: 14)),
-          dateAdded: DateTime.now(),
-        ),
-      ];
+      // // If no inventory items exist, initialize with sample data (optional)
+      // final sampleInventory = [
+      //   InventoryItem(
+      //     id: 1,
+      //     template: IngredientTemplate(
+      //       id: 1,
+      //       name: 'Milk',
+      //       defaultUnit: 'liters',
+      //       proteinPerUnit: 3.4,
+      //       carbsPerUnit: 4.8,
+      //       fatPerUnit: 3.3,
+      //     ),
+      //     quantity: 2.0,
+      //     expirationDate: DateTime.now().add(const Duration(days: 7)),
+      //     dateAdded: DateTime.now(),
+      //   ),
+      //   InventoryItem(
+      //     id: 2,
+      //     template: IngredientTemplate(
+      //       id: 2,
+      //       name: 'Eggs',
+      //       defaultUnit: 'pieces',
+      //       proteinPerUnit: 6.0,
+      //       carbsPerUnit: 0.6,
+      //       fatPerUnit: 5.3,
+      //     ),
+      //     quantity: 12.0,
+      //     expirationDate: DateTime.now().add(const Duration(days: 14)),
+      //     dateAdded: DateTime.now(),
+      //   ),
+      // ];
 
-      for (var inventoryItem in sampleInventory) {
-        await InventoryItem.create(
-          inventoryItem,
-        ); // Save sample inventory items to Hive
-      }
+      // for (var inventoryItem in sampleInventory) {
+      //   await InventoryItem.create(
+      //     inventoryItem,
+      //   ); // Save sample inventory items to Hive
+      // }
 
-      items.value =
-          sampleInventory.map((inventoryItem) {
-            return {
-              'id': inventoryItem.id.toString(),
-              'name': inventoryItem.template.name,
-              'quantity': inventoryItem.quantity.toString(),
-              'unit': inventoryItem.template.defaultUnit,
-              'expirationDate': inventoryItem.expirationDate,
-              'addedDate': inventoryItem.dateAdded,
-              'usebyDate': inventoryItem.expirationDate != null,
-            };
-          }).toList();
+      // items.value =
+      //     sampleInventory.map((inventoryItem) {
+      //       return {
+      //         'id': inventoryItem.id.toString(),
+      //         'name': inventoryItem.template.name,
+      //         'quantity': inventoryItem.quantity.toString(),
+      //         'unit': inventoryItem.template.defaultUnit,
+      //         'expirationDate': inventoryItem.expirationDate,
+      //         'addedDate': inventoryItem.dateAdded,
+      //         'usebyDate': inventoryItem.expirationDate != null,
+      //       };
+      //     }).toList();
     } else {
       // Load inventory items from Hive
       items.value =

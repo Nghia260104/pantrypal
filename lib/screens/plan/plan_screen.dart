@@ -118,11 +118,172 @@ class PlanScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "Daily Goals",
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: colors.textPrimaryColor,
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        // Handle edit button tap
+                        // print("Edit button tapped");
+                        controller.isEditing.value =
+                            !controller.isEditing.value;
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(8), // Padding inside the rounded box
+                        decoration: BoxDecoration(
+                          color: controller.isEditing.value ? colors.buttonColor : colors.secondaryButtonColor, // Background color
+                          borderRadius: BorderRadius.circular(50), // Fully rounded
+                          border: controller.isEditing.value ? null : Border.all(
+                            color: colors.secondaryButtonContentColor.withAlpha(50),
+                            width: 1.0,
+                          ),
+                        ),
+                        child: Icon(
+                          Icons.edit, // Edit icon
+                          size: 20,
+                          color: controller.isEditing.value ? colors.buttonContentColor : colors.secondaryButtonContentColor, // Icon color
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 16),
+                RoundedBox(
+                  padding: EdgeInsets.all(16),
+                  color: colors.mainContainerColor,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Row with "Calories" Text and TextField
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "Calories",
+                            style: TextStyle(
+                              color: colors.textPrimaryColor,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 16,
+                            ),
+                          ),
+                          Row(
+                            children: [
+                              Obx(() {
+                                return SizedBox(
+                                  width: 70, // Set a fixed width for the text field
+                                  child: TextField(
+                                    enabled: controller.isEditing.value, // Enable only if editing
+                                    keyboardType: TextInputType.number,
+                                    controller: controller.goalKcalController,
+                                    onChanged: (value) {
+                                      final intValue = int.tryParse(value) ?? 0;
+                                      if (intValue < controller.minGoalKcal) {
+                                        controller.goalKcalController.text =
+                                            controller.minGoalKcal.toString();
+                                        controller.goalKcal.value =
+                                            controller.minGoalKcal;
+                                      } else if (intValue > controller.maxGoalKcal) {
+                                        controller.goalKcalController.text =
+                                            controller.maxGoalKcal.toString();
+                                        controller.goalKcal.value =
+                                            controller.maxGoalKcal;
+                                      } else {
+                                        controller.goalKcalController.text =
+                                            intValue.toString();
+                                        controller.goalKcal.value = intValue;
+                                      }
+                                    },
+                                    decoration: InputDecoration(
+                                      isDense: true,
+                                      contentPadding: EdgeInsets.symmetric(
+                                        horizontal: 8,
+                                        vertical: 8,
+                                      ),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                        borderSide: BorderSide(
+                                          color: colors.secondaryButtonContentColor,
+                                          width: 1.0,
+                                        ),
+                                      ),
+                                      disabledBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                        borderSide: BorderSide(
+                                          color: colors.secondaryButtonContentColor.withAlpha(50),
+                                          width: 1.0,
+                                        ),
+                                      ),
+                                      enabledBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                        borderSide: BorderSide(
+                                          color: colors.secondaryButtonContentColor.withAlpha(100),
+                                          width: 1.0,
+                                        ),
+                                      ),
+                                      focusedBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                        borderSide: BorderSide(
+                                          color: colors.buttonColor,
+                                          width: 1.0,
+                                        ),
+                                      ),
+                                      fillColor: controller.isEditing.value
+                                          ? colors.secondaryButtonColor.withOpacity(0.1)
+                                          : colors.secondaryButtonColor,
+                                      filled: true,
+                                    ),
+                                    style: TextStyle(
+                                      color: colors.textPrimaryColor,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                );
+                              }),
+                              SizedBox(width: 8),
+                              Text(
+                                "kcal",
+                                style: TextStyle(
+                                  color: colors.hintTextColor,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+
+                      // Slider (Visible only when editing)
+                      Obx(() {
+                        if (!controller.isEditing.value) return SizedBox.shrink();
+                        return Slider(
+                          value: controller.goalKcal.value.toDouble(),
+                          min: controller.minGoalKcal.toDouble(),
+                          max: controller.maxGoalKcal.toDouble(),
+                          onChanged: (value) {
+                            controller.goalKcal.value = value.toInt();
+                            controller.goalKcalController.text = value.toInt().toString();
+                          },
+                          activeColor: colors.progressColor,
+                          inactiveColor: colors.backgroundColor,
+                        );
+                      }),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 16),
                 // Today's Overview
                 Text(
                   "Today's Overview",
                   style: TextStyle(
-                    fontSize: 18,
+                    fontSize: 20,
                     fontWeight: FontWeight.bold,
                     color: colors.textPrimaryColor,
                   ),
@@ -142,6 +303,7 @@ class PlanScreen extends StatelessWidget {
                             style: TextStyle(
                               color: colors.textPrimaryColor,
                               fontWeight: FontWeight.w600,
+                              fontSize: 16,
                             ),
                           ),
                           Text(

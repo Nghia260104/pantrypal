@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pantrypal/models/meal_plan.dart';
 
@@ -5,6 +6,12 @@ class PlanController extends GetxController {
   final titles = ["Meal Planner", "Goals"];
   var currentKcal = 1200.obs;
   var goalKcal = 2000.obs;
+  var isEditing = false.obs;
+
+  final minGoalKcal = 500;
+  final maxGoalKcal = 5000;
+
+  final TextEditingController goalKcalController = TextEditingController();
 
   var selectedTab = 0.obs;
 
@@ -21,6 +28,7 @@ class PlanController extends GetxController {
   void onInit() {
     super.onInit();
     fetchMealPlans(); // Fetch meal plans on initialization
+    goalKcalController.text = goalKcal.value.toString();
   }
 
   // Fetch meal plans from the Hive database
