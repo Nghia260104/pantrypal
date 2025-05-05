@@ -34,4 +34,11 @@ class PlanController extends GetxController {
   }
 
   void toggleTab(int index) => selectedTab.value = index;
+
+  void deleteMealPlan(int mealPlanId) async {
+    // mealFavoriteStatus[mealId] = false;
+    final mealPlan = mealPlans.firstWhere((m) => m.id == mealPlanId);
+    await mealPlan.delete();
+    mealPlans.removeWhere((m) => m.id == mealPlanId);
+  }
 }

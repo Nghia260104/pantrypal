@@ -5,7 +5,7 @@ import 'package:pantrypal/core/theme/theme_colors.dart';
 import 'package:pantrypal/screens/plan/add_meal_to_plan_screen.dart';
 // import 'package:pantrypal/screens/meal/create_meal_screen.dart';
 // import 'package:pantrypal/screens/meal/create_recipe_screen.dart';
-// import 'package:pantrypal/screens/meal/meal_detail_screen.dart';
+import 'package:pantrypal/screens/plan/meal_plan_detail_screen.dart';
 // import 'package:pantrypal/screens/meal/recipe_detail_screen.dart';
 // import 'package:pantrypal/models/meal_plan.dart';
 import 'package:pantrypal/widgets/rounded_box.dart';
@@ -276,78 +276,88 @@ class PlanScreen extends StatelessWidget {
                                 : colors.upcomingColor;
 
                         return [
-                          RoundedBox(
-                            padding: EdgeInsets.all(12),
-                            color: colors.mainContainerColor,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                // Left Section: Meal Details
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      // Meal Type
-                                      Text(
-                                        mealPlan.type.name,
-                                        style: TextStyle(
-                                          color: colors.textPrimaryColor,
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
+                          GestureDetector(
+                            onTap: () {
+                              // Navigate to MealPlanDetailScreen with the mealPlanId
+                              Get.to(
+                                MealPlanDetailScreen(mealPlanId: mealPlan.id),
+                                id: rootController.currentNavId.value,
+                              );
+                            },
+                            child: RoundedBox(
+                              padding: EdgeInsets.all(12),
+                              color: colors.mainContainerColor,
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  // Left Section: Meal Details
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        // Meal Type
+                                        Text(
+                                          mealPlan.type.name,
+                                          style: TextStyle(
+                                            color: colors.textPrimaryColor,
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                          ),
                                         ),
-                                      ),
-                                      SizedBox(height: 4),
+                                        SizedBox(height: 4),
 
-                                      // Time and Calories
-                                      Text(
-                                        "${mealPlan.formattedTime} • ${mealPlan.calories.round()} kcal",
-                                        style: TextStyle(
-                                          color: colors.hintTextColor,
-                                          fontSize: 14,
+                                        // Time and Calories
+                                        Text(
+                                          "${mealPlan.formattedTime} • ${mealPlan.calories.round()} kcal",
+                                          style: TextStyle(
+                                            color: colors.hintTextColor,
+                                            fontSize: 14,
+                                          ),
                                         ),
-                                      ),
-                                      SizedBox(height: 4),
+                                        SizedBox(height: 4),
 
-                                      // List of Recipe Names
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children:
-                                            mealPlan.portions.map((portion) {
-                                              return Text(
-                                                portion.recipe.name,
-                                                style: TextStyle(
-                                                  color:
-                                                      colors.textPrimaryColor,
-                                                  fontSize: 14,
-                                                ),
-                                              );
-                                            }).toList(),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-
-                                // Right Section: Status Badge
-                                Container(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                    vertical: 6,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: statusColor,
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: Text(
-                                    mealPlan.status.name,
-                                    style: TextStyle(
-                                      color: statusTextColor,
-                                      fontWeight: FontWeight.w500,
+                                        // List of Recipe Names
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children:
+                                              mealPlan.portions.map((portion) {
+                                                return Text(
+                                                  portion.recipe.name,
+                                                  style: TextStyle(
+                                                    color:
+                                                        colors.textPrimaryColor,
+                                                    fontSize: 14,
+                                                  ),
+                                                );
+                                              }).toList(),
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                ),
-                              ],
+
+                                  // Right Section: Status Badge
+                                  Container(
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: 12,
+                                      vertical: 6,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: statusColor,
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Text(
+                                      mealPlan.status.name,
+                                      style: TextStyle(
+                                        color: statusTextColor,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                           SizedBox(height: 12), // Spacing after each box
@@ -377,7 +387,7 @@ class PlanScreen extends StatelessWidget {
                   minimumSize: Size(double.infinity, 50),
                 ),
                 child: Text(
-                  "Add Meal",
+                  "Add Meal Plan",
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
