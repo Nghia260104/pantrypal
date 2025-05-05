@@ -23,10 +23,7 @@ class MealScreen extends StatelessWidget {
         backgroundColor: colors.appbarColor,
         title: const Text(
           "Meal Suggestions",
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
       ),
       body: Obx(
@@ -141,12 +138,23 @@ class MealScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildMyRecipesTab(ThemeColors colors) {
-    final list = controller.recipes;
+  Widget _buildMyRecipesTab(ThemeColors colors, {bool isFavorites = false}) {
+    // Filter the recipes list if in the Favorites tab
+    final list =
+        isFavorites
+            ? controller.recipes
+                .where(
+                  (recipe) =>
+                      controller.recipeFavoriteStatus[recipe.id] == true,
+                )
+                .toList()
+            : controller.recipes;
     if (list.isEmpty) {
       return Center(
         child: Text(
-          "No recipes available",
+          isFavorites
+              ? "No favorite recipes available"
+              : "No recipes available",
           style: TextStyle(color: colors.hintTextColor),
         ),
       );
@@ -329,19 +337,25 @@ class MealScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildMyMealsTab(ThemeColors colors) {
+  Widget _buildMyMealsTab(ThemeColors colors, {bool isFavorites = false}) {
     // final list = [];
     // if (list.isEmpty) {
     //   return Center(
     //     child: Text("No meals available", style: TextStyle(color: colors.hintTextColor)),
     //   );
     // }
-    final meals = controller.meals;
+    // Filter the meals list if in the Favorites tab
+    final meals =
+        isFavorites
+            ? controller.meals
+                .where((meal) => controller.mealFavoriteStatus[meal.id] == true)
+                .toList()
+            : controller.meals;
 
     if (meals.isEmpty) {
       return Center(
         child: Text(
-          "No meals available",
+          isFavorites ? "No favorite meals available" : "No meals available",
           style: TextStyle(color: colors.hintTextColor),
         ),
       );
@@ -528,63 +542,66 @@ class MealScreen extends StatelessWidget {
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            // Display the number of items
             Obx(
-              () => Text(
-                '0 (Tự add data đi) item(s)',
-                style: TextStyle(
-                  fontSize: 18,
-                  color: colors.textPrimaryColor,
+              () => Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Text(
+                  '${controller.getFilteredFavorites().length} item(s)',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w500,
+                    color: colors.textPrimaryColor,
+                  ),
                 ),
               ),
             ),
-            CustomDropdownButton(
-              selectedValue:
-                  controller
-                      .selectedFilter, // Pass the reactive variable
-              items: [
-                "Meals",
-                "Recipes",
-              ], // Dropdown items
-              onChanged: (value) {
-                controller.selectedFilter.value =
-                    value; // Update the selected filter
-              },
-              width: 150, // Set the width of the dropdown button
-              height: 45, // Set the height of the dropdown button
-              textStyle: TextStyle(
-                fontSize: 16,
-                color: colors.hintTextColor,
-              ), // Customize text style
-              selectedText: TextStyle(
-                fontSize: 16,
-                color: colors.buttonContentColor,
+            // Dropdown button for filter selection
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: CustomDropdownButton(
+                selectedValue:
+                    controller.selectedFilter, // Pass the reactive variable
+                items: ["Meals", "Recipes"], // Dropdown items
+                onChanged: (value) {
+                  controller.selectedFilter.value =
+                      value; // Update the selected filter
+                },
+                width: 150, // Set the width of the dropdown button
+                height: 45, // Set the height of the dropdown button
+                textStyle: TextStyle(
+                  fontSize: 16,
+                  color: colors.hintTextColor,
+                ), // Customize text style
+                selectedText: TextStyle(
+                  fontSize: 16,
+                  color: colors.buttonContentColor,
+                ),
+                selectedColor: colors.buttonColor,
+                buttonColor:
+                    colors
+                        .secondaryButtonColor, // Set the button background color
+                outlineColor:
+                    colors.secondaryButtonContentColor, // Set the outline color
+                iconColor:
+                    colors
+                        .secondaryButtonContentColor, // Set the dropdown arrow color
+                outlineStroke: 0.5,
               ),
-              selectedColor: colors.buttonColor,
-              buttonColor:
-                  colors
-                      .secondaryButtonColor, // Set the button background color
-              outlineColor:
-                  colors
-                      .secondaryButtonContentColor, // Set the outline color
-              iconColor:
-                  colors
-                      .secondaryButtonContentColor, // Set the dropdown arrow color
-              outlineStroke: 0.5,
             ),
           ],
         ),
         SizedBox(height: 16),
         Expanded(
-          child: Obx(
-            () {
-              if (controller.selectedFilter.value == "Meals") {
-                return _buildMyMealsTab(colors);
-              } else {
-                return _buildMyRecipesTab(colors);
-              }
-            },
-          ),
+          child: Obx(() {
+            if (controller.selectedFilter.value == "Meals") {
+              return _buildMyMealsTab(colors, isFavorites: true);
+            } else {
+              return _buildMyRecipesTab(colors, isFavorites: true);
+            }
+          }),
         ),
       ],
     );

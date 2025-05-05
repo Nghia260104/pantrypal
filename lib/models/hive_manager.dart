@@ -245,7 +245,7 @@ class HiveManager {
 
     // Update the PlanController's mealPlans list
     final planController = Get.find<PlanController>();
-    final homeController = Get.find<HomeController>();
+    // final homeController = Get.find<HomeController>();
     planController.fetchMealPlans();
 
     // Update the nutritional progress in PlanController
@@ -255,6 +255,6 @@ class HiveManager {
       totalCarbs: totalCarbs,
       totalFat: totalFat,
     );
-    homeController.fetchMealPlans();
+    // homeController.fetchMealPlans();
   }
 }

@@ -73,4 +73,19 @@ class MealController extends GetxController {
     await meal.delete();
     meals.removeWhere((m) => m.id == mealId);
   }
+
+  /// Get the filtered list of favorites based on the selected filter
+  List<dynamic> getFilteredFavorites() {
+    if (selectedFilter.value == "Meals") {
+      // Return only favorite meals
+      return meals
+          .where((meal) => mealFavoriteStatus[meal.id] == true)
+          .toList();
+    } else {
+      // Return only favorite recipes
+      return recipes
+          .where((recipe) => recipeFavoriteStatus[recipe.id] == true)
+          .toList();
+    }
+  }
 }

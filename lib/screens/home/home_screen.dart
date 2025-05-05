@@ -11,7 +11,7 @@ import 'package:pantrypal/models/enums/meal_status.dart';
 
 class HomeScreen extends StatelessWidget {
   final HomeController controller = Get.put(HomeController());
-  final PlanController planController = Get.put(PlanController());
+  final PlanController planController = Get.find<PlanController>();
   final RootController rootController = Get.find<RootController>();
 
   final List<Map<String, dynamic>> quickAccess = [

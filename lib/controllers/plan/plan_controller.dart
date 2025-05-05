@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pantrypal/models/meal_plan.dart';
 import 'package:pantrypal/models/nutrition_goal.dart';
-import 'package:hive_ce/hive.dart';
+import 'package:pantrypal/models/enums/meal_status.dart';
 
 class PlanController extends GetxController {
   final titles = ["Meal Planner", "Goals"];
@@ -38,8 +38,25 @@ class PlanController extends GetxController {
   }
 
   // Fetch meal plans from the Hive database
-  void fetchMealPlans() {
-    mealPlans.assignAll(MealPlan.sortByTimeOfDay(MealPlan.all()));
+  void fetchMealPlans({DateTime? date, MealStatus? status}) {
+    final today = DateTime.now();
+    final targetDate = date ?? today;
+
+    // Query meal plans dynamically based on the provided date and status
+    final queriedMealPlans =
+        MealPlan.all().where((mealPlan) {
+          final isSameDate =
+              mealPlan.dateTime.year == targetDate.year &&
+              mealPlan.dateTime.month == targetDate.month &&
+              mealPlan.dateTime.day == targetDate.day;
+
+          final matchesStatus = status == null || mealPlan.status == status;
+
+          return isSameDate && matchesStatus;
+        }).toList();
+
+    // Update the observable list with the queried meal plans
+    mealPlans.assignAll(MealPlan.sortByTimeOfDay(queriedMealPlans));
   }
 
   // Initialize the daily nutrition goal

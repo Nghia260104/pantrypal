@@ -20,25 +20,25 @@ class HomeController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    fetchMealPlans();
+    // fetchMealPlans();
 
-    planController.mealPlans.listen((mealPlans) {
-      // Update the meal plans in this controller when they change in PlanController
-      fetchMealPlans();
-    });
+    // planController.mealPlans.listen((mealPlans) {
+    //   // Update the meal plans in this controller when they change in PlanController
+    //   // fetchMealPlans();
+    // });
   }
 
-  void fetchMealPlans() {
-    mealPlans.assignAll(MealPlan.sortByTimeOfDay(MealPlan.all()));
-  }
+  // void fetchMealPlans() {
+  //   mealPlans.assignAll(MealPlan.sortByTimeOfDay(MealPlan.all()));
+  // }
 
   List<MealPlan> get filteredMealPlans {
     if (selectedMealIndex.value == 0) {
       // All meal plans
-      return mealPlans;
+      return planController.mealPlans;
     } else if (selectedMealIndex.value == 1) {
       // Upcoming (includes Ongoing)
-      return mealPlans
+      return planController.mealPlans
           .where(
             (mealPlan) =>
                 mealPlan.status == MealStatus.Upcoming ||
@@ -47,7 +47,7 @@ class HomeController extends GetxController {
           .toList();
     } else {
       // Completed
-      return mealPlans
+      return planController.mealPlans
           .where((mealPlan) => mealPlan.status == MealStatus.Completed)
           .toList();
     }
