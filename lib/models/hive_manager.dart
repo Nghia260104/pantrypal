@@ -23,9 +23,6 @@ import 'nutrition_goal.dart';
 
 // To update meal plan statuses periodically
 import 'dart:async';
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:pantrypal/controllers/plan/plan_controller.dart';
 
 class HiveManager {
   /// Call once at app startup:
@@ -65,7 +62,7 @@ class HiveManager {
     await initializeCounters();
 
     // Start the MealPlan status updater
-    startMealPlanStatusUpdater();
+    // startMealPlanStatusUpdater();
 
     // Done — now your boxes are ready to use throughout the app.
   }
@@ -180,81 +177,81 @@ class HiveManager {
     return nextId;
   }
 
-  static void startMealPlanStatusUpdater() {
-    // Execute the callback immediately
-    _updateMealPlanStatusAndProgress();
+  // static void startMealPlanStatusUpdater() {
+  //   // Execute the callback immediately
+  //   _updateMealPlanStatusAndProgress();
 
-    // Start the periodic timer
-    Timer.periodic(Duration(minutes: 1), (timer) async {
-      _updateMealPlanStatusAndProgress();
-    });
-  }
+  //   // Start the periodic timer
+  //   Timer.periodic(Duration(minutes: 1), (timer) async {
+  //     _updateMealPlanStatusAndProgress();
+  //   });
+  // }
 
-  // Helper function to update meal plan statuses and progress
-  static Future<void> _updateMealPlanStatusAndProgress() async {
-    final now = TimeOfDay.now();
-    final currentMinutes = now.hour * 60 + now.minute;
+  // // Helper function to update meal plan statuses and progress
+  // static Future<void> _updateMealPlanStatusAndProgress() async {
+  //   final now = TimeOfDay.now();
+  //   final currentMinutes = now.hour * 60 + now.minute;
 
-    // Fetch all meal plans from the Hive database
-    final mealPlans = MealPlan.all();
+  //   // Fetch all meal plans from the Hive database
+  //   final mealPlans = MealPlan.all();
 
-    // Initialize variables to track nutritional progress
-    double totalCalories = 0;
-    double totalProtein = 0;
-    double totalCarbs = 0;
-    double totalFat = 0;
+  //   // Initialize variables to track nutritional progress
+  //   double totalCalories = 0;
+  //   double totalProtein = 0;
+  //   double totalCarbs = 0;
+  //   double totalFat = 0;
 
-    for (var mealPlan in mealPlans) {
-      final mealMinutes =
-          mealPlan.timeOfDay.hour * 60 + mealPlan.timeOfDay.minute;
-      final isBreakfastLunchDinner =
-          mealPlan.type == MealType.Breakfast ||
-          mealPlan.type == MealType.Lunch ||
-          mealPlan.type == MealType.Dinner;
+  //   for (var mealPlan in mealPlans) {
+  //     final mealMinutes =
+  //         mealPlan.timeOfDay.hour * 60 + mealPlan.timeOfDay.minute;
+  //     final isBreakfastLunchDinner =
+  //         mealPlan.type == MealType.Breakfast ||
+  //         mealPlan.type == MealType.Lunch ||
+  //         mealPlan.type == MealType.Dinner;
 
-      // Determine the Ongoing period
-      final ongoingDuration = isBreakfastLunchDinner ? 60 : 30;
+  //     // Determine the Ongoing period
+  //     final ongoingDuration = isBreakfastLunchDinner ? 60 : 30;
 
-      if (currentMinutes < mealMinutes) {
-        // Before the meal time
-        mealPlan.status = MealStatus.Upcoming;
-      } else if (currentMinutes >= mealMinutes &&
-          currentMinutes <= mealMinutes + ongoingDuration) {
-        // Within the Ongoing period
-        mealPlan.status = MealStatus.Ongoing;
-      } else {
-        // After the Ongoing period
-        mealPlan.status = MealStatus.Completed;
-      }
+  //     if (currentMinutes < mealMinutes) {
+  //       // Before the meal time
+  //       mealPlan.status = MealStatus.Upcoming;
+  //     } else if (currentMinutes >= mealMinutes &&
+  //         currentMinutes <= mealMinutes + ongoingDuration) {
+  //       // Within the Ongoing period
+  //       mealPlan.status = MealStatus.Ongoing;
+  //     } else {
+  //       // After the Ongoing period
+  //       mealPlan.status = MealStatus.Completed;
+  //     }
 
-      // If the meal plan is completed and is for today, add its nutritional values
-      final today = DateTime.now();
-      if (mealPlan.status == MealStatus.Completed &&
-          mealPlan.dateTime.year == today.year &&
-          mealPlan.dateTime.month == today.month &&
-          mealPlan.dateTime.day == today.day) {
-        totalCalories += mealPlan.calories;
-        totalProtein += mealPlan.protein;
-        totalCarbs += mealPlan.carbs;
-        totalFat += mealPlan.fat;
-      }
+  //     // If the meal plan is completed and is for today, add its nutritional values
+  //     final today = DateTime.now();
+  //     if (mealPlan.status == MealStatus.Completed &&
+  //         mealPlan.dateTime.year == today.year &&
+  //         mealPlan.dateTime.month == today.month &&
+  //         mealPlan.dateTime.day == today.day) {
+  //       totalCalories += mealPlan.calories;
+  //       totalProtein += mealPlan.protein;
+  //       totalCarbs += mealPlan.carbs;
+  //       totalFat += mealPlan.fat;
+  //     }
 
-      // Save the updated status to Hive
-      await mealPlan.save();
-    }
+  //     // Save the updated status to Hive
+  //     await mealPlan.save();
+  //   }
 
-    // Update the PlanController's mealPlans list
-    final planController = Get.find<PlanController>();
-    // final homeController = Get.find<HomeController>();
-    planController.fetchMealPlans();
+  //   // Update the PlanController's mealPlans list
+  //   final planController = Get.find<PlanController>();
+  //   // final homeController = Get.find<HomeController>();
+  //   planController.fetchMealPlans();
 
-    // Update the nutritional progress in PlanController
-    planController.updateNutritionalProgress(
-      totalCalories: totalCalories,
-      totalProtein: totalProtein,
-      totalCarbs: totalCarbs,
-      totalFat: totalFat,
-    );
-    // homeController.fetchMealPlans();
-  }
+  //   // Update the nutritional progress in PlanController
+  //   planController.updateNutritionalProgress(
+  //     totalCalories: totalCalories,
+  //     totalProtein: totalProtein,
+  //     totalCarbs: totalCarbs,
+  //     totalFat: totalFat,
+  //   );
+  //   // homeController.fetchMealPlans();
+  // }
 }

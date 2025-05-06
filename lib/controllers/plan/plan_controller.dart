@@ -3,6 +3,8 @@ import 'package:get/get.dart';
 import 'package:pantrypal/models/meal_plan.dart';
 import 'package:pantrypal/models/nutrition_goal.dart';
 import 'package:pantrypal/models/enums/meal_status.dart';
+import 'package:pantrypal/models/enums/meal_type.dart';
+import 'dart:async';
 
 class PlanController extends GetxController {
   final titles = ["Meal Planner", "Goals"];
@@ -23,6 +25,7 @@ class PlanController extends GetxController {
 
   // List of meal plans
   var mealPlans = <MealPlan>[].obs;
+  Timer? _mealPlanStatusUpdater;
 
   List<Map<String, dynamic>> mealBoxes = [
     {"title": "Breakfast", "status": "Completed"},
@@ -36,6 +39,90 @@ class PlanController extends GetxController {
     fetchMealPlans(); // Fetch meal plans on initialization
     // goalKcalController.text = goalKcal.value.toString();
     _initializeDailyGoal(); // Initialize the daily nutrition goal
+    _startMealPlanStatusUpdater(); // Start the periodic updater
+  }
+
+  @override
+  void onClose() {
+    _mealPlanStatusUpdater
+        ?.cancel(); // Cancel the timer when the controller is disposed
+    super.onClose();
+  }
+
+  // Start the periodic updater for meal plan statuses and nutritional progress
+  void _startMealPlanStatusUpdater() {
+    // Execute the update immediately
+    _updateMealPlanStatusAndProgress();
+
+    // Start the periodic timer
+    _mealPlanStatusUpdater = Timer.periodic(Duration(minutes: 1), (timer) {
+      _updateMealPlanStatusAndProgress();
+    });
+  }
+
+  // Update meal plan statuses and nutritional progress
+  void _updateMealPlanStatusAndProgress() {
+    final now = TimeOfDay.now();
+    final currentMinutes = now.hour * 60 + now.minute;
+
+    // Fetch all meal plans from the Hive database
+    final mealPlans = MealPlan.all();
+
+    // Initialize variables to track nutritional progress
+    double totalCalories = 0;
+    double totalProtein = 0;
+    double totalCarbs = 0;
+    double totalFat = 0;
+
+    for (var mealPlan in mealPlans) {
+      final mealMinutes =
+          mealPlan.timeOfDay.hour * 60 + mealPlan.timeOfDay.minute;
+      final isBreakfastLunchDinner =
+          mealPlan.type == MealType.Breakfast ||
+          mealPlan.type == MealType.Lunch ||
+          mealPlan.type == MealType.Dinner;
+
+      // Determine the Ongoing period
+      final ongoingDuration = isBreakfastLunchDinner ? 60 : 30;
+
+      if (currentMinutes < mealMinutes) {
+        // Before the meal time
+        mealPlan.status = MealStatus.Upcoming;
+      } else if (currentMinutes >= mealMinutes &&
+          currentMinutes <= mealMinutes + ongoingDuration) {
+        // Within the Ongoing period
+        mealPlan.status = MealStatus.Ongoing;
+      } else {
+        // After the Ongoing period
+        mealPlan.status = MealStatus.Completed;
+      }
+
+      // If the meal plan is completed and is for today, add its nutritional values
+      final today = DateTime.now();
+      if (mealPlan.status == MealStatus.Completed &&
+          mealPlan.dateTime.year == today.year &&
+          mealPlan.dateTime.month == today.month &&
+          mealPlan.dateTime.day == today.day) {
+        totalCalories += mealPlan.calories;
+        totalProtein += mealPlan.protein;
+        totalCarbs += mealPlan.carbs;
+        totalFat += mealPlan.fat;
+      }
+
+      // Save the updated status to Hive
+      mealPlan.save();
+    }
+
+    // Update the observable list with the queried meal plans
+    fetchMealPlans();
+
+    // Update the nutritional progress
+    updateNutritionalProgress(
+      totalCalories: totalCalories,
+      totalProtein: totalProtein,
+      totalCarbs: totalCarbs,
+      totalFat: totalFat,
+    );
   }
 
   // Fetch meal plans from the Hive database
@@ -164,8 +251,6 @@ class PlanController extends GetxController {
         )
         .isEmpty;
   }
-
-
 
   List<MealPlan> filteredMealPlans(int selectedMealIndex) {
     if (selectedMealIndex == 0) {

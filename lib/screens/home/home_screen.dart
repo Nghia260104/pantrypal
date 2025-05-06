@@ -641,7 +641,10 @@ class HomeScreen extends StatelessWidget {
 
                     // Meal List
                     Obx(() {
-                      final filteredMealPlans = planController.filteredMealPlans(controller.selectedMealIndex.value);
+                      final filteredMealPlans = planController
+                          .filteredMealPlans(
+                            controller.selectedMealIndex.value,
+                          );
 
                       if (filteredMealPlans.isEmpty) {
                         return Center(
@@ -757,6 +760,7 @@ class HomeScreen extends StatelessWidget {
                             }).toList(),
                       );
                     }),
+                    SizedBox(height: 16),
                   ],
                 ),
               ),

@@ -1,10 +1,10 @@
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 // import 'package:pantrypal/models/ingredient_template.dart';
-import 'package:pantrypal/controllers/ingredients/ingredients_controller.dart';
+// import 'package:pantrypal/controllers/ingredients/ingredients_controller.dart';
 import 'package:pantrypal/models/meal_plan.dart';
-import 'package:pantrypal/models/enums/meal_status.dart';
-import 'package:pantrypal/controllers/plan/plan_controller.dart';
+// import 'package:pantrypal/models/enums/meal_status.dart';
+// import 'package:pantrypal/controllers/plan/plan_controller.dart';
 
 class HomeController extends GetxController {
   // t cần update meal plan nên phải put cái plan controller ở đây
