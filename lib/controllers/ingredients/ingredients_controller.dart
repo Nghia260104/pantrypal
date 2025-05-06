@@ -5,12 +5,13 @@ import 'package:pantrypal/models/inventory_item.dart';
 
 class IngredientsController extends GetxController {
   var selectedFilter = 'All'.obs;
-  var ingredientTemplates =
-      <IngredientTemplate>[].obs; // Observable list for ingredient templates
   var items =
       <Map<String, dynamic>>[].obs; // Observable list for inventory items
   var checkedItems = <String>{}.obs;
   var colorsList = <Color>[Colors.red, Colors.yellow, Colors.green].obs;
+  var ingredientTemplatesMap = <String, List<IngredientTemplate>>{};
+  var ingredientTemplates = <IngredientTemplate>[].obs;
+  final uniqueIngredientNames = <String>[]; // Unique ingredient names
 
   @override
   void onInit() {
@@ -21,7 +22,12 @@ class IngredientsController extends GetxController {
 
   Future<void> _loadIngredientTemplates() async {
     final templates = IngredientTemplate.all();
-    ingredientTemplates.value = templates; // Populate the observable list
+    ingredientTemplates.assignAll(templates);
+    for (var ingredient in templates) {
+      ingredientTemplatesMap.putIfAbsent(ingredient.name, () => []);
+      ingredientTemplatesMap[ingredient.name]!.add(ingredient);
+    }
+    uniqueIngredientNames.assignAll(ingredientTemplatesMap.keys.toList());
   }
 
   /// Loads ingredients from local storage or initializes with sample data.

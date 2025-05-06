@@ -11,7 +11,8 @@ import 'package:pantrypal/controllers/meal/meal_controller.dart';
 import 'package:pantrypal/widgets/custom_dropdown_button.dart'; // Ensure this is the correct path
 
 class MealScreen extends StatelessWidget {
-  final MealController controller = Get.put(MealController());
+  // final MealController controller = Get.put(MealController());
+  final MealController controller = Get.find<MealController>();
   final RootController rootController = Get.find<RootController>();
 
   @override
@@ -155,7 +156,10 @@ class MealScreen extends StatelessWidget {
           isFavorites
               ? "No favorite recipes available"
               : "No recipes available",
-          style: TextStyle(color: colors.hintTextColor),
+          style: TextStyle(
+            color: colors.hintTextColor,
+            fontSize: 16,
+          ),
         ),
       );
     }
@@ -356,7 +360,10 @@ class MealScreen extends StatelessWidget {
       return Center(
         child: Text(
           isFavorites ? "No favorite meals available" : "No meals available",
-          style: TextStyle(color: colors.hintTextColor),
+          style: TextStyle(
+            color: colors.hintTextColor,
+            fontSize: 16,
+          ),
         ),
       );
     }

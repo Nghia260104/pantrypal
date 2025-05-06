@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pantrypal/controllers/ingredients/add_ingredients_modal_controller.dart';
 import 'package:pantrypal/widgets/custom_dropdown_button.dart';
 import 'package:pantrypal/core/theme/theme_colors.dart';
 import 'package:pantrypal/controllers/ingredients/ingredients_controller.dart';
@@ -7,19 +8,8 @@ import 'package:pantrypal/models/ingredient_template.dart';
 import 'package:pantrypal/models/inventory_item.dart';
 
 class AddIngredientModal extends StatelessWidget {
-  final RxInt selectedTab =
-      0.obs; // 0 for "Add to Pantry", 1 for "Create New Type"
-  final RxString selectedIngredient = 'Choose ingredient'.obs;
-  final RxString selectedQuantity = '1'.obs;
-  final RxString selectedUnit = 'kg'.obs;
-  final Rx<DateTime?> selectedDate = Rx<DateTime?>(null);
-
-  final RxString newIngredientName = ''.obs;
-  final RxString newUnit = 'kg'.obs;
-  final RxString calories = ''.obs;
-  final RxString protein = ''.obs;
-  final RxString carbs = ''.obs;
-  final RxString fat = ''.obs;
+  final controller = Get.find<IngredientsController>();
+  final curController = Get.put(AddIngredientsModalController());
 
   @override
   Widget build(BuildContext context) {
@@ -68,12 +58,12 @@ class AddIngredientModal extends StatelessWidget {
                     children: [
                       Expanded(
                         child: GestureDetector(
-                          onTap: () => selectedTab.value = 0,
+                          onTap: () => curController.selectedTab.value = 0,
                           child: Container(
                             padding: const EdgeInsets.symmetric(vertical: 12),
                             decoration: BoxDecoration(
                               color:
-                                  selectedTab.value == 0
+                                  curController.selectedTab.value == 0
                                       ? colors.buttonColor
                                       : colors.backgroundColor,
                               borderRadius: BorderRadius.circular(8),
@@ -85,7 +75,7 @@ class AddIngredientModal extends StatelessWidget {
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
                                   color:
-                                      selectedTab.value == 0
+                                      curController.selectedTab.value == 0
                                           ? colors.buttonContentColor
                                           : colors.hintTextColor,
                                 ),
@@ -98,12 +88,12 @@ class AddIngredientModal extends StatelessWidget {
                       const SizedBox(width: 8),
                       Expanded(
                         child: GestureDetector(
-                          onTap: () => selectedTab.value = 1,
+                          onTap: () => curController.selectedTab.value = 1,
                           child: Container(
                             padding: const EdgeInsets.symmetric(vertical: 12),
                             decoration: BoxDecoration(
                               color:
-                                  selectedTab.value == 1
+                                  curController.selectedTab.value == 1
                                       ? colors.buttonColor
                                       : colors.backgroundColor,
                               borderRadius: BorderRadius.circular(8),
@@ -115,7 +105,7 @@ class AddIngredientModal extends StatelessWidget {
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
                                   color:
-                                      selectedTab.value == 1
+                                      curController.selectedTab.value == 1
                                           ? colors.buttonContentColor
                                           : colors.hintTextColor,
                                 ),
@@ -134,7 +124,7 @@ class AddIngredientModal extends StatelessWidget {
                 Flexible(
                   child: SingleChildScrollView(
                     child: Obx(() {
-                      return selectedTab.value == 0
+                      return curController.selectedTab.value == 0
                           ? _buildAddToPantryContent(context, colors)
                           : _buildAddNewTypeContent(context, colors);
                     }),
@@ -150,8 +140,6 @@ class AddIngredientModal extends StatelessWidget {
 
   // Content for "Add to Pantry" Tab
   Widget _buildAddToPantryContent(BuildContext context, ThemeColors colors) {
-    final controller = Get.find<IngredientsController>();
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -161,26 +149,25 @@ class AddIngredientModal extends StatelessWidget {
           style: TextStyle(fontSize: 16, color: colors.textPrimaryColor),
         ),
         const SizedBox(height: 8),
-        Obx(() {
-          return CustomDropdownButton(
-            selectedValue: selectedIngredient,
-            items:
-                controller.ingredientTemplates
-                    .map((template) => template.name)
-                    .toList(),
-            onChanged: (value) => selectedIngredient.value = value,
-            width: double.infinity,
-            // height: 45,
-            buttonColor: colors.secondaryButtonColor,
-            outlineColor: colors.secondaryButtonContentColor.withAlpha(50),
-            textStyle: TextStyle(fontSize: 16, color: colors.textPrimaryColor),
-            selectedColor: colors.buttonColor,
-            selectedText: TextStyle(
-              color: colors.buttonContentColor,
-              fontSize: 16,
-            ),
-          );
-        }),
+        CustomDropdownButton(
+          selectedValue: curController.selectedIngredient,
+          items:
+              // controller.ingredientTemplates
+              //     .map((template) => template.name)
+              //     .toList(),
+              controller.uniqueIngredientNames,
+          onChanged: (value) => curController.selectedIngredient.value = value,
+          width: double.infinity,
+          // height: 45,
+          buttonColor: colors.secondaryButtonColor,
+          outlineColor: colors.secondaryButtonContentColor.withAlpha(50),
+          textStyle: TextStyle(fontSize: 16, color: colors.textPrimaryColor),
+          selectedColor: colors.buttonColor,
+          selectedText: TextStyle(
+            color: colors.buttonContentColor,
+            fontSize: 16,
+          ),
+        ),
         const SizedBox(height: 16),
 
         // Quantity
@@ -204,7 +191,7 @@ class AddIngredientModal extends StatelessWidget {
                 child: TextField(
                   onChanged: (value) {
                     if (double.tryParse(value) != null) {
-                      selectedQuantity.value = value;
+                      curController.selectedQuantity.value = value;
                     }
                   },
                   keyboardType: TextInputType.numberWithOptions(decimal: true),
@@ -224,9 +211,20 @@ class AddIngredientModal extends StatelessWidget {
             SizedBox(
               width: 100,
               child: CustomDropdownButton(
-                selectedValue: selectedUnit,
-                items: ['kg', 'g', 'lb'], // Example units
-                onChanged: (value) => selectedUnit.value = value,
+                selectedValue: curController.selectedUnit,
+                selectedIndex: curController.unitIndex,
+                items: 
+                (curController.selectedIngredient.value != "Choose ingredient" &&
+                        curController.selectedIngredient.value.isNotEmpty) 
+                  ? [
+                    for (
+                      var template in controller.ingredientTemplatesMap[
+                        curController.selectedIngredient.value
+                      ]!
+                    ) template.defaultUnit
+                  ]
+                  : [], // Example units
+                onChanged: (value) => curController.selectedUnit.value = value,
                 buttonColor: colors.secondaryButtonColor,
                 outlineColor: colors.secondaryButtonContentColor.withAlpha(50),
                 textStyle: TextStyle(
@@ -236,6 +234,13 @@ class AddIngredientModal extends StatelessWidget {
                 selectedColor: colors.buttonColor,
                 selectedText: TextStyle(
                   color: colors.buttonContentColor,
+                  fontSize: 16,
+                ),
+                isEnabled:
+                    (curController.selectedIngredient.value != "Choose ingredient" &&
+                        curController.selectedIngredient.value.isNotEmpty),
+                disabledTextStyle: TextStyle(
+                  color: colors.hintTextColor,
                   fontSize: 16,
                 ),
               ),
@@ -259,7 +264,7 @@ class AddIngredientModal extends StatelessWidget {
               lastDate: DateTime(2100),
             );
             if (pickedDate != null) {
-              selectedDate.value = pickedDate;
+              curController.selectedDate.value = pickedDate;
             }
           },
           child: Container(
@@ -274,8 +279,8 @@ class AddIngredientModal extends StatelessWidget {
             width: double.infinity,
             child: Obx(() {
               return Text(
-                selectedDate.value != null
-                    ? '${selectedDate.value!.toLocal()}'.split(' ')[0]
+                curController.selectedDate.value != null
+                    ? '${curController.selectedDate.value!.toLocal()}'.split(' ')[0]
                     : 'Select Date',
                 style: TextStyle(fontSize: 16, color: colors.textPrimaryColor),
               );
@@ -289,8 +294,10 @@ class AddIngredientModal extends StatelessWidget {
           width: double.infinity,
           child: ElevatedButton(
             onPressed: () async {
-              if (selectedIngredient.value.isEmpty ||
-                  selectedQuantity.value.isEmpty) {
+              if (curController.selectedIngredient.value.isEmpty ||
+                  curController.selectedQuantity.value.isEmpty ||
+                  curController.selectedUnit.value == 'Unit' ||
+                  curController.selectedDate.value == null) {
                 Get.snackbar(
                   'Error',
                   'Please fill in all fields',
@@ -303,16 +310,18 @@ class AddIngredientModal extends StatelessWidget {
               final controller = Get.find<IngredientsController>();
 
               try {
-                final template = controller.ingredientTemplates.firstWhere(
-                  (template) => template.name == selectedIngredient.value,
-                );
+                // final template = controller.ingredientTemplates.firstWhere(
+                //   (template) => template.name == selectedIngredient.value,
+                // );
+                final template = controller.ingredientTemplatesMap[
+                  curController.selectedIngredient.value]![curController.unitIndex.value];
 
                 // Create a new inventory item
                 final newItem = InventoryItem(
                   id: 0,
                   template: template,
-                  quantity: double.parse(selectedQuantity.value),
-                  expirationDate: selectedDate.value,
+                  quantity: double.parse(curController.selectedQuantity.value),
+                  expirationDate: curController.selectedDate.value,
                   dateAdded: DateTime.now(),
                 );
 
@@ -391,7 +400,7 @@ class AddIngredientModal extends StatelessWidget {
             ),
           ),
           child: TextField(
-            onChanged: (value) => newIngredientName.value = value,
+            onChanged: (value) => curController.newIngredientName.value = value,
             decoration: InputDecoration(
               border: InputBorder.none,
               hintText: 'Enter ingredient name',
@@ -408,17 +417,23 @@ class AddIngredientModal extends StatelessWidget {
           style: TextStyle(fontSize: 16, color: colors.textPrimaryColor),
         ),
         const SizedBox(height: 8),
-        CustomDropdownButton(
-          selectedValue: newUnit,
-          items: ['kg', 'g', 'lb'], // Example units
-          onChanged: (value) => newUnit.value = value,
-          buttonColor: colors.secondaryButtonColor,
-          outlineColor: colors.secondaryButtonContentColor.withAlpha(50),
-          textStyle: TextStyle(fontSize: 16, color: colors.textPrimaryColor),
-          selectedColor: colors.buttonColor,
-          selectedText: TextStyle(
-            color: colors.buttonContentColor,
-            fontSize: 16,
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          decoration: BoxDecoration(
+            color: colors.secondaryButtonColor,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: colors.secondaryButtonContentColor.withAlpha(50),
+            ),
+          ),
+          child: TextField(
+            onChanged: (value) => curController.newUnit.value = value,
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              hintText: 'Enter your unit',
+              hintStyle: TextStyle(color: colors.hintTextColor),
+            ),
+            style: TextStyle(color: colors.textPrimaryColor),
           ),
         ),
         const SizedBox(height: 16),
@@ -450,7 +465,7 @@ class AddIngredientModal extends StatelessWidget {
                     child: TextField(
                       onChanged: (value) {
                         if (double.tryParse(value) != null) {
-                          protein.value = value;
+                          curController.protein.value = value;
                         }
                       },
                       keyboardType: TextInputType.numberWithOptions(
@@ -495,7 +510,7 @@ class AddIngredientModal extends StatelessWidget {
                     child: TextField(
                       onChanged: (value) {
                         if (double.tryParse(value) != null) {
-                          carbs.value = value;
+                          curController.carbs.value = value;
                         }
                       },
                       keyboardType: TextInputType.numberWithOptions(
@@ -537,7 +552,7 @@ class AddIngredientModal extends StatelessWidget {
           child: TextField(
             onChanged: (value) {
               if (double.tryParse(value) != null) {
-                fat.value = value;
+                curController.fat.value = value;
               }
             },
             keyboardType: TextInputType.numberWithOptions(decimal: true),
@@ -558,10 +573,10 @@ class AddIngredientModal extends StatelessWidget {
               child: ElevatedButton(
                 onPressed: () async {
                   // Validate input
-                  if (newIngredientName.value.isEmpty ||
-                      protein.value.isEmpty ||
-                      carbs.value.isEmpty ||
-                      fat.value.isEmpty) {
+                  if (curController.newIngredientName.value.isEmpty ||
+                      curController.protein.value.isEmpty ||
+                      curController.carbs.value.isEmpty ||
+                      curController.fat.value.isEmpty) {
                     Get.snackbar(
                       'Error',
                       'Please fill in all fields',
@@ -573,11 +588,11 @@ class AddIngredientModal extends StatelessWidget {
                   // Create new ingredient
                   final newIngredient = IngredientTemplate(
                     id: 0, // Unique ID
-                    name: newIngredientName.value,
-                    defaultUnit: newUnit.value,
-                    proteinPerUnit: double.parse(protein.value),
-                    carbsPerUnit: double.parse(carbs.value),
-                    fatPerUnit: double.parse(fat.value),
+                    name: curController.newIngredientName.value,
+                    defaultUnit: curController.newUnit.value,
+                    proteinPerUnit: double.parse(curController.protein.value),
+                    carbsPerUnit: double.parse(curController.carbs.value),
+                    fatPerUnit: double.parse(curController.fat.value),
                   );
 
                   // Save to Hive
@@ -587,7 +602,8 @@ class AddIngredientModal extends StatelessWidget {
 
                   // Update the controller
                   final controller = Get.find<IngredientsController>();
-                  controller.ingredientTemplates.add(
+                  controller.ingredientTemplatesMap.putIfAbsent(newIngredient.name, () => []);
+                  controller.ingredientTemplatesMap[newIngredient.name]!.add(
                     IngredientTemplate(
                       id: assignedId, // Use the assigned ID
                       name: newIngredient.name,
@@ -596,6 +612,10 @@ class AddIngredientModal extends StatelessWidget {
                       carbsPerUnit: newIngredient.carbsPerUnit,
                       fatPerUnit: newIngredient.fatPerUnit,
                     ),
+                  );
+                  controller.uniqueIngredientNames.clear();
+                  controller.uniqueIngredientNames.assignAll(
+                    controller.ingredientTemplatesMap.keys.toList()
                   );
 
                   // Close modal

@@ -10,12 +10,12 @@ class HomeController extends GetxController {
   // t cần update meal plan nên phải put cái plan controller ở đây
 
   // final PlanController planController = Get.find<PlanController>();
-  final PlanController planController = Get.put(
-    PlanController(),
-  ); // Lazy initialization
-  final IngredientsController ingredientController = Get.put(
-    IngredientsController(),
-  ); // Lazy initialization
+  // final PlanController planController = Get.put(
+  //   PlanController(),
+  // ); // Lazy initialization
+  // final IngredientsController ingredientController = Get.put(
+  //   IngredientsController(),
+  // ); // Lazy initialization
   var selectedMealIndex = 0.obs;
   var num = 1200.obs;
 
@@ -35,27 +35,6 @@ class HomeController extends GetxController {
   // void fetchMealPlans() {
   //   mealPlans.assignAll(MealPlan.sortByTimeOfDay(MealPlan.all()));
   // }
-
-  List<MealPlan> get filteredMealPlans {
-    if (selectedMealIndex.value == 0) {
-      // All meal plans
-      return planController.mealPlans;
-    } else if (selectedMealIndex.value == 1) {
-      // Upcoming (includes Ongoing)
-      return planController.mealPlans
-          .where(
-            (mealPlan) =>
-                mealPlan.status == MealStatus.Upcoming ||
-                mealPlan.status == MealStatus.Ongoing,
-          )
-          .toList();
-    } else {
-      // Completed
-      return planController.mealPlans
-          .where((mealPlan) => mealPlan.status == MealStatus.Completed)
-          .toList();
-    }
-  }
 
   String getCurrentDate() {
     final now = DateTime.now();

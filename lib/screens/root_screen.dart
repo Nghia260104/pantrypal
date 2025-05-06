@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pantrypal/controllers/home/home_controller.dart';
 import 'package:pantrypal/screens/ingredients/ingredients_screen.dart';
 import 'package:pantrypal/screens/meal/meal_screen.dart';
 // import 'package:pantrypal/screens/place_holder_screen.dart';
@@ -8,15 +9,22 @@ import 'package:pantrypal/widgets/custom_bottom_nav_bar.dart';
 import 'package:pantrypal/controllers/root_controller.dart';
 import 'package:pantrypal/screens/home/home_screen.dart';
 import 'package:pantrypal/core/theme/theme_colors.dart';
+import 'package:pantrypal/controllers/plan/plan_controller.dart';
+import 'package:pantrypal/controllers/ingredients/ingredients_controller.dart';
+import 'package:pantrypal/controllers/meal/meal_controller.dart';
 // import 'dart:io';
 // import 'package:flutter/services.dart';
 
 class RootScreen extends StatelessWidget {
-  const RootScreen({super.key});
+  // const RootScreen({super.key});
+  final controller = Get.put(RootController());
+  final HomeController homeController = Get.put(HomeController());
+  final PlanController planController = Get.put(PlanController());
+  final IngredientsController ingredientController = Get.put(IngredientsController());
+  final MealController mealController = Get.put(MealController());
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(RootController());
     final colors = Theme.of(context).extension<ThemeColors>()!;
 
     return PopScope(

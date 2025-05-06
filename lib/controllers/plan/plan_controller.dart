@@ -61,7 +61,7 @@ class PlanController extends GetxController {
   }
 
   // Initialize the daily nutrition goal
-  void _initializeDailyGoal() async {
+  void _initializeDailyGoal() {
     // Wait until the Hive box is ready
     // while (!Hive.isBoxOpen(NutritionGoal.boxName)) {
     //   await Future.delayed(Duration(milliseconds: 100));
@@ -163,5 +163,28 @@ class PlanController extends GetxController {
               mealPlan.dateTime.day == today.day,
         )
         .isEmpty;
+  }
+
+
+
+  List<MealPlan> filteredMealPlans(int selectedMealIndex) {
+    if (selectedMealIndex == 0) {
+      // All meal plans
+      return mealPlans;
+    } else if (selectedMealIndex == 1) {
+      // Upcoming (includes Ongoing)
+      return mealPlans
+          .where(
+            (mealPlan) =>
+                mealPlan.status == MealStatus.Upcoming ||
+                mealPlan.status == MealStatus.Ongoing,
+          )
+          .toList();
+    } else {
+      // Completed
+      return mealPlans
+          .where((mealPlan) => mealPlan.status == MealStatus.Completed)
+          .toList();
+    }
   }
 }

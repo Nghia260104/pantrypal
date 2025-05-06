@@ -91,6 +91,17 @@ class IngredientsScreen extends StatelessWidget {
               Expanded(
                 child: Obx(() {
                   final sections = controller.getFilteredItems();
+                  if (controller.items.isEmpty) {
+                    return Center(
+                      child: Text(
+                        'No items found',
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: colors.hintTextColor,
+                        ),
+                      ),
+                    );
+                  }
                   return ListView.builder(
                     itemCount:
                         sections.length +
@@ -104,6 +115,9 @@ class IngredientsScreen extends StatelessWidget {
                       }
 
                       final section = sections[index];
+                      if (section['items'].isEmpty) {
+                        return const SizedBox.shrink(); // Skip empty sections
+                      }
                       return Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 12),
                         child: Column(
@@ -165,6 +179,25 @@ class IngredientsScreen extends StatelessWidget {
                                                 fontWeight: FontWeight.w500,
                                                 color: colors.textPrimaryColor,
                                               ),
+                                            ),
+                                            Row(
+                                              children: [
+                                                Text(
+                                                  item['quantity'],
+                                                  style: TextStyle(
+                                                    fontSize: 16,
+                                                    color: colors.hintTextColor,
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 8),
+                                                Text(
+                                                  item['unit'],
+                                                  style: TextStyle(
+                                                    fontSize: 16,
+                                                    color: colors.hintTextColor,
+                                                  ),
+                                                ),
+                                              ],
                                             ),
                                             Text(
                                               item['status'],

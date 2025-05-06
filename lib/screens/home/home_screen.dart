@@ -11,10 +11,17 @@ import 'package:pantrypal/widgets/rounded_box.dart';
 import 'package:pantrypal/models/enums/meal_status.dart';
 
 class HomeScreen extends StatelessWidget {
-  final HomeController controller = Get.put(HomeController());
+  // final PlanController planController = Get.put(
+  //   PlanController(),
+  // );
+  final PlanController planController = Get.find<PlanController>();
+  // final HomeController controller = Get.put(HomeController());
+  final HomeController controller = Get.find<HomeController>();
+  // final IngredientsController ingredientsController = Get.put(
+  //   IngredientsController(),
+  // );
   final IngredientsController ingredientsController =
       Get.find<IngredientsController>();
-  final PlanController planController = Get.find<PlanController>();
   final RootController rootController = Get.find<RootController>();
 
   final List<Map<String, dynamic>> quickAccess = [
@@ -634,7 +641,7 @@ class HomeScreen extends StatelessWidget {
 
                     // Meal List
                     Obx(() {
-                      final filteredMealPlans = controller.filteredMealPlans;
+                      final filteredMealPlans = planController.filteredMealPlans(controller.selectedMealIndex.value);
 
                       if (filteredMealPlans.isEmpty) {
                         return Center(
