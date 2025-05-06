@@ -9,7 +9,11 @@ import 'package:pantrypal/models/inventory_item.dart';
 
 class AddIngredientModal extends StatelessWidget {
   final controller = Get.find<IngredientsController>();
-  final curController = Get.put(AddIngredientsModalController());
+  final curController = Get.find<AddIngredientsModalController>();
+
+  void closeModal(BuildContext context) {
+    Navigator.of(context).pop();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +49,7 @@ class AddIngredientModal extends StatelessWidget {
                       ),
                     ),
                     GestureDetector(
-                      onTap: () => Navigator.of(context).pop(), // Close modal
+                      onTap: () => closeModal(context), // Close modal
                       child: Icon(Icons.close, color: colors.hintTextColor),
                     ),
                   ],
@@ -156,7 +160,11 @@ class AddIngredientModal extends StatelessWidget {
               //     .map((template) => template.name)
               //     .toList(),
               controller.uniqueIngredientNames,
-          onChanged: (value) => curController.selectedIngredient.value = value,
+          onChanged: (value) {
+            curController.selectedIngredient.value = value;
+            curController.unitIndex.value = -1;
+            curController.selectedUnit.value = 'Unit';
+          },
           width: double.infinity,
           // height: 45,
           buttonColor: colors.secondaryButtonColor,
@@ -255,37 +263,53 @@ class AddIngredientModal extends StatelessWidget {
           style: TextStyle(fontSize: 16, color: colors.textPrimaryColor),
         ),
         const SizedBox(height: 8),
-        GestureDetector(
-          onTap: () async {
-            final pickedDate = await showDatePicker(
-              context: context,
-              initialDate: DateTime.now(),
-              firstDate: DateTime(2000),
-              lastDate: DateTime(2100),
-            );
-            if (pickedDate != null) {
-              curController.selectedDate.value = pickedDate;
-            }
-          },
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            decoration: BoxDecoration(
-              color: colors.secondaryButtonColor,
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(
-                color: colors.secondaryButtonContentColor.withAlpha(50),
+        Row(
+          children: [
+            Expanded(
+              child: GestureDetector(
+                onTap: () async {
+                  final pickedDate = await showDatePicker(
+                    context: context,
+                    initialDate: DateTime.now(),
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime(2100),
+                  );
+                  if (pickedDate != null) {
+                    curController.selectedDate.value = pickedDate;
+                  }
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: colors.secondaryButtonColor,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: colors.secondaryButtonContentColor.withAlpha(50),
+                    ),
+                  ),
+                  // width: double.infinity,
+                  child: Obx(() {
+                    return Text(
+                      curController.selectedDate.value != null
+                          ? '${curController.selectedDate.value!.toLocal()}'.split(' ')[0]
+                          : 'Select Date',
+                      style: TextStyle(fontSize: 16, color: colors.textPrimaryColor),
+                    );
+                  }),
+                ),
               ),
             ),
-            width: double.infinity,
-            child: Obx(() {
-              return Text(
-                curController.selectedDate.value != null
-                    ? '${curController.selectedDate.value!.toLocal()}'.split(' ')[0]
-                    : 'Select Date',
-                style: TextStyle(fontSize: 16, color: colors.textPrimaryColor),
-              );
-            }),
-          ),
+            SizedBox(width: 8),
+            GestureDetector(
+              onTap: () {
+                curController.selectedDate.value = null;
+              },
+              child: Icon(
+                Icons.clear,
+                color: colors.hintTextColor,
+              ),
+            ),
+          ],
         ),
         const SizedBox(height: 16),
 
@@ -296,8 +320,7 @@ class AddIngredientModal extends StatelessWidget {
             onPressed: () async {
               if (curController.selectedIngredient.value.isEmpty ||
                   curController.selectedQuantity.value.isEmpty ||
-                  curController.selectedUnit.value == 'Unit' ||
-                  curController.selectedDate.value == null) {
+                  curController.selectedUnit.value == 'Unit') {
                 Get.snackbar(
                   'Error',
                   'Please fill in all fields',
@@ -359,7 +382,7 @@ class AddIngredientModal extends StatelessWidget {
                 }
 
                 // Close modal
-                Navigator.of(context).pop();
+                closeModal(context);
               } catch (e) {
                 Get.snackbar(
                   'Error',
@@ -413,7 +436,7 @@ class AddIngredientModal extends StatelessWidget {
 
         // Unit Dropdown
         Text(
-          'Unit',
+          'Unit ("Unit" will be replaced with "item")',
           style: TextStyle(fontSize: 16, color: colors.textPrimaryColor),
         ),
         const SizedBox(height: 8),
@@ -427,7 +450,30 @@ class AddIngredientModal extends StatelessWidget {
             ),
           ),
           child: TextField(
-            onChanged: (value) => curController.newUnit.value = value,
+            onChanged: (value) {
+              curController.newUnit.value = value;
+              if (value.toUpperCase() == 'UNIT') {
+                curController.newUnit.value = 'item';
+                curController.unitController.text = 'item';
+                curController.unitController.selection = TextSelection.fromPosition(
+                  TextPosition(offset: curController.unitController.text.length),
+                );
+              }
+            },
+            // onSubmitted: (value) {
+            //   if (value.toUpperCase() == 'UNIT') {
+            //     curController.newUnit.value = 'item';
+            //     curController.unitController.text = 'item';
+            //   }
+            // },
+            // onEditingComplete: () {
+            //    if (curController.newUnit.value.toUpperCase() == 'UNIT') {
+            //     curController.newUnit.value = 'item';
+            //     curController.unitController.text = 'item';
+            //     print('Unit changed to item');
+            //   }
+            // },
+            controller: curController.unitController,
             decoration: InputDecoration(
               border: InputBorder.none,
               hintText: 'Enter your unit',
@@ -613,13 +659,23 @@ class AddIngredientModal extends StatelessWidget {
                       fatPerUnit: newIngredient.fatPerUnit,
                     ),
                   );
+                  controller.ingredientTemplates.add(
+                    IngredientTemplate(
+                      id: assignedId, // Use the assigned ID
+                      name: newIngredient.name,
+                      defaultUnit: newIngredient.defaultUnit,
+                      proteinPerUnit: newIngredient.proteinPerUnit,
+                      carbsPerUnit: newIngredient.carbsPerUnit,
+                      fatPerUnit: newIngredient.fatPerUnit,
+                    ),
+                  );
                   controller.uniqueIngredientNames.clear();
                   controller.uniqueIngredientNames.assignAll(
                     controller.ingredientTemplatesMap.keys.toList()
                   );
 
                   // Close modal
-                  Navigator.of(context).pop();
+                  closeModal(context);
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: colors.buttonColor,

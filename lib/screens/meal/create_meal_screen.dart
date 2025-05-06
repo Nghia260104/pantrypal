@@ -537,7 +537,7 @@ class CreateMealScreen extends StatelessWidget {
                                     ),
                                     Obx(
                                       () => Text(
-                                        "${controller.totalCalories.value.toStringAsFixed(0)} cal",
+                                        "${controller.totalCalories.value.toStringAsFixed(0)} kcal",
                                         style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.bold,

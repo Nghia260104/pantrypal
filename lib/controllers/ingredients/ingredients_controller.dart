@@ -348,7 +348,7 @@ class IngredientsController extends GetxController {
     if (expiredCount > 0 && aboutToExpireCount > 0) {
       return "Some of your items became unedible!\nSome will suffer the same fate soon!";
     } else if (expiredCount > 0) {
-      return "Some of your ingredients have evolved to be unedible!";
+      return "Some of your ingredients have evolved to be inedible!";
     } else {
       return "Act now because some of your items will turn to rot soon!";
     }

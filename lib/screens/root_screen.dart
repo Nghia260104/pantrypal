@@ -22,6 +22,7 @@ class RootScreen extends StatelessWidget {
   final PlanController planController = Get.put(PlanController());
   final IngredientsController ingredientController = Get.put(IngredientsController());
   final MealController mealController = Get.put(MealController());
+  
 
   @override
   Widget build(BuildContext context) {

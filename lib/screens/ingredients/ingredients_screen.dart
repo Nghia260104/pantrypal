@@ -4,9 +4,11 @@ import 'package:pantrypal/screens/ingredients/add_ingredient_modal.dart';
 import 'package:pantrypal/widgets/custom_dropdown_button.dart';
 import 'package:pantrypal/core/theme/theme_colors.dart';
 import 'package:pantrypal/controllers/ingredients/ingredients_controller.dart';
+import 'package:pantrypal/controllers/ingredients/add_ingredients_modal_controller.dart';
 
 class IngredientsScreen extends StatelessWidget {
   final IngredientsController controller = Get.find<IngredientsController>();
+  final internalController = Get.put(AddIngredientsModalController());
 
   @override
   Widget build(BuildContext context) {
@@ -329,6 +331,7 @@ class IngredientsScreen extends StatelessWidget {
                   FloatingActionButton(
                     onPressed: () {
                       // Handle add button press
+                      internalController.resetData();
                       showDialog(
                         context: context,
                         barrierDismissible: true,

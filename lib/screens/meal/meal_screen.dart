@@ -498,6 +498,8 @@ class MealScreen extends StatelessWidget {
                                 fontSize: 16,
                                 color: colors.hintTextColor,
                               ),
+                              maxLines: 3,
+                              overflow: TextOverflow.ellipsis,
                             ),
 
                             const SizedBox(height: 4),
