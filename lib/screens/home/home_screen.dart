@@ -446,9 +446,7 @@ class HomeScreen extends StatelessWidget {
                           if (isMealPlanEmpty)
                             GestureDetector(
                               onTap: () {
-                                rootController.changeTab(
-                                  2,
-                                ); // Navigate to Plan tab
+                                rootController.changeTab(3);
                               },
                               child: RoundedBox(
                                 color: colors.mealPrepAlertColor,
