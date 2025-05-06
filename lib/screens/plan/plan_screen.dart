@@ -95,13 +95,19 @@ class PlanScreen extends StatelessWidget {
           ),
           // const SizedBox(height: 16),
           Expanded(
-            child: Obx(() {
-              if (controller.selectedTab.value == 0) {
-                return _buildMealPlannerTab(colors);
-              } else {
-                return _buildGoalsTab(colors);
-              }
-            }),
+            child: GestureDetector(
+              onTap: () {
+                // Dismiss the keyboard when tapping outside of the text field
+                FocusScope.of(context).unfocus();
+              },
+              child: Obx(() {
+                if (controller.selectedTab.value == 0) {
+                  return _buildMealPlannerTab(colors);
+                } else {
+                  return _buildGoalsTab(colors);
+                }
+              }),
+            )
           ),
         ],
       ),

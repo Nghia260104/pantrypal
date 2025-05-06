@@ -16,7 +16,7 @@ class PlanController extends GetxController {
   var isEditing = false.obs;
   // var hasUpcomingMeals = false.obs;
   // var isMealPlanEmpty = false.obs;
-  final minGoalKcal = 500;
+  final minGoalKcal = 0;
   final maxGoalKcal = 10000;
 
   final TextEditingController goalKcalController = TextEditingController();
